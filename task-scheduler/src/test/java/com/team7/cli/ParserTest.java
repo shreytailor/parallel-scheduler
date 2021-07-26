@@ -1,15 +1,9 @@
 package com.team7.cli;
 
 import org.junit.jupiter.api.Test;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParserTest {
-
 
     /**
      * Test common case for Parser#parseCommandLineArguments method
@@ -124,6 +118,7 @@ class ParserTest {
 //        TODO: change Exception to appropriate assertion, with appropriate message
         try {
             Config config = Parser.parseCommandLineArguments(arguments);
+            fail();
         } catch (Exception e) {
             assertEquals("Flag unrecognised", e.getMessage());
         }
@@ -146,9 +141,9 @@ class ParserTest {
 //        TODO: change Exception to appropriate assertion, with appropriate message
         try {
             Config config = Parser.parseCommandLineArguments(arguments);
+            fail();
         } catch (Exception e) {
             assertEquals("No parameters specified", e.getMessage());
         }
     }
-
 }
