@@ -24,7 +24,7 @@ public class Config {
         this(1,1, false,"","");
     }
 
-    public Config(int numOfCores, int numOfProcessors, boolean isVisualised, String outputName, String inputName) {
+    public Config(int numOfProcessors, int numOfCores,  boolean isVisualised, String outputName, String inputName) {
         this.numOfCores = numOfCores;
         this.numOfProcessors = numOfProcessors;
         this.isVisualised = isVisualised;
