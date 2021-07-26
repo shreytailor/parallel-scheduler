@@ -6,7 +6,7 @@ This is the project repository for Group 7 (*The Marauders*). It consists of the
 
 | Name | UPI | GitHub Username |
 | --- | --- | --- |
-| Simon Cheng | sche987 | - |
+| Simon Cheng | sche987 | [simoncheng987](https://github.com/simoncheng987) |
 | Hajin Kim | hkim532 | [hkim532](https://github.com/hkim532) |
 | Shrey Tailor | stai259 | [shreytailor](https://github.com/shreytailor) |
 | Oscar Li | oli356 | [oscarli00](https://github.com/oscarli00) |
