@@ -8,6 +8,7 @@ public class Parser {
      * @return
      */
     public static Config parseCommandLineArguments(String[] args){
+        
 
         return null;
     }

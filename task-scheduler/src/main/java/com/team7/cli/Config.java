@@ -1,5 +1,7 @@
 package com.team7.cli;
 
+import java.util.Objects;
+
 public class Config {
     private int numOfCores;
     private boolean isVisualised;
@@ -9,11 +11,32 @@ public class Config {
     /**
      * initialise with default values, as specified in the requirement
      */
-    private Config(){
-        numOfCores = 1;
-        isVisualised = false;
+    public Config(){
+        this(1,false,"","");
     }
 
+    public Config(int numOfCores, boolean isVisualised, String outputName, String inputName) {
+        this.numOfCores = numOfCores;
+        this.isVisualised = isVisualised;
+        this.outputName = outputName;
+        this.inputName = inputName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Config config = (Config) o;
+        return numOfCores == config.numOfCores &&
+                isVisualised == config.isVisualised &&
+                Objects.equals(outputName, config.outputName) &&
+                Objects.equals(inputName, config.inputName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(numOfCores, isVisualised, outputName, inputName);
+    }
 
     public int getNumOfCores() {
         return numOfCores;
