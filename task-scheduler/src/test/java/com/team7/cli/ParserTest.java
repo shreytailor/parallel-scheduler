@@ -51,8 +51,8 @@ class ParserTest {
                 4,
                 3,
                 true,
-                "sampleInput.dot",
-                "sampleInput-output.dot");
+                "sampleInput-output.dot",
+                "sampleInput.dot");
 
 //        Then
         assertEquals(expectedConfig, config);
