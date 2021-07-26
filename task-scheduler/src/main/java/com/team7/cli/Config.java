@@ -3,7 +3,16 @@ package com.team7.cli;
 import java.util.Objects;
 
 public class Config {
+    /*
+        This is the number of cores which are used for running the scheduling algorithm.
+     */
     private int numOfCores;
+
+    /*
+        This is the number of processors on which the scheduling is done on.
+     */
+    private int numOfProcessors;
+
     private boolean isVisualised;
     private String outputName;
     private String inputName;
@@ -12,11 +21,12 @@ public class Config {
      * initialise with default values, as specified in the requirement
      */
     public Config(){
-        this(1,false,"","");
+        this(1,1, false,"","");
     }
 
-    public Config(int numOfCores, boolean isVisualised, String outputName, String inputName) {
+    public Config(int numOfCores, int numOfProcessors, boolean isVisualised, String outputName, String inputName) {
         this.numOfCores = numOfCores;
+        this.numOfProcessors = numOfProcessors;
         this.isVisualised = isVisualised;
         this.outputName = outputName;
         this.inputName = inputName;
@@ -44,6 +54,14 @@ public class Config {
 
     public void setNumOfCores(int numOfCores) {
         this.numOfCores = numOfCores;
+    }
+
+    public int getNumOfProcessors() {
+        return numOfProcessors;
+    }
+
+    public void setNumOfProcessors(int numOfProcessors) {
+        this.numOfProcessors = numOfProcessors;
     }
 
     public boolean isVisualised() {
