@@ -1,6 +1,7 @@
 ### 26 Jul
 - Consolidated WBS, Network diagram
 - Finished Gantt chart with the team
+- Wrote [meeting minutes](../minutes/26-Jul.md)
 
 ### 22 Jul
 
