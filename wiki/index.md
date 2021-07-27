@@ -6,5 +6,6 @@ It contains information about the meetings minutes, how tasks were distributed a
 
 ## Table of Contents
 
+- [Project Plan](project-plan.md)
 - [Git Conventions](git-conventions.md)
 - [Meeting Minutes](minutes/index.md)
