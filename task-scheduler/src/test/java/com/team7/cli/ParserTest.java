@@ -1,5 +1,6 @@
 package com.team7.cli;
 
+import com.team7.exceptions.CommandLineException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +17,11 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+
+        Config config = null;
+        try {
+            config = Parser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {};
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -24,7 +29,7 @@ class ParserTest {
                 "outputName.dot",
                 "sampleInput.dot");
 
-//        Then
+//      Then
         assertEquals(expectedConfig, config);
     }
 
@@ -40,7 +45,11 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+
+        Config config = null;
+        try {
+            config = Parser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {};
         Config expectedConfig = new Config(
                 4,
                 3,
@@ -63,7 +72,11 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+
+        Config config = null;
+        try {
+            config = Parser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {};
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -88,7 +101,11 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+
+        Config config = null;
+        try {
+            config = Parser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {};
         Config expectedConfig = new Config(
                 2,
                 1,
@@ -135,7 +152,7 @@ class ParserTest {
         String cliString = "";
 
 //        When
-        String[] arguments = cliString.split(" ");
+        String[] arguments = cliString.split("");
 
 //        Then
 //        TODO: change Exception to appropriate assertion, with appropriate message
@@ -143,7 +160,7 @@ class ParserTest {
             Config config = Parser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
-            assertEquals("No parameters specified", e.getMessage());
+            assertEquals("Not enough parameters specified", e.getMessage());
         }
     }
 }
