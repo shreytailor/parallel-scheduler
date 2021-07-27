@@ -1,25 +1,33 @@
 package com.team7.cli;
 
+import com.team7.exceptions.CommandLineException;
 import org.apache.commons.cli.*;
 
 public class Parser {
 
     /**
+     * This static method is used to construct a Config object from the parameters provided by
+     * the user through the command line.
      *
-     * @param args requires commandline arguments to be passed in
+     * @param args the command line arguments to be passed in.
      * @return Config object which embeds all the command line configuration.
      */
-    public static Config parseCommandLineArguments(String[] args) {
+    public static Config parseCommandLineArguments(String[] args) throws CommandLineException {
         Config config = new Config();
-
-        config.setInputName(args[0]);
-        config.setNumOfProcessors(Integer.parseInt(args[1]));
 
         // Informing the CLI framework about possible optional parameters which users can enter.
         Options options = new Options();
         options.addOption("p", "processors", true, "cores for execution in parallel (default is sequential).");
         options.addOption("v", "visualisation", false, "visualisation for the algorithm.");
         options.addOption("o", "output", true, "name for the output file.");
+
+        if (args.length <= 1) {
+            printHelp(options);
+            throw new CommandLineException("Not enough parameters specified");
+        }
+
+        config.setInputName(args[0]);
+        config.setNumOfProcessors(Integer.parseInt(args[1]));
 
         CommandLine commandLine = null;
         CommandLineParser parser = new DefaultParser();
@@ -48,12 +56,19 @@ public class Parser {
             }
 
         } catch (ParseException exception) {
-
-            // If there are any exceptions, show the documentation to the user.
-            HelpFormatter helpFormatter = new HelpFormatter();
-            helpFormatter.printHelp("Command Line Parameters", options);
+            printHelp(options);
+            throw new CommandLineException("Flag unrecognised");
         }
 
         return config;
+    }
+
+    /**
+     * This private method is used to print the command line help.
+     * @param options the options for the command line.
+     */
+    private static void printHelp(Options options) {
+        HelpFormatter helpFormatter = new HelpFormatter();
+        helpFormatter.printHelp("Command Line Parameters", options);
     }
 }
