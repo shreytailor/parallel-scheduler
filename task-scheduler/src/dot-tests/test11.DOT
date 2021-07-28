@@ -1,6 +1,0 @@
-
-
-digraph test{
-a [Weight=1]
-b [Wright=1]
-a -> b [Weight=1]}
