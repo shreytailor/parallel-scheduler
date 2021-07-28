@@ -9,6 +9,7 @@ import java.util.*;
 public class Scheduler {
 
     public Schedule AStar(List<Node> nodes, int numProcessors) {
+        //note: using a regular queue for now since we are doing brute force
         Queue<Schedule> scheduleQueue = new LinkedList<>();
 
         //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
@@ -16,7 +17,7 @@ public class Scheduler {
             if (n.getIngoingEdges().size() == 0) {
                 for (int i = 0; i < numProcessors; i++) {
                     Schedule s = new Schedule();
-                    s.addTask(n, i, 0 , n.getWeight());
+                    s.addTask(n, i, 0, n.getWeight());
                     scheduleQueue.add(s);
                 }
             }
@@ -25,7 +26,7 @@ public class Scheduler {
         Schedule optimalSchedule = null;
         while (scheduleQueue.size() != 0) {
             Schedule s = scheduleQueue.poll();
-            
+
             //Check if the schedule is complete
             if (s.getNumberOfTasks() == nodes.size()) {
                 if (optimalSchedule == null || s.getOverallFinishTime() < optimalSchedule.getOverallFinishTime()) {
@@ -53,18 +54,20 @@ public class Scheduler {
 
                 //Creating new schedules for all the new tasks that can be completed
                 for (Node n : canBegin) {
-                    for (int i=0;i<numProcessors;i++) {
+                    for (int i = 0; i < numProcessors; i++) {
                         Schedule newSchedule = s.clone();
-                        int earliestStartTime=0;
+                        //note: might have to also check the current finish time of processor i from the newSchedule
+                        int earliestStartTime = 0;
                         for (Edge e : n.getIngoingEdges()) {
                             int finishTime = newSchedule.getTaskFinishTime(e.getTail());
-                            if (finishedTasks.get(e.getTail())==i) {
-                                earliestStartTime = Math.max(earliestStartTime,finishTime);
+
+                            if (finishedTasks.get(e.getTail()) == i) {
+                                earliestStartTime = Math.max(earliestStartTime, finishTime);
                             } else {
-                                earliestStartTime = Math.max(earliestStartTime,finishTime+e.getTail().getWeight());
+                                earliestStartTime = Math.max(earliestStartTime, finishTime + e.getTail().getWeight());
                             }
                         }
-                        newSchedule.addTask(n,i,earliestStartTime,earliestStartTime+n.getWeight());
+                        newSchedule.addTask(n, i, earliestStartTime, earliestStartTime + n.getWeight());
                         scheduleQueue.add(newSchedule);
                     }
                 }
