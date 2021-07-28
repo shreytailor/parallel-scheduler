@@ -8,6 +8,10 @@
 
 ### 22 Jul
 
-- Discussed about the project requirement with the team member and collaborated in the making of WBS and Network Diagram
-- Wrote [meeting minutes](../minutes/22-Jul.md)
+- Discussed about the project requirement with the team member and collaborated with others in the making of WBS and Network Diagram
+- Organised wiki structure (minutes, work log), and wrote [meeting minutes](../minutes/22-Jul.md) 
+- A research into a suitable algorithm is in the process, where I would initially want to understand [Oliver Sinnen's paper](https://www.sciencedirect.com/science/article/pii/S0305054813002542?fbclid=IwAR34tKob8V73ri4qL_I9PzJsxBY6pRtJBb9p9BU3K9NPu17-C4UdpLRiWNg)
+  - A part of this is A* algorithm
+    - this was good for intuition of : https://www.youtube.com/watch?v=ySN5Wnu88nE 
+    - this was good for pseudocode: https://www.youtube.com/watch?v=-L-WgKMFuhE 
 

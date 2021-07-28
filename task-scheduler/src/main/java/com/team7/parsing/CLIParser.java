@@ -1,9 +1,9 @@
-package com.team7.cli;
+package com.team7.parsing;
 
 import com.team7.exceptions.CommandLineException;
 import org.apache.commons.cli.*;
 
-public class Parser {
+public class CLIParser {
 
     /**
      * This static method is used to construct a Config object from the parameters provided by

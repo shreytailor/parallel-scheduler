@@ -1,4 +1,4 @@
-package com.team7.cli;
+package com.team7.parsing;
 
 import com.team7.exceptions.CommandLineException;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-
-        Config config = null;
-        try {
-            config = Parser.parseCommandLineArguments(arguments);
-        } catch (CommandLineException exception) {};
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -45,11 +41,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-
-        Config config = null;
-        try {
-            config = Parser.parseCommandLineArguments(arguments);
-        } catch (CommandLineException exception) {};
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 4,
                 3,
@@ -72,11 +64,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-
-        Config config = null;
-        try {
-            config = Parser.parseCommandLineArguments(arguments);
-        } catch (CommandLineException exception) {};
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -101,11 +89,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-
-        Config config = null;
-        try {
-            config = Parser.parseCommandLineArguments(arguments);
-        } catch (CommandLineException exception) {};
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 2,
                 1,
@@ -134,7 +118,7 @@ class ParserTest {
 //        Then
 //        TODO: change Exception to appropriate assertion, with appropriate message
         try {
-            Config config = Parser.parseCommandLineArguments(arguments);
+            Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
             assertEquals("Flag unrecognised", e.getMessage());
@@ -157,7 +141,7 @@ class ParserTest {
 //        Then
 //        TODO: change Exception to appropriate assertion, with appropriate message
         try {
-            Config config = Parser.parseCommandLineArguments(arguments);
+            Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
             assertEquals("Not enough parameters specified", e.getMessage());
