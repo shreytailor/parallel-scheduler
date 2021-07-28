@@ -1,3 +1,14 @@
+### 28 Jul
+- Reviewed Oscar's implementation of brute force algorithm
+- Refactored the A star algorithm into several methods for testability and readability. Added comments to assist other group members' understanding.
+- Created JUnit5 tests for testing the validity of the schedule produced by the above brute force algorithm. There are two constraints to be accounted for - Processor and Precedence constraints. Only Processor constraints have been tested so far. 
+- Implemented [TestFactory](https://www.baeldung.com/junit5-dynamic-tests) that creates test cases dynamically for each dot files Simon and Shrey have created.
+- Suggested fix for a recursive call between classes in execution of hashCode/toString/Equals that caused Stack Overflow Exception.
+
+### 27 Jul
+- Discussed the algorithm with team members, referring to several papers
+- Wrote pseudocode for the A star algorithm
+
 ### 26 Jul
 - Consolidated WBS, Network diagram
 - Finished Gantt chart with the team
@@ -11,7 +22,7 @@
 - Discussed about the project requirement with the team member and collaborated with others in the making of WBS and Network Diagram
 - Organised wiki structure (minutes, work log), and wrote [meeting minutes](../minutes/22-Jul.md) 
 - A research into a suitable algorithm is in the process, where I would initially want to understand [Oliver Sinnen's paper](https://www.sciencedirect.com/science/article/pii/S0305054813002542?fbclid=IwAR34tKob8V73ri4qL_I9PzJsxBY6pRtJBb9p9BU3K9NPu17-C4UdpLRiWNg)
-  - A part of this is A* algorithm
-    - this was good for intuition of : https://www.youtube.com/watch?v=ySN5Wnu88nE 
-    - this was good for pseudocode: https://www.youtube.com/watch?v=-L-WgKMFuhE 
+  - One of this this is A* algorithm
+  - [This](https://www.youtube.com/watch?v=ySN5Wnu88nE) helped me with intuition
+  - [This](https://www.youtube.com/watch?v=-L-WgKMFuhE) helped me with formulating pseudocode
 

@@ -5,7 +5,6 @@ import com.paypal.digraph.parser.GraphNode;
 import com.paypal.digraph.parser.GraphParser;
 import com.team7.model.Edge;
 import com.team7.model.Task;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -15,11 +14,11 @@ import java.util.Map;
 
 public class DOTParser {
     private List<Edge> edges;
-    private Map<String, Task> nodes;
+    private Map<String, Task> tasks;
 
     public DOTParser() {
         edges = new ArrayList<>();
-        nodes = new HashMap<>();
+        tasks = new HashMap<>();
     }
 
     public void parse(String filename) throws FileNotFoundException {
@@ -30,19 +29,27 @@ public class DOTParser {
         for (GraphNode n : nodeMap.values()) {
             String name = n.getId();
             int weight = Integer.parseInt((String) n.getAttribute("Weight"));
-            nodes.put(name, new Task(name, weight));
+            tasks.put(name, new Task(name, weight));
         }
 
         for (GraphEdge e : edgeMap.values()) {
             String headName = e.getNode2().getId();
-            Task head = nodes.get(headName);
+            Task head = tasks.get(headName);
             String tailName = e.getNode1().getId();
-            Task tail = nodes.get(tailName);
+            Task tail = tasks.get(tailName);
             int weight = Integer.parseInt((String) e.getAttribute("Weight"));
             Edge edge = new Edge(head,tail,weight);
             head.addIngoingEdge(edge);
             tail.addOutgoingEdge(edge);
             edges.add(edge);
         }
+    }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    public Map<String, Task> getTasks() {
+        return tasks;
     }
 }

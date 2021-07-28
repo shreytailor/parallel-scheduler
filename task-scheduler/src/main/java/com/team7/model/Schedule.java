@@ -1,5 +1,6 @@
 package com.team7.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,5 +60,27 @@ public class Schedule {
 
     public Schedule clone() {
         return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
+    }
+
+    public <T,S> String mapToString(Map<T,S> map){
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<T, S> e : map.entrySet()) {
+            sb.append("\t\t"+e.getKey()+" : "+e.getValue()+"\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+
+
+
+        return "Schedule{" +
+                "\n\ttaskProcessorMap=\n" + mapToString(taskProcessorMap) +
+                "\n\ttaskStartTimeMap=\n" + mapToString(taskStartTimeMap) +
+                "\n\ttaskFinishTimeMap=\n" + mapToString(taskFinishTimeMap) +
+                "\n\tprocessorFinishTimes=" + Arrays.toString(processorFinishTimes) +
+                "\n\tfinishTime=" + finishTime +
+                "\n\n}";
     }
 }
