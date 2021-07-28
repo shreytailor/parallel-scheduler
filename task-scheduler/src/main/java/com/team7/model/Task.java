@@ -3,15 +3,15 @@ package com.team7.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+public class Task {
     private String name;
-    private int nodeWeight;
+    private int weight;
     private List<Edge> inEdges;
     private List<Edge> outEdges;
 
-    public Node(String name, int weight) {
-        this.name=name;
-        this.nodeWeight=weight;
+    public Task(String name, int weight) {
+        this.name = name;
+        this.weight = weight;
         inEdges = new ArrayList<>();
         outEdges = new ArrayList<>();
     }
@@ -22,5 +22,17 @@ public class Node {
 
     public void addOutgoingEdge(Edge e) {
         outEdges.add(e);
+    }
+
+    public List<Edge> getIngoingEdges() {
+        return inEdges;
+    }
+
+    public List<Edge> getOutgoingEdges() {
+        return outEdges;
+    }
+
+    public int getWeight() {
+        return weight;
     }
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class DOTParser {
     private List<Edge> edges;
-    private Map<String,Node> nodes;
+    private Map<String, Task> nodes;
 
     public DOTParser() {
         edges = new ArrayList<>();
@@ -28,14 +28,14 @@ public class DOTParser {
         for (GraphNode n : nodeMap.values()) {
             String name = n.getId();
             int weight = Integer.parseInt((String) n.getAttribute("Weight"));
-            nodes.put(name, new Node(name, weight));
+            nodes.put(name, new Task(name, weight));
         }
 
         for (GraphEdge e : edgeMap.values()) {
             String headName = e.getNode2().getId();
-            Node head = nodes.get(headName);
+            Task head = nodes.get(headName);
             String tailName = e.getNode1().getId();
-            Node tail = nodes.get(tailName);
+            Task tail = nodes.get(tailName);
             int weight = Integer.parseInt((String) e.getAttribute("Weight"));
             Edge edge = new Edge(head,tail,weight);
             head.addIngoingEdge(edge);
