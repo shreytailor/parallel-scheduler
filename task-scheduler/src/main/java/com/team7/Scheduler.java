@@ -16,7 +16,7 @@ public class Scheduler {
         for (Node n : nodes) {
             if (n.getIngoingEdges().size() == 0) {
                 for (int i = 0; i < numProcessors; i++) {
-                    Schedule s = new Schedule();
+                    Schedule s = new Schedule(numProcessors);
                     s.addTask(n, i, 0, n.getWeight());
                     scheduleQueue.add(s);
                 }
@@ -56,8 +56,7 @@ public class Scheduler {
                 for (Node n : canBegin) {
                     for (int i = 0; i < numProcessors; i++) {
                         Schedule newSchedule = s.clone();
-                        //note: might have to also check the current finish time of processor i from the newSchedule
-                        int earliestStartTime = 0;
+                        int earliestStartTime = newSchedule.getProcessorFinishTime(i);
                         for (Edge e : n.getIngoingEdges()) {
                             int finishTime = newSchedule.getTaskFinishTime(e.getTail());
                             if (finishedTasks.get(e.getTail()) == i) {
