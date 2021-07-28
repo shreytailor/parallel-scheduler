@@ -52,4 +52,14 @@ public class Task {
     public int hashCode() {
         return Objects.hash(name, weight, inEdges, outEdges);
     }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "name='" + name + '\'' +
+                ", weight=" + weight +
+                ", inEdges=" + inEdges +
+                ", outEdges=" + outEdges +
+                '}';
+    }
 }

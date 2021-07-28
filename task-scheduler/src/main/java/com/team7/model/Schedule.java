@@ -1,5 +1,6 @@
 package com.team7.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,5 +60,16 @@ public class Schedule {
 
     public Schedule clone() {
         return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
+    }
+
+    @Override
+    public String toString() {
+        return "Schedule{" +
+                "taskProcessorMap=" + taskProcessorMap +
+                ", taskStartTimeMap=" + taskStartTimeMap +
+                ", taskFinishTimeMap=" + taskFinishTimeMap +
+                ", processorFinishTimes=" + Arrays.toString(processorFinishTimes) +
+                ", finishTime=" + finishTime +
+                '}';
     }
 }
