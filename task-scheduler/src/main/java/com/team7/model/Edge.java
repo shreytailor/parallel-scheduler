@@ -18,4 +18,8 @@ public class Edge {
     public Node getHead() {
         return head;
     }
+
+    public int getWeight() {
+        return edgeWeight;
+    }
 }

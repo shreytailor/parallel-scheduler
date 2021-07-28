@@ -60,11 +60,10 @@ public class Scheduler {
                         int earliestStartTime = 0;
                         for (Edge e : n.getIngoingEdges()) {
                             int finishTime = newSchedule.getTaskFinishTime(e.getTail());
-
                             if (finishedTasks.get(e.getTail()) == i) {
                                 earliestStartTime = Math.max(earliestStartTime, finishTime);
                             } else {
-                                earliestStartTime = Math.max(earliestStartTime, finishTime + e.getTail().getWeight());
+                                earliestStartTime = Math.max(earliestStartTime, finishTime + e.getWeight());
                             }
                         }
                         newSchedule.addTask(n, i, earliestStartTime, earliestStartTime + n.getWeight());
