@@ -10,6 +10,8 @@ public class Scheduler {
 
     public Schedule AStar(List<Node> nodes, int numProcessors) {
         Queue<Schedule> scheduleQueue = new LinkedList<>();
+
+        //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
         for (Node n : nodes) {
             if (n.getIngoingEdges().size() == 0) {
                 for (int i = 0; i < numProcessors; i++) {
@@ -19,16 +21,21 @@ public class Scheduler {
                 }
             }
         }
+
         Schedule optimalSchedule = null;
         while (scheduleQueue.size() != 0) {
             Schedule s = scheduleQueue.poll();
+            
+            //Check if the schedule is complete
             if (s.getNumberOfTasks() == nodes.size()) {
                 if (optimalSchedule == null || s.getOverallFinishTime() < optimalSchedule.getOverallFinishTime()) {
                     optimalSchedule = s;
                 }
             } else {
                 Map<Node, Integer> finishedTasks = s.getTaskProcessorMap();
-                List<Node> canComplete = new ArrayList<>();
+                List<Node> canBegin = new ArrayList<>();
+
+                //Checking which tasks can be started
                 for (Node n : nodes) {
                     if (!finishedTasks.containsKey(n)) {
                         boolean able = true;
@@ -39,11 +46,13 @@ public class Scheduler {
                             }
                         }
                         if (able) {
-                            canComplete.add(n);
+                            canBegin.add(n);
                         }
                     }
                 }
-                for (Node n : canComplete) {
+
+                //Creating new schedules for all the new tasks that can be completed
+                for (Node n : canBegin) {
                     for (int i=0;i<numProcessors;i++) {
                         Schedule newSchedule = s.clone();
                         int earliestStartTime=0;
