@@ -4,40 +4,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Schedule {
-    Map<Node, Integer> taskProcessorMap;
-    Map<Node, Integer> taskStarttimeMap;
-    Map<Node, Integer> taskFinishtimeMap;
-    int[] processorFinishtimes;
+    Map<Task, Integer> taskProcessorMap;
+    Map<Task, Integer> taskStartTimeMap;
+    Map<Task, Integer> taskFinishTimeMap;
+    int[] processorFinishTimes;
     int finishTime;
 
     public Schedule(int numProcessors) {
         taskProcessorMap = new HashMap<>();
-        taskStarttimeMap = new HashMap<>();
-        taskFinishtimeMap = new HashMap<>();
-        processorFinishtimes = new int[numProcessors];
+        taskStartTimeMap = new HashMap<>();
+        taskFinishTimeMap = new HashMap<>();
+        processorFinishTimes = new int[numProcessors];
         finishTime = 0;
     }
 
-    public Schedule(Map<Node, Integer> taskProcessorMap, Map<Node, Integer> taskStarttimeMap, Map<Node, Integer> taskFinishtimeMap, int[] processorFinishtimes, int finishTime) {
+    public Schedule(Map<Task, Integer> taskProcessorMap, Map<Task, Integer> taskStartTimeMap, Map<Task, Integer> taskFinishTimeMap, int[] processorFinishTimes, int finishTime) {
         this.taskProcessorMap = taskProcessorMap;
-        this.taskStarttimeMap = taskStarttimeMap;
-        this.taskFinishtimeMap = taskFinishtimeMap;
-        this.processorFinishtimes = processorFinishtimes;
+        this.taskStartTimeMap = taskStartTimeMap;
+        this.taskFinishTimeMap = taskFinishTimeMap;
+        this.processorFinishTimes = processorFinishTimes;
         this.finishTime=finishTime;
     }
 
-    public void addTask(Node n, int processor, int startTime, int finishTime) {
+    public void addTask(Task n, int processor, int startTime, int finishTime) {
         taskProcessorMap.put(n, processor);
-        taskStarttimeMap.put(n, startTime);
-        taskFinishtimeMap.put(n, finishTime);
-        if (processorFinishtimes[processor]>startTime) {
+        taskStartTimeMap.put(n, startTime);
+        taskFinishTimeMap.put(n, finishTime);
+        if (processorFinishTimes[processor]>startTime) {
             throw new RuntimeException("Something went wrong");
         }
-        processorFinishtimes[processor] = finishTime;
+        processorFinishTimes[processor] = finishTime;
         this.finishTime = Math.max(this.finishTime,finishTime);
     }
 
-    public Map<Node, Integer> getTaskProcessorMap() {
+    public Map<Task, Integer> getTaskProcessorMap() {
         return taskProcessorMap;
     }
 
@@ -45,12 +45,12 @@ public class Schedule {
         return taskProcessorMap.size();
     }
 
-    public int getTaskFinishTime(Node n) {
-        return taskFinishtimeMap.get(n);
+    public int getTaskFinishTime(Task n) {
+        return taskFinishTimeMap.get(n);
     }
 
     public int getProcessorFinishTime(int processor) {
-        return processorFinishtimes[processor];
+        return processorFinishTimes[processor];
     }
 
     public int getOverallFinishTime() {
@@ -58,6 +58,6 @@ public class Schedule {
     }
 
     public Schedule clone() {
-        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStarttimeMap), new HashMap<>(taskFinishtimeMap), processorFinishtimes.clone(), finishTime);
+        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
     }
 }
