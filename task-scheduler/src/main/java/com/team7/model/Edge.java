@@ -43,8 +43,8 @@ public class Edge {
     @Override
     public String toString() {
         return "Edge{" +
-                "head=" + head +
-                ", tail=" + tail +
+                "head=" + head.getName() +
+                ", tail=" + tail.getName() +
                 ", edgeWeight=" + edgeWeight +
                 '}';
     }

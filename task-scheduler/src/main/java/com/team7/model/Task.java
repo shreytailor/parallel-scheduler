@@ -37,6 +37,10 @@ public class Task {
         return weight;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,11 +53,6 @@ public class Task {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(name, weight, inEdges, outEdges);
-    }
-
-    @Override
     public String toString() {
         return "Task{" +
                 "name='" + name + '\'' +
@@ -62,4 +61,13 @@ public class Task {
                 ", outEdges=" + outEdges +
                 '}';
     }
+
+    /**
+     * removed, since it causes recursive call with Edge class
+     */
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(name, weight, inEdges, outEdges);
+//    }
+
 }
