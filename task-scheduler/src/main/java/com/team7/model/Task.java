@@ -17,6 +17,10 @@ public class Task {
         outEdges = new ArrayList<>();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void addIngoingEdge(Edge e) {
         inEdges.add(e);
     }
@@ -37,19 +41,18 @@ public class Task {
         return weight;
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return name.equals(task.name) &&
-                weight == task.weight &&
-                inEdges.equals(task.inEdges) &&
-                outEdges.equals(task.outEdges);
+                weight == task.weight;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, weight);
     }
 
     @Override
@@ -61,13 +64,4 @@ public class Task {
                 ", outEdges=" + outEdges +
                 '}';
     }
-
-    /**
-     * removed, since it causes recursive call with Edge class
-     */
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(name, weight, inEdges, outEdges);
-//    }
-
 }
