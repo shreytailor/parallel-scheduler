@@ -1,3 +1,0 @@
-digraph "digraphOne" {
-    a   [Weight=2];
-}
