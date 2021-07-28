@@ -1,8 +1,10 @@
-package com.team7.model;
+package com.team7.parsing;
 
 import com.paypal.digraph.parser.GraphEdge;
 import com.paypal.digraph.parser.GraphNode;
 import com.paypal.digraph.parser.GraphParser;
+import com.team7.model.Edge;
+import com.team7.model.Task;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
