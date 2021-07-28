@@ -4,9 +4,12 @@ import com.paypal.digraph.parser.GraphEdge;
 import com.paypal.digraph.parser.GraphNode;
 import com.paypal.digraph.parser.GraphParser;
 import com.team7.model.Edge;
+import com.team7.model.Schedule;
 import com.team7.model.Task;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +24,7 @@ public class DOTParser {
         tasks = new HashMap<>();
     }
 
-    public void parse(String filename) throws FileNotFoundException {
+    public void read(String filename) throws FileNotFoundException {
         GraphParser parser = new GraphParser(new FileInputStream(filename));
         Map<String, GraphNode> nodeMap = parser.getNodes();
         Map<String, GraphEdge> edgeMap = parser.getEdges();
@@ -42,6 +45,21 @@ public class DOTParser {
             head.addIngoingEdge(edge);
             tail.addOutgoingEdge(edge);
             edges.add(edge);
+        }
+    }
+
+    public void write(String path, Schedule schedule, List<Edge> edges) {
+        try (FileWriter writer = new FileWriter(path)) {
+            writer.write("digraph output {\n");
+            for (Task t : schedule.getTaskProcessorMap().keySet()) {
+                writer.append(t.getName() + " [Weight=" + t.getWeight()+",Start=" + schedule.getTaskStartTime(t) +",Processor="+schedule.getTaskProcessor(t)+"];\n");
+            }
+            for (Edge e : edges) {
+                writer.append(e.getTail().getName() + " -> " +e.getHead().getName() + "[Weight="+e.getWeight()+"];\n");
+            }
+            writer.append("}");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

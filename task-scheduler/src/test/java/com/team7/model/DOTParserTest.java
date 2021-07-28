@@ -17,7 +17,7 @@ public class DOTParserTest {
     public void testDotParser_twoNodesOneEdgeInBetween() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test0.dot");
+        dotParser.read(testDir + "test0.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -43,7 +43,7 @@ public class DOTParserTest {
     public void testDotParser_twoNodesNoEdges() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test1.dot");
+        dotParser.read(testDir + "test1.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -67,7 +67,7 @@ public class DOTParserTest {
     public void testDotParser_threeNodesCircularDirectedGraph() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test2.dot");
+        dotParser.read(testDir + "test2.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -100,7 +100,7 @@ public class DOTParserTest {
     public void testDotParser_threeNodesAllConnectedWithARoot() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test3.dot");
+        dotParser.read(testDir + "test3.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -130,7 +130,7 @@ public class DOTParserTest {
     public void testDotParser_threeNodesWithTwoConnectedNodes() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test4.dot");
+        dotParser.read(testDir + "test4.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -158,7 +158,7 @@ public class DOTParserTest {
     public void testDotParser_emptyGraph() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test5.dot");
+        dotParser.read(testDir + "test5.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -179,7 +179,7 @@ public class DOTParserTest {
     public void testDotParser_oneNodeNoEdges() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test6.dot");
+        dotParser.read(testDir + "test6.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -201,7 +201,7 @@ public class DOTParserTest {
     public void testDotParser_oneNodeWithEdgeToItself() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "test7.dot");
+        dotParser.read(testDir + "test7.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
@@ -225,7 +225,7 @@ public class DOTParserTest {
     public void testDotParser_complexFeasibleDirectedGraph() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.parse(testDir + "testComplex.dot");
+        dotParser.read(testDir + "testComplex.dot");
 
         // When
         List<Edge> actualEdges = dotParser.getEdges();
