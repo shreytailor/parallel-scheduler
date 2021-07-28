@@ -42,6 +42,10 @@ public class Schedule {
         return taskProcessorMap;
     }
 
+    public Map<Task, Integer> getTaskStartTimeMap() {
+        return taskStartTimeMap;
+    }
+
     public int getNumberOfTasks() {
         return taskProcessorMap.size();
     }

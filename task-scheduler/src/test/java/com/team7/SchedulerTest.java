@@ -4,6 +4,7 @@ import com.team7.model.Edge;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.DOTParser;
+import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -77,13 +78,14 @@ class SchedulerTest {
 
 //        When
         Schedule result = scheduler.AStar(tasks, numProcessors);
+        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
 
-//        Then
-//        TODO: precedence/dependence constraint tests
-        System.out.println("result = " + result);
+////        Then
+////        TODO: precedence/dependence constraint tests
+//        System.out.println("result = " + result);
     }
 
-    private boolean testAStarWithDotFile(File file){
+    private void testAStarWithDotFile(File file){
         // given
         DOTParser parser = new DOTParser();
         try{
@@ -98,10 +100,12 @@ class SchedulerTest {
         Scheduler scheduler = new Scheduler();
 
         // when
-        Schedule result = scheduler.AStar(tasks, 1);
+        int numProcessors = 1;
+        Schedule result = scheduler.AStar(tasks, numProcessors);
 
         // then
-        return true;
+        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
+
     }
 
 
@@ -114,13 +118,12 @@ class SchedulerTest {
             tests.add(
                     DynamicTest.dynamicTest(
                             file.getName(),
-                            ()->assertTrue(testAStarWithDotFile(file))
+                            ()->testAStarWithDotFile(file)
                     ));
         }
 
         return tests;
     }
-
 
 
 
