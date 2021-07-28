@@ -43,4 +43,12 @@ public class DOTParser {
             edges.add(edge);
         }
     }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    public Map<String, Node> getNodes() {
+        return nodes;
+    }
 }
