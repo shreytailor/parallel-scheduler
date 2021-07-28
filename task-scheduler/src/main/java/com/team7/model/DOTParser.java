@@ -20,7 +20,7 @@ public class DOTParser {
         nodes = new HashMap<>();
     }
 
-    public void parse(String filename) throws FileNotFoundException {
+    public List<Node> parse(String filename) throws FileNotFoundException {
         GraphParser parser = new GraphParser(new FileInputStream(filename));
         Map<String, GraphNode> nodeMap = parser.getNodes();
         Map<String, GraphEdge> edgeMap = parser.getEdges();
@@ -42,5 +42,7 @@ public class DOTParser {
             tail.addOutgoingEdge(edge);
             edges.add(edge);
         }
+
+        return new ArrayList<Node>(nodes.values());
     }
 }

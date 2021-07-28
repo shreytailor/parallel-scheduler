@@ -7,22 +7,22 @@ public class Schedule {
     Map<Node, Integer> taskProcessorMap;
     Map<Node, Integer> taskStarttimeMap;
     Map<Node, Integer> taskFinishtimeMap;
-    int[] processorFinishtimes;
+    int[] processorFinishTimes;
     int finishTime;
 
     public Schedule(int numProcessors) {
         taskProcessorMap = new HashMap<>();
         taskStarttimeMap = new HashMap<>();
         taskFinishtimeMap = new HashMap<>();
-        processorFinishtimes = new int[numProcessors];
+        processorFinishTimes = new int[numProcessors];
         finishTime = 0;
     }
 
-    public Schedule(Map<Node, Integer> taskProcessorMap, Map<Node, Integer> taskStarttimeMap, Map<Node, Integer> taskFinishtimeMap, int[] processorFinishtimes, int finishTime) {
+    public Schedule(Map<Node, Integer> taskProcessorMap, Map<Node, Integer> taskStarttimeMap, Map<Node, Integer> taskFinishtimeMap, int[] processorFinishTimes, int finishTime) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStarttimeMap = taskStarttimeMap;
         this.taskFinishtimeMap = taskFinishtimeMap;
-        this.processorFinishtimes = processorFinishtimes;
+        this.processorFinishTimes = processorFinishTimes;
         this.finishTime=finishTime;
     }
 
@@ -30,10 +30,10 @@ public class Schedule {
         taskProcessorMap.put(n, processor);
         taskStarttimeMap.put(n, startTime);
         taskFinishtimeMap.put(n, finishTime);
-        if (processorFinishtimes[processor]>startTime) {
+        if (processorFinishTimes[processor]>startTime) {
             throw new RuntimeException("Something went wrong");
         }
-        processorFinishtimes[processor] = finishTime;
+        processorFinishTimes[processor] = finishTime;
         this.finishTime = Math.max(this.finishTime,finishTime);
     }
 
@@ -50,7 +50,7 @@ public class Schedule {
     }
 
     public int getProcessorFinishTime(int processor) {
-        return processorFinishtimes[processor];
+        return processorFinishTimes[processor];
     }
 
     public int getOverallFinishTime() {
@@ -58,6 +58,6 @@ public class Schedule {
     }
 
     public Schedule clone() {
-        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStarttimeMap), new HashMap<>(taskFinishtimeMap), processorFinishtimes.clone(), finishTime);
+        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStarttimeMap), new HashMap<>(taskFinishtimeMap), processorFinishTimes.clone(), finishTime);
     }
 }
