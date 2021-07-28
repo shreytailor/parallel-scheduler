@@ -1,0 +1,12 @@
+digraph test {
+    a [Weight=1]
+    b [Weight=1]
+    c [Weight=2]
+    d [Weight=5]
+    e [Weight=10]
+    a -> b [Weight=3]
+    a -> c [Weight=5]
+    c -> d [Weight=2]
+    b -> d [Weight=3]
+    d -> e [Weight=10]
+}
