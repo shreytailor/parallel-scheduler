@@ -28,6 +28,8 @@ public class Schedule {
 
     public void addTask(Node n, int processor, int startTime, int finishTime) {
         taskProcessorMap.put(n, processor);
+        taskStarttimeMap.put(n, startTime);
+        taskFinishtimeMap.put(n, finishTime);
         if (processorFinishtimes[processor]>startTime) {
             throw new RuntimeException("Something went wrong");
         }
