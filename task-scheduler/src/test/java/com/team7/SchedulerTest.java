@@ -3,18 +3,25 @@ package com.team7;
 import com.team7.model.Edge;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
+import com.team7.parsing.DOTParser;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 class SchedulerTest {
 
+    public static final String DOT_TEST_FILE_DIRECTORY = "src/20testdotfiles";
+
     /**
+     * DOES NOT ASSERT
      * Allocate a graph of 3 tasks onto 1 processor
+     *
      */
     @Test
     void AStar_singleProcessor3TasksNoDependency() {
@@ -39,6 +46,7 @@ class SchedulerTest {
 
 
     /**
+     * DOES NOT ASSERT
      * This tests AStar algorithm's handling of dependencies, for single processor task allocation
      */
     @Test
@@ -67,8 +75,6 @@ class SchedulerTest {
 
         tasks.addAll(Arrays.asList(task1, task2, task3));
 
-
-
 //        When
         Schedule result = scheduler.AStar(tasks, numProcessors);
 
@@ -76,6 +82,45 @@ class SchedulerTest {
 //        TODO: precedence/dependence constraint tests
         System.out.println("result = " + result);
     }
+
+    private boolean testAStarWithDotFile(File file){
+        // given
+        DOTParser parser = new DOTParser();
+        try{
+            parser.parse(file.toString());
+        }catch(Exception e){
+            e.printStackTrace();
+            fail();
+        }
+
+        Map<String, Task> taskMap = parser.getTasks();
+        List<Task> tasks = new ArrayList<>(taskMap.values());
+        Scheduler scheduler = new Scheduler();
+
+        // when
+        Schedule result = scheduler.AStar(tasks, 1);
+
+        // then
+        return true;
+    }
+
+
+    @TestFactory
+    Collection<DynamicTest> dynamicTestsWithCollection() {
+        List<DynamicTest> tests = new ArrayList<>();
+
+        File directory = new File(DOT_TEST_FILE_DIRECTORY);
+        for (File file : directory.listFiles()) {
+            tests.add(
+                    DynamicTest.dynamicTest(
+                            file.getName(),
+                            ()->assertTrue(testAStarWithDotFile(file))
+                    ));
+        }
+
+        return tests;
+    }
+
 
 
 
