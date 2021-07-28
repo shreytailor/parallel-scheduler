@@ -10,4 +10,12 @@ public class Edge {
         this.tail=tail;
         this.edgeWeight=weight;
     }
+
+    public Node getTail() {
+        return tail;
+    }
+
+    public Node getHead() {
+        return head;
+    }
 }

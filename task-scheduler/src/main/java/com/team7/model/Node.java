@@ -23,4 +23,16 @@ public class Node {
     public void addOutgoingEdge(Edge e) {
         outEdges.add(e);
     }
+
+    public List<Edge> getIngoingEdges() {
+        return inEdges;
+    }
+
+    public List<Edge> getOutgoingEdges() {
+        return outEdges;
+    }
+
+    public int getWeight() {
+        return nodeWeight;
+    }
 }
