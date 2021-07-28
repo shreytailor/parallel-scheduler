@@ -1,5 +1,6 @@
 package com.team7.parsing;
 
+import com.team7.exceptions.CommandLineException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +25,7 @@ class ParserTest {
                 "outputName.dot",
                 "sampleInput.dot");
 
-//        Then
+//      Then
         assertEquals(expectedConfig, config);
     }
 
@@ -135,7 +136,7 @@ class ParserTest {
         String cliString = "";
 
 //        When
-        String[] arguments = cliString.split(" ");
+        String[] arguments = cliString.split("");
 
 //        Then
 //        TODO: change Exception to appropriate assertion, with appropriate message
@@ -143,7 +144,7 @@ class ParserTest {
             Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
-            assertEquals("No parameters specified", e.getMessage());
+            assertEquals("Not enough parameters specified", e.getMessage());
         }
     }
 }
