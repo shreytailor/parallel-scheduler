@@ -39,4 +39,13 @@ public class Edge {
     public int hashCode() {
         return Objects.hash(head, tail, edgeWeight);
     }
+
+    @Override
+    public String toString() {
+        return "Edge{" +
+                "head=" + head.getName() +
+                ", tail=" + tail.getName() +
+                ", edgeWeight=" + edgeWeight +
+                '}';
+    }
 }
