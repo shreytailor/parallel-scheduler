@@ -52,10 +52,10 @@ public class DOTParser {
         try (FileWriter writer = new FileWriter(path)) {
             writer.write("digraph output {\n");
             for (Task t : schedule.getTaskProcessorMap().keySet()) {
-                writer.append(t.getName() + " [Weight=" + t.getWeight()+",Start=" + schedule.getTaskStartTime(t) +",Processor="+schedule.getTaskProcessor(t)+"];\n");
+                writer.append(t.getName()).append(" [Weight=").append(String.valueOf(t.getWeight())).append(",Start=").append(String.valueOf(schedule.getTaskStartTime(t))).append(",Processor=").append(String.valueOf(schedule.getTaskProcessor(t))).append("];\n");
             }
             for (Edge e : edges) {
-                writer.append(e.getTail().getName() + " -> " +e.getHead().getName() + "[Weight="+e.getWeight()+"];\n");
+                writer.append(e.getTail().getName()).append(" -> ").append(e.getHead().getName()).append(" [Weight=").append(String.valueOf(e.getWeight())).append("];\n");
             }
             writer.append("}");
         } catch (IOException e) {
