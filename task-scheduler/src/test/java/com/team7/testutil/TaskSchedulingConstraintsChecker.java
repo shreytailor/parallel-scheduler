@@ -1,5 +1,6 @@
 package com.team7.testutil;
 
+import com.team7.model.Edge;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 
@@ -71,7 +72,32 @@ public class TaskSchedulingConstraintsChecker {
         return processors;
     }
 
-    public static boolean isPrecedenceConstraintMet() {
+    public static boolean isPrecedenceConstraintMet(Schedule schedule, int numOfProcessors, List<Edge> edges) {
+//         for each edge ij (i being the tail task, j being the head task)
+//        if p_i != p_j, then
+//        ts_j => ts_i + w_i + c_e (cost of edge)
+//        else, ts_j => ts_i + w_i
+
+        Map<Task, Integer> taskProcessorMap = schedule.getTaskProcessorMap();
+        Map<Task, Integer> taskStartTimeMap = schedule.getTaskStartTimeMap();
+
+
+        for (Edge edge : edges) {
+            Task tail = edge.getTail();
+            Task head = edge.getHead();
+            int tailPid = taskProcessorMap.get(tail);
+            int headPid = taskProcessorMap.get(head);
+            Integer tailStartTime = taskStartTimeMap.get(tail);
+            Integer headStartTime = taskStartTimeMap.get(head);
+
+            int commCost = (tailPid == headPid)?0:edge.getWeight();
+            boolean isConstraintMet = headStartTime >= tailStartTime + tail.getWeight() + commCost;
+
+            if (!isConstraintMet) {
+                return false;
+            }
+        }
+
         return true;
     }
 

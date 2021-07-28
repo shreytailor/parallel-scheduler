@@ -85,30 +85,6 @@ class SchedulerTest {
 //        System.out.println("result = " + result);
     }
 
-    private void testAStarWithDotFile(File file){
-        // given
-        DOTParser parser = new DOTParser();
-        try{
-            parser.parse(file.toString());
-        }catch(Exception e){
-            e.printStackTrace();
-            fail();
-        }
-
-        Map<String, Task> taskMap = parser.getTasks();
-        List<Task> tasks = new ArrayList<>(taskMap.values());
-        Scheduler scheduler = new Scheduler();
-
-        // when
-        int numProcessors = 1;
-        Schedule result = scheduler.AStar(tasks, numProcessors);
-
-        // then
-        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-
-    }
-
-
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() {
         List<DynamicTest> tests = new ArrayList<>();
@@ -124,6 +100,55 @@ class SchedulerTest {
 
         return tests;
     }
+
+    private void testAStarWithDotFile(File file){
+        // given
+        DOTParser parser = getDotParser(file);
+        Map<String, Task> taskMap = parser.getTasks();
+
+        List<Task> tasks = new ArrayList<>(taskMap.values());
+        List<Edge> edges = parser.getEdges();
+        Scheduler scheduler = new Scheduler();
+
+        // when
+        int numProcessors = 1;
+        Schedule result = scheduler.AStar(tasks, numProcessors);
+
+        // then
+
+        if(shouldBeNullSchedule(file)){
+            assertNull(result);
+        }else{
+            assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
+            assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, numProcessors, edges));
+        }
+
+
+
+    }
+
+    private boolean shouldBeNullSchedule(File file) {
+        String fileName = file.getName();
+
+        if(fileName.contains("cycle") || fileName.contains("empty")){
+            return true;
+        }
+        return false;
+    }
+
+    private DOTParser getDotParser(File file) {
+        DOTParser parser = new DOTParser();
+        try{
+            parser.parse(file.toString());
+        }catch(Exception e){
+            e.printStackTrace();
+            fail();
+        }
+        return parser;
+    }
+
+
+
 
 
 
