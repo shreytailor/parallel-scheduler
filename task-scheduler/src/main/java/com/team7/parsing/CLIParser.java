@@ -1,8 +1,8 @@
-package com.team7.cli;
+package com.team7.parsing;
 
 import org.apache.commons.cli.*;
 
-public class Parser {
+public class CLIParser {
 
     /**
      *

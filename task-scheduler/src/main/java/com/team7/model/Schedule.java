@@ -1,52 +1,57 @@
 package com.team7.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Schedule {
-    Map<Node, Integer> taskProcessorMap;
-    Map<Node, Integer> taskStarttimeMap;
-    Map<Node, Integer> taskFinishtimeMap;
+    Map<Task, Integer> taskProcessorMap;
+    Map<Task, Integer> taskStartTimeMap;
+    Map<Task, Integer> taskFinishTimeMap;
     int[] processorFinishTimes;
     int finishTime;
 
     public Schedule(int numProcessors) {
         taskProcessorMap = new HashMap<>();
-        taskStarttimeMap = new HashMap<>();
-        taskFinishtimeMap = new HashMap<>();
+        taskStartTimeMap = new HashMap<>();
+        taskFinishTimeMap = new HashMap<>();
         processorFinishTimes = new int[numProcessors];
         finishTime = 0;
     }
 
-    public Schedule(Map<Node, Integer> taskProcessorMap, Map<Node, Integer> taskStarttimeMap, Map<Node, Integer> taskFinishtimeMap, int[] processorFinishTimes, int finishTime) {
+    public Schedule(Map<Task, Integer> taskProcessorMap, Map<Task, Integer> taskStartTimeMap, Map<Task, Integer> taskFinishTimeMap, int[] processorFinishTimes, int finishTime) {
         this.taskProcessorMap = taskProcessorMap;
-        this.taskStarttimeMap = taskStarttimeMap;
-        this.taskFinishtimeMap = taskFinishtimeMap;
+        this.taskStartTimeMap = taskStartTimeMap;
+        this.taskFinishTimeMap = taskFinishTimeMap;
         this.processorFinishTimes = processorFinishTimes;
-        this.finishTime=finishTime;
+        this.finishTime = finishTime;
     }
 
-    public void addTask(Node n, int processor, int startTime, int finishTime) {
+    public void addTask(Task n, int processor, int startTime, int finishTime) {
         taskProcessorMap.put(n, processor);
-        taskStarttimeMap.put(n, startTime);
-        taskFinishtimeMap.put(n, finishTime);
-        if (processorFinishTimes[processor]>startTime) {
+        taskStartTimeMap.put(n, startTime);
+        taskFinishTimeMap.put(n, finishTime);
+        if (processorFinishTimes[processor] > startTime) {
             throw new RuntimeException("Something went wrong");
         }
         processorFinishTimes[processor] = finishTime;
-        this.finishTime = Math.max(this.finishTime,finishTime);
+        this.finishTime = Math.max(this.finishTime, finishTime);
     }
 
-    public Map<Node, Integer> getTaskProcessorMap() {
+    public Map<Task, Integer> getTaskProcessorMap() {
         return taskProcessorMap;
+    }
+
+    public Map<Task, Integer> getTaskStartTimeMap() {
+        return taskStartTimeMap;
     }
 
     public int getNumberOfTasks() {
         return taskProcessorMap.size();
     }
 
-    public int getTaskFinishTime(Node n) {
-        return taskFinishtimeMap.get(n);
+    public int getTaskFinishTime(Task n) {
+        return taskFinishTimeMap.get(n);
     }
 
     public int getProcessorFinishTime(int processor) {
@@ -58,6 +63,25 @@ public class Schedule {
     }
 
     public Schedule clone() {
-        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStarttimeMap), new HashMap<>(taskFinishtimeMap), processorFinishTimes.clone(), finishTime);
+        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
+    }
+
+    public <T, S> String mapToString(Map<T, S> map) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<T, S> e : map.entrySet()) {
+            sb.append("\t\t" + e.getKey() + " : " + e.getValue() + "\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Schedule{" +
+                "\n\ttaskProcessorMap=\n" + mapToString(taskProcessorMap) +
+                "\n\ttaskStartTimeMap=\n" + mapToString(taskStartTimeMap) +
+                "\n\ttaskFinishTimeMap=\n" + mapToString(taskFinishTimeMap) +
+                "\n\tprocessorFinishTimes=" + Arrays.toString(processorFinishTimes) +
+                "\n\tfinishTime=" + finishTime +
+                "\n\n}";
     }
 }

@@ -1,4 +1,4 @@
-package com.team7.cli;
+package com.team7.parsing;
 
 import java.util.Objects;
 

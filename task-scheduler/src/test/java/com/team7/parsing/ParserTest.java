@@ -1,4 +1,4 @@
-package com.team7.cli;
+package com.team7.parsing;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +16,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -40,7 +40,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 4,
                 3,
@@ -63,7 +63,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -88,7 +88,7 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = Parser.parseCommandLineArguments(arguments);
+        Config config = CLIParser.parseCommandLineArguments(arguments);
         Config expectedConfig = new Config(
                 2,
                 1,
@@ -117,7 +117,7 @@ class ParserTest {
 //        Then
 //        TODO: change Exception to appropriate assertion, with appropriate message
         try {
-            Config config = Parser.parseCommandLineArguments(arguments);
+            Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
             assertEquals("Flag unrecognised", e.getMessage());
@@ -140,7 +140,7 @@ class ParserTest {
 //        Then
 //        TODO: change Exception to appropriate assertion, with appropriate message
         try {
-            Config config = Parser.parseCommandLineArguments(arguments);
+            Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
             assertEquals("No parameters specified", e.getMessage());
