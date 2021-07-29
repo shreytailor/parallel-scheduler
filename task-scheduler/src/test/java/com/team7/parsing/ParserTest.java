@@ -1,5 +1,4 @@
 package com.team7.parsing;
-
 import com.team7.exceptions.CommandLineException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +16,12 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = CLIParser.parseCommandLineArguments(arguments);
+        Config config = null;
+        try {
+            config = CLIParser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {
+            fail();
+        }
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -41,7 +45,12 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = CLIParser.parseCommandLineArguments(arguments);
+        Config config = null;
+        try {
+            config = CLIParser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {
+            fail();
+        }
         Config expectedConfig = new Config(
                 4,
                 3,
@@ -64,7 +73,12 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = CLIParser.parseCommandLineArguments(arguments);
+        Config config = null;
+        try {
+            config = CLIParser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {
+            fail();
+        }
         Config expectedConfig = new Config(
                 2,
                 3,
@@ -89,7 +103,12 @@ class ParserTest {
 
 //        When
         String[] arguments = cliString.split(" ");
-        Config config = CLIParser.parseCommandLineArguments(arguments);
+        Config config = null;
+        try {
+            config = CLIParser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {
+            fail();
+        }
         Config expectedConfig = new Config(
                 2,
                 1,
