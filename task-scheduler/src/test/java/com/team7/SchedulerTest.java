@@ -111,7 +111,7 @@ class SchedulerTest {
         Scheduler scheduler = new Scheduler();
 
         // when
-        int numProcessors = 1;
+        int numProcessors = 2;
         Schedule result = scheduler.AStar(tasks, numProcessors);
 
         // then
@@ -123,7 +123,7 @@ class SchedulerTest {
             assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, numProcessors, edges));
         }
 
-
+        System.out.println("schedule = " + result);
 
     }
 

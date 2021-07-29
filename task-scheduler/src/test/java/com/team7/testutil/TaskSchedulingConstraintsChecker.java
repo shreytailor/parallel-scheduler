@@ -20,6 +20,10 @@ public class TaskSchedulingConstraintsChecker {
 //        for each processor, check that each pair of tasks meet processor requirement
 //        this check is only done if there's an edge between those pair of tasks
         for (List<Task> processor : processors) {
+//            if a processor doesn't have any tasks assigned, break
+            if(processor == null){
+                break;
+            }
             for (Task taskOne : processor) {
                 for (Task taskTwo : processor) {
                     if (taskOne.equals(taskTwo)) {
