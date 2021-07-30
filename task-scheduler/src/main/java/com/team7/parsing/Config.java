@@ -88,4 +88,13 @@ public class Config {
     public void setInputName(String inputName) {
         this.inputName = inputName;
     }
+
+    public String toString() {
+        return "Config {" +
+                "numOfProcessors=" + numOfProcessors +
+                ", numOfCores=" + numOfCores +
+                ", isVisualized=" + isVisualised +
+                ", outputName=" + outputName +
+                ", inputName=" + inputName;
+    }
 }

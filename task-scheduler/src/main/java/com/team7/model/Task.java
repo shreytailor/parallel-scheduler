@@ -46,16 +46,14 @@ public class Task {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return name.equals(task.name) &&
-                weight == task.weight;
+        return name.equals(task.name) && weight == task.weight;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(name, weight);
     }
-
-    @Override
+    
     public String toString() {
         return "Task{" +
                 "name='" + name + '\'' +
