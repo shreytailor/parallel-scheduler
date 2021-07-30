@@ -19,6 +19,12 @@ From these early insights, we could start creating prototypes early-on in the pr
 
 To get a preview of how the Graphical User Interface would look, below is a prototype which was created during the second week.
 
-![Low Fidelity Prototype](images/low-fidelity-prototype.png)
+![Low Fidelity Prototype](images/low-fidelity-prototype-old.png)
 
-During the next iteration of this prototype, we decided to include the representation of the input directed graph as well, as the users would be able to understand how the final schedule is constructed.
+During the next iteration of this prototype, we decided to include the representation of the input directed graph as well, as the users would be able to understand how the final schedule is constructed. 
+
+The images below show the improved low-fidelity prototype, where there is a toggle button for the user to switch between the CPU and RAM utilization, and visualization of the input graph.
+
+![High Fidelity Prototype](images/low-fidelity-prototype-1.png)
+
+![High Fidelity Prototype](images/low-fidelity-prototype-2.png)

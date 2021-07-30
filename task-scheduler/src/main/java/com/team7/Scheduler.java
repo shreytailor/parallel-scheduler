@@ -18,8 +18,8 @@ public class Scheduler {
 
             //Check if the schedule is complete
             if (s.getNumberOfTasks() == tasks.size()) {
-                //If schedule is complete, it is optimal
-                if (isCompleteSchedule(optimalSchedule, s)) {
+                //If schedule is complete, check it is more optimal than the previous 'optimalSchedule'
+                if (isMoreOptimal(optimalSchedule, s)) {
                     optimalSchedule = s;
                 }
             } else {
@@ -66,14 +66,15 @@ public class Scheduler {
     }
 
     /**
-     * Returns a boolean indicating that the current schedule that we opened (and are about to expand) is a complete schedule.
-     * That is, it's a schedule that has all tasks allocated to it.
+     * Returns a boolean indicating that the current schedule that is complete
+     * is a better solution than previous 'optimalSchedule'.
+     * That is, return true if finish time of the current schedule is lower than the current optimalSchedule.
      *
      * @param optimalSchedule
      * @param s
      * @return
      */
-    private boolean isCompleteSchedule(Schedule optimalSchedule, Schedule s) {
+    private boolean isMoreOptimal(Schedule optimalSchedule, Schedule s) {
         return optimalSchedule == null || s.getOverallFinishTime() < optimalSchedule.getOverallFinishTime();
     }
 

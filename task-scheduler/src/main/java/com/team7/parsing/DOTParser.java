@@ -46,6 +46,8 @@ public class DOTParser {
             tail.addOutgoingEdge(edge);
             edges.add(edge);
         }
+
+        return new ArrayList<Task>(tasks.values());
     }
 
     public void write(String path, Schedule schedule, List<Edge> edges) {
