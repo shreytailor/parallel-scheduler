@@ -8,7 +8,7 @@ Implemented a method for generating a DOT file from a schedule.
 Implemented a method to read DOT files into a graph.
 Implemented a brute force algorithm (breadth first search).
 
-## 27 July
+### 27 July
 Created the classes required for the scheduling algorithm. Helped finish the Plan by writing explanations for the WBS.
 
 ### 26 July
