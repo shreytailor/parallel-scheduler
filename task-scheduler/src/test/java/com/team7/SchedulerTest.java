@@ -1,6 +1,7 @@
 package com.team7;
 
 import com.team7.model.Edge;
+import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.DOTParser;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SchedulerTest {
 
-    public static final String DOT_TEST_FILE_DIRECTORY = "src/20testdotfiles";
+    public static final String DOT_TEST_FILE_DIRECTORY = "src/dot-tests";
 
     /**
      * DOES NOT ASSERT
@@ -98,28 +100,29 @@ class SchedulerTest {
 
     private void testAStarWithDotFile(File file){
         // given
-        DOTParser parser = getDotParser(file);
-        Map<String, Task> taskMap = parser.getTasks();
+        try {
+            Graph g = DOTParser.read(file.toString());
+            List<Task> tasks = g.getNodes();
+            List<Edge> edges = g.getEdges();
+            Scheduler scheduler = new Scheduler();
 
-        List<Task> tasks = new ArrayList<>(taskMap.values());
-        List<Edge> edges = parser.getEdges();
-        Scheduler scheduler = new Scheduler();
+            // when
+            int numProcessors = 2;
+            Schedule result = scheduler.AStar(tasks, numProcessors);
 
-        // when
-        int numProcessors = 2;
-        Schedule result = scheduler.AStar(tasks, numProcessors);
+            // then
+            if(shouldBeNullSchedule(file)){
+                assertNull(result);
+            }else{
+                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
+                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, numProcessors, edges));
+            }
 
-        // then
-
-        if(shouldBeNullSchedule(file)){
-            assertNull(result);
-        }else{
-            assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-            assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, numProcessors, edges));
+            System.out.println("schedule = " + result);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
         }
-
-        System.out.println("schedule = " + result);
-
     }
 
     private boolean shouldBeNullSchedule(File file) {
@@ -130,23 +133,4 @@ class SchedulerTest {
         }
         return false;
     }
-
-    private DOTParser getDotParser(File file) {
-        DOTParser parser = new DOTParser();
-        try{
-            parser.read(file.toString());
-        }catch(Exception e){
-            e.printStackTrace();
-            fail();
-        }
-        return parser;
-    }
-
-
-
-
-
-
-
-
 }

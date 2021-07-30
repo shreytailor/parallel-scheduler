@@ -4,6 +4,7 @@ import com.paypal.digraph.parser.GraphEdge;
 import com.paypal.digraph.parser.GraphNode;
 import com.paypal.digraph.parser.GraphParser;
 import com.team7.model.Edge;
+import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import java.io.FileInputStream;
@@ -16,15 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 public class DOTParser {
-    private List<Edge> edges;
-    private Map<String, Task> tasks;
-
-    public DOTParser() {
-        edges = new ArrayList<>();
-        tasks = new HashMap<>();
-    }
-
-    public List<Task> read(String filename) throws FileNotFoundException {
+    public static Graph read(String filename) throws FileNotFoundException {
+        List<Edge> edges = new ArrayList<>();
+        Map<String, Task> tasks = new HashMap<>();
         GraphParser parser = new GraphParser(new FileInputStream(filename));
         Map<String, GraphNode> nodeMap = parser.getNodes();
         Map<String, GraphEdge> edgeMap = parser.getEdges();
@@ -47,10 +42,10 @@ public class DOTParser {
             edges.add(edge);
         }
 
-        return new ArrayList<Task>(tasks.values());
+        return new Graph(new ArrayList<>(tasks.values()), edges);
     }
 
-    public void write(String path, Schedule schedule, List<Edge> edges) {
+    public static void write(String path, Schedule schedule, List<Edge> edges) {
         try (FileWriter writer = new FileWriter(path)) {
             writer.write("digraph output {\n");
             for (Task t : schedule.getTaskProcessorMap().keySet()) {
@@ -63,13 +58,5 @@ public class DOTParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public List<Edge> getEdges() {
-        return edges;
-    }
-
-    public Map<String, Task> getTasks() {
-        return tasks;
     }
 }

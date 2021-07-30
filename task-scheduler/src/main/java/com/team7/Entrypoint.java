@@ -2,6 +2,7 @@ package com.team7;
 
 import com.team7.exceptions.CommandLineException;
 import com.team7.model.Edge;
+import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
@@ -20,12 +21,12 @@ public class Entrypoint {
             Config config  = CLIParser.parseCommandLineArguments(args);
             System.out.println(config);
             DOTParser dotParser = new DOTParser();
-            List<Task> tasks = dotParser.read(config.getInputName());
+            Graph g = dotParser.read(config.getInputName());
 
             Scheduler scheduler = new Scheduler();
 
-            Schedule schedule = scheduler.AStar(tasks, config.getNumOfProcessors());
-            dotParser.write(config.getOutputName(),schedule, dotParser.getEdges());
+            Schedule schedule = scheduler.AStar(g.getNodes(), config.getNumOfProcessors());
+            dotParser.write(config.getOutputName(),schedule, g.getEdges());
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);

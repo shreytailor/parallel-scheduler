@@ -17,19 +17,19 @@ public class DOTParserTest {
     public void testDotParser_twoNodesOneEdgeInBetween() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test0.dot");
+        Graph graph = dotParser.read(testDir + "test0.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Task b = new Task("b", 1);
         Edge aToB = new Edge(b, a, 1);
         expectedEdges.add(aToB);
-        expectedTasks.put("a", a);
-        expectedTasks.put("b", b);
+        expectedTasks.add(a);
+        expectedTasks.add(b);
 
         // Then
         assertEquals(expectedEdges, actualEdges);
@@ -43,17 +43,17 @@ public class DOTParserTest {
     public void testDotParser_twoNodesNoEdges() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test1.dot");
+        Graph graph = dotParser.read(testDir + "test1.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Task b = new Task("b", 1);
-        expectedTasks.put("a", a);
-        expectedTasks.put("b", b);
+        expectedTasks.add(a);
+        expectedTasks.add(b);
 
         // Then
         assertEquals(expectedEdges, actualEdges);
@@ -67,22 +67,22 @@ public class DOTParserTest {
     public void testDotParser_threeNodesCircularDirectedGraph() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test2.dot");
+        Graph graph = dotParser.read(testDir + "cycle1.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Task b = new Task("b", 1);
         Task c = new Task("c", 1);
         Edge aToB = new Edge(b, a, 1);
         Edge bToC = new Edge(c, b, 1);
         Edge cToA = new Edge(a, c, 1);
-        expectedTasks.put("a", a);
-        expectedTasks.put("b", b);
-        expectedTasks.put("c", c);
+        expectedTasks.add(a);
+        expectedTasks.add(b);
+        expectedTasks.add(c);
         expectedEdges.add(aToB);
         expectedEdges.add(bToC);
         expectedEdges.add(cToA);
@@ -100,21 +100,21 @@ public class DOTParserTest {
     public void testDotParser_threeNodesAllConnectedWithARoot() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test3.dot");
+        Graph graph = dotParser.read(testDir + "test3.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Task b = new Task("b", 1);
         Task c = new Task("c", 1);
         Edge aToB = new Edge(b, a, 1);
         Edge aToC = new Edge(c, a, 1);
-        expectedTasks.put("a", a);
-        expectedTasks.put("b", b);
-        expectedTasks.put("c", c);
+        expectedTasks.add(a);
+        expectedTasks.add(b);
+        expectedTasks.add(c);
         expectedEdges.add(aToB);
         expectedEdges.add(aToC);
 
@@ -130,20 +130,20 @@ public class DOTParserTest {
     public void testDotParser_threeNodesWithTwoConnectedNodes() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test4.dot");
+        Graph graph = dotParser.read(testDir + "test4.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Task b = new Task("b", 1);
         Task c = new Task("c", 1);
         Edge aToB = new Edge(b, a, 1);
-        expectedTasks.put("a", a);
-        expectedTasks.put("b", b);
-        expectedTasks.put("c", c);
+        expectedTasks.add(a);
+        expectedTasks.add(b);
+        expectedTasks.add(c);
         expectedEdges.add(aToB);
 
         // Then
@@ -158,13 +158,13 @@ public class DOTParserTest {
     public void testDotParser_emptyGraph() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test5.dot");
+        Graph graph = dotParser.read(testDir + "empty.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
 
         // Then
         assertEquals(expectedEdges, actualEdges);
@@ -179,15 +179,15 @@ public class DOTParserTest {
     public void testDotParser_oneNodeNoEdges() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test6.dot");
+        Graph graph = dotParser.read(testDir + "test6.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
-        expectedTasks.put("a", a);
+        expectedTasks.add(a);
 
         // Then
         assertEquals(expectedEdges, actualEdges);
@@ -201,16 +201,16 @@ public class DOTParserTest {
     public void testDotParser_oneNodeWithEdgeToItself() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "test7.dot");
+        Graph graph = dotParser.read(testDir + "cycle2.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Edge aToA = new Edge(a, a, 1);
-        expectedTasks.put("a", a);
+        expectedTasks.add(a);
         expectedEdges.add(aToA);
 
         // Then
@@ -225,13 +225,13 @@ public class DOTParserTest {
     public void testDotParser_complexFeasibleDirectedGraph() throws FileNotFoundException {
         // Given
         DOTParser dotParser = new DOTParser();
-        dotParser.read(testDir + "testComplex.dot");
+        Graph graph = dotParser.read(testDir + "5tasks.dot");
 
         // When
-        List<Edge> actualEdges = dotParser.getEdges();
-        Map<String, Task> actualTasks = dotParser.getTasks();
+        List<Edge> actualEdges = graph.getEdges();
+        List<Task> actualTasks = graph.getNodes();
         List<Edge> expectedEdges = new ArrayList<>();
-        Map<String, Task> expectedTasks = new HashMap<>();
+        List<Task> expectedTasks = new ArrayList<>();
         Task a = new Task("a", 1);
         Task b = new Task("b", 1);
         Task c = new Task("c", 2);
@@ -242,11 +242,11 @@ public class DOTParserTest {
         Edge cToD = new Edge(d, c, 2);
         Edge bToD = new Edge(d, b, 3);
         Edge dToE = new Edge(e, d, 10);
-        expectedTasks.put("a", a);
-        expectedTasks.put("b", b);
-        expectedTasks.put("c", c);
-        expectedTasks.put("d", d);
-        expectedTasks.put("e", e);
+        expectedTasks.add(a);
+        expectedTasks.add(b);
+        expectedTasks.add(c);
+        expectedTasks.add(d);
+        expectedTasks.add(e);
         expectedEdges.add(aToB);
         expectedEdges.add(aToC);
         expectedEdges.add(cToD);
