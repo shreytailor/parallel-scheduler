@@ -41,8 +41,7 @@ class SchedulerTest {
         Schedule result = scheduler.AStar(tasks, numProcessors);
 
 //        Then
-//        TODO: precedence/dependence constraint tests
-        System.out.println("result = " + result);
+        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
     }
 
 
@@ -79,10 +78,6 @@ class SchedulerTest {
 //        When
         Schedule result = scheduler.AStar(tasks, numProcessors);
         assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-
-////        Then
-////        TODO: precedence/dependence constraint tests
-//        System.out.println("result = " + result);
     }
 
     @TestFactory
