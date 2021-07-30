@@ -50,8 +50,16 @@ public class Schedule {
         return taskProcessorMap.size();
     }
 
+    public int getTaskStartTime(Task n) {
+        return taskStartTimeMap.get(n);
+    }
+
     public int getTaskFinishTime(Task n) {
         return taskFinishTimeMap.get(n);
+    }
+
+    public int getTaskProcessor(Task n) {
+        return taskProcessorMap.get(n);
     }
 
     public int getProcessorFinishTime(int processor) {
