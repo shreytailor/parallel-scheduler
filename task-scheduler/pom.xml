@@ -30,6 +30,11 @@
             <artifactId>digraph-parser</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <artifactId>gs-core</artifactId>
+            <groupId>org.graphstream</groupId>
+            <version>2.0</version>
+        </dependency>
     </dependencies>
 
 </project>
