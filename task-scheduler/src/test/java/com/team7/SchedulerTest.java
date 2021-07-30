@@ -134,7 +134,7 @@ class SchedulerTest {
     private DOTParser getDotParser(File file) {
         DOTParser parser = new DOTParser();
         try{
-            parser.parse(file.toString());
+            parser.read(file.toString());
         }catch(Exception e){
             e.printStackTrace();
             fail();

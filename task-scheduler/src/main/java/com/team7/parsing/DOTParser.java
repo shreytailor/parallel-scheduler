@@ -24,7 +24,7 @@ public class DOTParser {
         tasks = new HashMap<>();
     }
 
-    public void read(String filename) throws FileNotFoundException {
+    public List<Task> read(String filename) throws FileNotFoundException {
         GraphParser parser = new GraphParser(new FileInputStream(filename));
         Map<String, GraphNode> nodeMap = parser.getNodes();
         Map<String, GraphEdge> edgeMap = parser.getEdges();

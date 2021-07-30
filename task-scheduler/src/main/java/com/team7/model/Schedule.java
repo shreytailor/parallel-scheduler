@@ -74,7 +74,7 @@ public class Schedule {
         return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
     }
 
-    public <T, S> String mapToString(Map<T, S> map) {
+    private <T, S> String mapToString(Map<T, S> map) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<T, S> e : map.entrySet()) {
             sb.append("\t\t" + e.getKey() + " : " + e.getValue() + "\n");
