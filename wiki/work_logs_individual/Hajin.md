@@ -1,3 +1,12 @@
+### 30 Jul
+- Created a dot file that reflects two graphs from lecture slides
+- Communicated solutions to the team about some of the issues I encountered while getting Shrey's newly built JavaFX application to run. 
+1. need fxml dependency
+2.need to wrap plugins tag with build tag 
+3. mvn clean install -U helps if you want to clean install dependencies 
+4. here's an example of program argument for Entrypoint run configuration: task-scheduler/src/dot-tests/lectureExample.DOT 2 -v
+5. NotImplementedException is only supported up to Java 6
+
 ### 28 Jul
 - Reviewed Oscar's implementation of brute force algorithm
 - Refactored the A star algorithm into several methods for testability and readability. Added comments to assist other group members' understanding.
