@@ -46,6 +46,8 @@ public class Schedule {
         return taskStartTimeMap;
     }
 
+    public Map<Task, Integer> getTaskFinishTimeMap() {return taskFinishTimeMap; }
+
     public int getNumberOfTasks() {
         return taskProcessorMap.size();
     }
