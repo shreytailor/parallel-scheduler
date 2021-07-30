@@ -24,22 +24,26 @@ public class Schedule {
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskFinishTimeMap = taskFinishTimeMap;
         this.processorFinishTimes = processorFinishTimes;
-        this.finishTime=finishTime;
+        this.finishTime = finishTime;
     }
 
     public void addTask(Task n, int processor, int startTime, int finishTime) {
         taskProcessorMap.put(n, processor);
         taskStartTimeMap.put(n, startTime);
         taskFinishTimeMap.put(n, finishTime);
-        if (processorFinishTimes[processor]>startTime) {
+        if (processorFinishTimes[processor] > startTime) {
             throw new RuntimeException("Something went wrong");
         }
         processorFinishTimes[processor] = finishTime;
-        this.finishTime = Math.max(this.finishTime,finishTime);
+        this.finishTime = Math.max(this.finishTime, finishTime);
     }
 
     public Map<Task, Integer> getTaskProcessorMap() {
         return taskProcessorMap;
+    }
+
+    public Map<Task, Integer> getTaskStartTimeMap() {
+        return taskStartTimeMap;
     }
 
     public int getNumberOfTasks() {
@@ -62,19 +66,16 @@ public class Schedule {
         return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
     }
 
-    public <T,S> String mapToString(Map<T,S> map){
+    public <T, S> String mapToString(Map<T, S> map) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<T, S> e : map.entrySet()) {
-            sb.append("\t\t"+e.getKey()+" : "+e.getValue()+"\n");
+            sb.append("\t\t" + e.getKey() + " : " + e.getValue() + "\n");
         }
         return sb.toString();
     }
 
     @Override
     public String toString() {
-
-
-
         return "Schedule{" +
                 "\n\ttaskProcessorMap=\n" + mapToString(taskProcessorMap) +
                 "\n\ttaskStartTimeMap=\n" + mapToString(taskStartTimeMap) +
