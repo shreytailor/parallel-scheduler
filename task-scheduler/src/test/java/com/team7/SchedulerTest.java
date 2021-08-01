@@ -40,7 +40,7 @@ class SchedulerTest {
 
 
 //        When
-        Schedule result = scheduler.AStar(tasks, numProcessors);
+        Schedule result = scheduler.findOptimalSchedule(tasks, numProcessors);
 
 //        Then
         assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
@@ -78,7 +78,7 @@ class SchedulerTest {
         tasks.addAll(Arrays.asList(task1, task2, task3));
 
 //        When
-        Schedule result = scheduler.AStar(tasks, numProcessors);
+        Schedule result = scheduler.findOptimalSchedule(tasks, numProcessors);
         assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
     }
 
@@ -108,7 +108,7 @@ class SchedulerTest {
 
             // when
             int numProcessors = 2;
-            Schedule result = scheduler.AStar(tasks, numProcessors);
+            Schedule result = scheduler.findOptimalSchedule(tasks, numProcessors);
 
             // then
             if(shouldBeNullSchedule(file)){

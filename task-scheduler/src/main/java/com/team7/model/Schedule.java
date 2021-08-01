@@ -1,41 +1,46 @@
 package com.team7.model;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Schedule {
-    Map<Task, Integer> taskProcessorMap;
-    Map<Task, Integer> taskStartTimeMap;
-    Map<Task, Integer> taskFinishTimeMap;
+    Map<Task, Integer> taskProcessorMap = new HashMap<>();
+    Map<Task, Integer> taskStartTimeMap= new HashMap<>();
+    Map<Task, Integer> taskRequirementsMap;
+    Set<Task> beginnableTasks;
+    int estimatedFinishTime=0;
     int[] processorFinishTimes;
-    int finishTime;
 
-    public Schedule(int numProcessors) {
-        taskProcessorMap = new HashMap<>();
-        taskStartTimeMap = new HashMap<>();
-        taskFinishTimeMap = new HashMap<>();
+    public Schedule(int numProcessors, Map<Task,Integer> taskRequirementsMap, Set<Task> beginnableTasks) {
         processorFinishTimes = new int[numProcessors];
-        finishTime = 0;
+        this.taskRequirementsMap=taskRequirementsMap;
+        this.beginnableTasks=beginnableTasks;
     }
 
-    public Schedule(Map<Task, Integer> taskProcessorMap, Map<Task, Integer> taskStartTimeMap, Map<Task, Integer> taskFinishTimeMap, int[] processorFinishTimes, int finishTime) {
+    public Schedule(Map<Task, Integer> taskProcessorMap, Map<Task, Integer> taskStartTimeMap, Map<Task,Integer> taskRequirementsMap, Set<Task> beginnableTasks, int[] processorFinishTimes, int estimatedFinishTime) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
-        this.taskFinishTimeMap = taskFinishTimeMap;
+        this.taskRequirementsMap = taskRequirementsMap;
+        this.beginnableTasks = beginnableTasks;
         this.processorFinishTimes = processorFinishTimes;
-        this.finishTime = finishTime;
+        this.estimatedFinishTime = estimatedFinishTime;
     }
 
-    public void addTask(Task n, int processor, int startTime, int finishTime) {
+    public void addTask(Task n, int processor, int startTime) {
         taskProcessorMap.put(n, processor);
         taskStartTimeMap.put(n, startTime);
-        taskFinishTimeMap.put(n, finishTime);
+        for (Edge out : n.getOutgoingEdges()) {
+            taskRequirementsMap.compute(out.getHead(), (k,v)-> {
+                v--;
+                if (v==0) {
+                    beginnableTasks.add(out.getHead());
+                }
+                return v;
+            });
+        }
         if (processorFinishTimes[processor] > startTime) {
             throw new RuntimeException("Something went wrong");
         }
-        processorFinishTimes[processor] = finishTime;
-        this.finishTime = Math.max(this.finishTime, finishTime);
+        processorFinishTimes[processor] = startTime + n.getWeight();
     }
 
     public Map<Task, Integer> getTaskProcessorMap() {
@@ -46,7 +51,9 @@ public class Schedule {
         return taskStartTimeMap;
     }
 
-    public Map<Task, Integer> getTaskFinishTimeMap() {return taskFinishTimeMap; }
+    public Set<Task> getBeginnableTasks() {
+        return beginnableTasks;
+    }
 
     public int getNumberOfTasks() {
         return taskProcessorMap.size();
@@ -57,7 +64,7 @@ public class Schedule {
     }
 
     public int getTaskFinishTime(Task n) {
-        return taskFinishTimeMap.get(n);
+        return taskStartTimeMap.get(n)+n.getWeight();
     }
 
     public int getTaskProcessor(Task n) {
@@ -68,12 +75,17 @@ public class Schedule {
         return processorFinishTimes[processor];
     }
 
-    public int getOverallFinishTime() {
-        return finishTime;
+    public void setEstimatedFinishTime(int n) {
+        estimatedFinishTime = n;
     }
 
+    public int getEstimatedFinishTime() {
+        return estimatedFinishTime;
+    }
+
+    @Override
     public Schedule clone() {
-        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskFinishTimeMap), processorFinishTimes.clone(), finishTime);
+        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskRequirementsMap), new HashSet<>(beginnableTasks), processorFinishTimes.clone(), estimatedFinishTime);
     }
 
     private <T, S> String mapToString(Map<T, S> map) {
@@ -89,9 +101,8 @@ public class Schedule {
         return "Schedule{" +
                 "\n\ttaskProcessorMap=\n" + mapToString(taskProcessorMap) +
                 "\n\ttaskStartTimeMap=\n" + mapToString(taskStartTimeMap) +
-                "\n\ttaskFinishTimeMap=\n" + mapToString(taskFinishTimeMap) +
                 "\n\tprocessorFinishTimes=" + Arrays.toString(processorFinishTimes) +
-                "\n\tfinishTime=" + finishTime +
+                "\n\tfinishTime=" + estimatedFinishTime +
                 "\n\n}";
     }
 }

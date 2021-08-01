@@ -20,7 +20,7 @@ public class Entrypoint {
 
             // Processing the input graph by using the scheduler, and storing the output.
             Scheduler scheduler = new Scheduler();
-            Schedule schedule = scheduler.AStar(graph.getNodes(), config.getNumOfProcessors());
+            Schedule schedule = scheduler.findOptimalSchedule(graph.getNodes(), config.getNumOfProcessors());
             dotParser.write(config.getOutputName(),schedule, graph.getEdges());
 
             // Showing the visualization of the output schedule.

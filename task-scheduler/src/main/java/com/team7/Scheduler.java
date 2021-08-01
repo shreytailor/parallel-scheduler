@@ -7,39 +7,39 @@ import com.team7.model.Task;
 import java.util.*;
 
 public class Scheduler {
+    Map<Task, Integer> taskRequirementsMap = new HashMap<>();
+    Set<Task> beginnableTasks = new HashSet<>();
+    Map<Task, Integer> taskDistanceMap = new HashMap<>();
 
-    public Schedule AStar(List<Task> tasks, int numProcessors) {
-        //note: using a regular queue for now since we are doing brute force
-        Queue<Schedule> scheduleQueue = generateOneTaskSchedules(tasks, numProcessors);
-
-        Schedule optimalSchedule = null;
-        while (scheduleQueue.size() != 0) {
-            Schedule s = scheduleQueue.poll();
-
-            //Check if the schedule is complete
-            if (s.getNumberOfTasks() == tasks.size()) {
-                //If schedule is complete, check it is more optimal than the previous 'optimalSchedule'
-                if (isMoreOptimal(optimalSchedule, s)) {
-                    optimalSchedule = s;
-                }
+    public void preprocess(List<Task> tasks) {
+        for (Task task : tasks) {
+            if (task.getIngoingEdges().size() != 0) {
+                taskRequirementsMap.put(task, task.getIngoingEdges().size());
             } else {
-                Map<Task, Integer> taskProcessorMap = s.getTaskProcessorMap();
-                //Get a list of tasks that haven't been allocated to the current schedule 's'
-                List<Task> tasksToSchedule = getTasksToSchedule(tasks, taskProcessorMap);
-
-                //Expanding the schedule s, and insert them into the scheduleQueue
-                for (Task t : tasksToSchedule) {
-                    for (int i = 0; i < numProcessors; i++) {
-                        Schedule newSchedule = s.clone();
-                        //Compute earliest time to schedule the task ('t') on this processor (processor 'i')
-                        int earliestStartTime = getEarliestTimeToSchedule(taskProcessorMap, t, i, newSchedule);
-                        newSchedule.addTask(t, i, earliestStartTime, earliestStartTime + t.getWeight());
-                        scheduleQueue.add(newSchedule);
+                beginnableTasks.add(task);
+            }
+        }
+        for (Task task : tasks) {
+            if (task.getOutgoingEdges().size() == 0) {
+                taskDistanceMap.put(task, task.getWeight());
+                Queue<Task> taskQueue = new LinkedList<>();
+                taskQueue.add(task);
+                while (taskQueue.size() > 0) {
+                    Task t = taskQueue.poll();
+                    for (Edge e : t.getIngoingEdges()) {
+                        Task neighbour = e.getTail();
+                        taskDistanceMap.compute(neighbour, (k,v) -> {
+                            if (v==null) {
+                                v=0;
+                            }
+                            return Math.max(v, taskDistanceMap.get(t)+neighbour.getWeight());
+                        });
+                        taskDistanceMap.put(neighbour, Math.max(taskDistanceMap.getOrDefault(neighbour, 0), taskDistanceMap.get(t) + neighbour.getWeight()));
+                        taskQueue.add(neighbour);
                     }
                 }
             }
         }
-        return optimalSchedule;
     }
 
     /**
@@ -49,49 +49,68 @@ public class Scheduler {
      * @param numProcessors
      * @return
      */
-    private LinkedList<Schedule> generateOneTaskSchedules(List<Task> tasks, int numProcessors) {
-        LinkedList<Schedule> scheduleQueue = new LinkedList<>();
-
+    private Queue<Schedule> generateInitialSchedules(List<Task> tasks, int numProcessors) {
+        Queue<Schedule> scheduleQueue = new PriorityQueue<>(Comparator.comparingInt(Schedule::getEstimatedFinishTime));
         //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
         for (Task t : tasks) {
             if (t.getIngoingEdges().size() == 0) {
-                for (int i = 0; i < numProcessors; i++) {
-                    Schedule s = new Schedule(numProcessors);
-                    s.addTask(t, i, 0, t.getWeight());
-                    scheduleQueue.add(s);
-                }
+                beginnableTasks.remove(t);
+                Schedule s = new Schedule(numProcessors, new HashMap<>(taskRequirementsMap), new HashSet<>(beginnableTasks));
+                s.addTask(t, 0, 0);
+                s.setEstimatedFinishTime(taskDistanceMap.get(t));
+                scheduleQueue.add(s);
+                beginnableTasks.add(t);
             }
         }
         return scheduleQueue;
     }
 
-    /**
-     * Returns a boolean indicating that the current schedule that is complete
-     * is a better solution than previous 'optimalSchedule'.
-     * That is, return true if finish time of the current schedule is lower than the current optimalSchedule.
-     *
-     * @param optimalSchedule
-     * @param s
-     * @return
-     */
-    private boolean isMoreOptimal(Schedule optimalSchedule, Schedule s) {
-        return optimalSchedule == null || s.getOverallFinishTime() < optimalSchedule.getOverallFinishTime();
+    public Schedule findOptimalSchedule(List<Task> tasks, int numProcessors) {
+        preprocess(tasks);
+        Queue<Schedule> scheduleQueue = generateInitialSchedules(tasks, numProcessors);
+
+        while (scheduleQueue.size() != 0) {
+            Schedule s = scheduleQueue.poll();
+
+            //Check if the schedule is complete
+            if (s.getNumberOfTasks() == tasks.size()) {
+                return s;
+            } else {
+                Map<Task, Integer> taskProcessorMap = s.getTaskProcessorMap();
+                //Get a list of tasks that haven't been allocated to the current schedule 's'
+                Set<Task> tasksToSchedule = s.getBeginnableTasks();
+
+                //Expanding the schedule s, and insert them into the scheduleQueue
+                for (Task t : tasksToSchedule) {
+                    int minDistanceToEnd = taskDistanceMap.get(t);
+                    for (int i = 0; i < numProcessors; i++) {
+                        Schedule newSchedule = s.clone();
+                        //Compute the earliest time to schedule the task ('t') on this processor (processor 'i')
+                        int earliestStartTime = getEarliestTimeToSchedule(taskProcessorMap, t, i, newSchedule);
+                        newSchedule.addTask(t, i, earliestStartTime);
+                        newSchedule.setEstimatedFinishTime(Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime+minDistanceToEnd));
+                        scheduleQueue.add(newSchedule);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
      * On the given processor, find the earliest time we can schedule the given task
      *
      * @param taskProcessorMap
-     * @param t
-     * @param i
+     * @param task
+     * @param processor
      * @param newSchedule
      * @return
      */
-    private int getEarliestTimeToSchedule(Map<Task, Integer> taskProcessorMap, Task t, int i, Schedule newSchedule) {
-        int earliestStartTime = newSchedule.getProcessorFinishTime(i);
-        for (Edge e : t.getIngoingEdges()) {
+    private int getEarliestTimeToSchedule(Map<Task, Integer> taskProcessorMap, Task task, int processor, Schedule newSchedule) {
+        int earliestStartTime = newSchedule.getProcessorFinishTime(processor);
+        for (Edge e : task.getIngoingEdges()) {
             int finishTime = newSchedule.getTaskFinishTime(e.getTail());
-            if (taskProcessorMap.get(e.getTail()) == i) {
+            if (taskProcessorMap.get(e.getTail()) == processor) {
                 earliestStartTime = Math.max(earliestStartTime, finishTime);
             } else {
                 earliestStartTime = Math.max(earliestStartTime, finishTime + e.getWeight());
@@ -99,35 +118,4 @@ public class Scheduler {
         }
         return earliestStartTime;
     }
-
-
-    /**
-     * Returns the list of tasks that we can schedule
-     *
-     * @param tasks            The grand list of tasks to be scheduled
-     * @param taskProcessorMap Map that maps currently allocated tasks of the schedule to processors
-     * @return
-     */
-    private List<Task> getTasksToSchedule(List<Task> tasks, Map<Task, Integer> taskProcessorMap) {
-        List<Task> canBegin = new ArrayList<>();
-
-        //Checking which tasks can be started
-        for (Task t : tasks) {
-            if (!taskProcessorMap.containsKey(t)) {
-                boolean able = true;
-                for (Edge required : t.getIngoingEdges()) {
-                    if (!taskProcessorMap.containsKey(required.getTail())) {
-                        able = false;
-                        break;
-                    }
-                }
-                if (able) {
-                    canBegin.add(t);
-                }
-            }
-        }
-        return canBegin;
-    }
-
-
 }
