@@ -1,5 +1,8 @@
 ## Simon's Work Log
 
+### 31/08/2021
+Write on the development process part of the milestone 1 report
+
 ### 29/07/2021
 
 Discussion with teammates about the task delegation, start on researching java packages that can be used to output digraph visualization.

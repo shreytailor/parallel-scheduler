@@ -1,5 +1,15 @@
 # Shrey's Work Log
 
+## 30/07/2021
+
+- Editing the Maven configuration file (`pom.xml`) to include the dependencies for JavaFX, because we are starting to scaffold a simple view for algorithm visualization.
+- Created a custom JavaFX Gantt Chart component which will display a simple view of the optimal schedule that is created. This will be displayed after the algorithm finishes its execution.
+  - **Note:** This is going to be changed heavily and currently only created so that the algorithm developers have a view of what the final schedule looks like.
+- With the created visualization, I researched a little about how to setup an event (or listener) based system so that we can run the JavaFX application while the algorithm is running (which would be more helpful).
+  - [Reference Documentation](https://www3.cs.stonybrook.edu/~pfodor/courses/CSE114/L15-EventDrivenProgrammingInJavaFX.pdf)
+
+---
+
 ## 29/07/2021
 
 - Sat down with some teammates this morning, and completed the low-fi prototype based on the feedback. The final version can be seen [here](./../interface-prototype.md).
