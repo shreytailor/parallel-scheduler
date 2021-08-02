@@ -12,7 +12,6 @@ import java.io.FileNotFoundException;
 public class Entrypoint {
     public static void main(String[] args) {
         try {
-
             // Getting the configuration from the command line, and reading the input graph.
             DOTParser dotParser = new DOTParser();
             Config config  = CLIParser.parseCommandLineArguments(args);
@@ -24,7 +23,7 @@ public class Entrypoint {
             dotParser.write(config.getOutputName(),schedule, graph.getEdges());
 
             // Showing the visualization of the output schedule.
-            VisualizationDriver.main(schedule, config);
+            VisualizationDriver.main(schedule, graph.getNodes(), config);
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);

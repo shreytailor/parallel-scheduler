@@ -28,6 +28,7 @@ public class Schedule {
     public void addTask(Task n, int processor, int startTime) {
         taskProcessorMap.put(n, processor);
         taskStartTimeMap.put(n, startTime);
+        beginnableTasks.remove(n);
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap.compute(out.getHead(), (k,v)-> {
                 v--;

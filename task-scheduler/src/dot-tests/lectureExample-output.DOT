@@ -1,11 +1,11 @@
 digraph output {
-c [Weight=2,Start=4,Processor=0];
+c [Weight=2,Start=2,Processor=0];
 d [Weight=3,Start=3,Processor=1];
-b [Weight=2,Start=2,Processor=0];
+b [Weight=2,Start=4,Processor=0];
 a [Weight=2,Start=0,Processor=0];
 g [Weight=2,Start=10,Processor=1];
+f [Weight=3,Start=6,Processor=1];
 e [Weight=2,Start=6,Processor=0];
-f [Weight=3,Start=7,Processor=1];
 a -> b [Weight=1];
 a -> c [Weight=3];
 a -> d [Weight=1];

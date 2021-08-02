@@ -1,6 +1,7 @@
 package com.team7.visualization;
 
 import com.team7.model.Schedule;
+import com.team7.model.Task;
 import com.team7.parsing.Config;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -18,10 +19,12 @@ import java.util.*;
 public class VisualizationDriver extends Application {
     private static Config _config;
     private static Schedule _schedule;
+    private static List<Task> _tasks;
 
-    public static void main(Schedule schedule, Config config) {
+    public static void main(Schedule schedule, List<Task> tasks, Config config) {
         _config = config;
         _schedule = schedule;
+        _tasks=tasks;
         launch();
     }
 
@@ -51,18 +54,13 @@ public class VisualizationDriver extends Application {
             processorSeries.add(new XYChart.Series());
         }
 
-        // Getting the important parts of the schedule.
-        List<Integer> taskProcess = new ArrayList<>(_schedule.getTaskProcessorMap().values());
-        List<Integer> taskStartTime = new ArrayList(_schedule.getTaskStartTimeMap().values());
-        List<Integer> taskEndTime = new ArrayList(_schedule.getTaskFinishTimeMap().values());
-
         // Inserting each task into the graph, by iterating through them.
-        for (int counter = 0; counter < _schedule.getNumberOfTasks(); counter++) {
-            String machine = processorTitles.get(taskProcess.get(counter));
-            int startTime = taskStartTime.get(counter);
-            int length = taskEndTime.get(counter) - startTime;
-            XYChart.Series series = processorSeries.get(taskProcess.get(counter));
-            series.getData().add(new XYChart.Data(taskStartTime.get(counter), machine, new ExtraData(length, "status-grey")));
+        for (Task t : _tasks) {
+            String machine = String.valueOf(_schedule.getTaskProcessor(t));
+            int startTime = _schedule.getTaskStartTime(t);
+            int length = t.getWeight();
+            XYChart.Series series = processorSeries.get(_schedule.getTaskProcessor(t));
+            series.getData().add(new XYChart.Data(startTime, machine, new ExtraData(length, "status-grey")));
         }
 
         // Adding each series to the final graph.
