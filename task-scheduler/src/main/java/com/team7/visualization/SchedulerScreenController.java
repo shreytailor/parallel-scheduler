@@ -1,4 +1,4 @@
-package com.team7.view;
+package com.team7.visualization;
 
 public class SchedulerScreenController {
 
