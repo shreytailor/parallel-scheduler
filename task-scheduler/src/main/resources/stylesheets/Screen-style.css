@@ -1,0 +1,17 @@
+.graph-label {
+    -fx-font-size: 25px;
+    -fx-padding: 10px;
+}
+
+.screen-title {
+    -fx-border-insets: 10px;
+}
+
+.btn {
+    -fx-font-size: 18px;
+
+}
+
+.icon:hover {
+    -fx-opacity: 0.5;
+}
