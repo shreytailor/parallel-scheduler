@@ -23,11 +23,19 @@ public class Entrypoint {
             Schedule schedule = scheduler.AStar(graph.getNodes(), config.getNumOfProcessors());
             dotParser.write(config.getOutputName(),schedule, graph.getEdges());
 
-            // Showing the visualization of the output schedule.
-            VisualizationDriver.main(schedule, config);
+            // Showing the visualization, if requested by the user.
+            if (config.isVisualised()) {
+                beginVisualisation(schedule, config);
+            }
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);
         }
+    }
+
+    private static void beginVisualisation(Schedule schedule, Config config) {
+        new Thread(() -> {
+            VisualizationDriver.main(schedule, config);
+        }).start();
     }
 }
