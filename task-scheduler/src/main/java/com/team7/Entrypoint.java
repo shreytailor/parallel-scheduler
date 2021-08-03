@@ -23,7 +23,7 @@ public class Entrypoint {
             dotParser.write(config.getOutputName(),schedule, graph.getEdges());
 
             // Showing the visualization of the output schedule.
-            VisualizationDriver.main(schedule, graph.getNodes(), config);
+            VisualizationDriver.main(schedule, config);
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);

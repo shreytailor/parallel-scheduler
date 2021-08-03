@@ -19,12 +19,10 @@ import java.util.*;
 public class VisualizationDriver extends Application {
     private static Config _config;
     private static Schedule _schedule;
-    private static List<Task> _tasks;
 
-    public static void main(Schedule schedule, List<Task> tasks, Config config) {
+    public static void main(Schedule schedule, Config config) {
         _config = config;
         _schedule = schedule;
-        _tasks=tasks;
         launch();
     }
 
@@ -55,7 +53,7 @@ public class VisualizationDriver extends Application {
         }
 
         // Inserting each task into the graph, by iterating through them.
-        for (Task t : _tasks) {
+        for (Task t : _schedule.getTasks()) {
             String machine = String.valueOf(_schedule.getTaskProcessor(t));
             int startTime = _schedule.getTaskStartTime(t);
             int length = t.getWeight();

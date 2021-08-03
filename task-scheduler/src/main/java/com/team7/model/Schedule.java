@@ -6,17 +6,17 @@ public class Schedule {
     Map<Task, Integer> taskProcessorMap = new HashMap<>();
     Map<Task, Integer> taskStartTimeMap= new HashMap<>();
     Map<Task, Integer> taskRequirementsMap;
-    Set<Task> beginnableTasks;
+    Queue<Task> beginnableTasks;
     int estimatedFinishTime=0;
     int[] processorFinishTimes;
 
-    public Schedule(int numProcessors, Map<Task,Integer> taskRequirementsMap, Set<Task> beginnableTasks) {
+    public Schedule(int numProcessors, Map<Task,Integer> taskRequirementsMap, Queue<Task> beginnableTasks) {
         processorFinishTimes = new int[numProcessors];
         this.taskRequirementsMap=taskRequirementsMap;
         this.beginnableTasks=beginnableTasks;
     }
 
-    public Schedule(Map<Task, Integer> taskProcessorMap, Map<Task, Integer> taskStartTimeMap, Map<Task,Integer> taskRequirementsMap, Set<Task> beginnableTasks, int[] processorFinishTimes, int estimatedFinishTime) {
+    public Schedule(Map<Task, Integer> taskProcessorMap, Map<Task, Integer> taskStartTimeMap, Map<Task,Integer> taskRequirementsMap, Queue<Task> beginnableTasks, int[] processorFinishTimes, int estimatedFinishTime) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
@@ -28,7 +28,6 @@ public class Schedule {
     public void addTask(Task n, int processor, int startTime) {
         taskProcessorMap.put(n, processor);
         taskStartTimeMap.put(n, startTime);
-        beginnableTasks.remove(n);
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap.compute(out.getHead(), (k,v)-> {
                 v--;
@@ -52,7 +51,7 @@ public class Schedule {
         return taskStartTimeMap;
     }
 
-    public Set<Task> getBeginnableTasks() {
+    public Queue<Task> getBeginnableTasks() {
         return beginnableTasks;
     }
 
@@ -84,9 +83,13 @@ public class Schedule {
         return estimatedFinishTime;
     }
 
+    public Collection<Task> getTasks() {
+        return taskProcessorMap.keySet();
+    }
+
     @Override
     public Schedule clone() {
-        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskRequirementsMap), new HashSet<>(beginnableTasks), processorFinishTimes.clone(), estimatedFinishTime);
+        return new Schedule(new HashMap<>(taskProcessorMap), new HashMap<>(taskStartTimeMap), new HashMap<>(taskRequirementsMap), new PriorityQueue<>(beginnableTasks), processorFinishTimes.clone(), estimatedFinishTime);
     }
 
     private <T, S> String mapToString(Map<T, S> map) {

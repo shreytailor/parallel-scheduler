@@ -1,0 +1,27 @@
+digraph output {
+e [Weight=4,Start=6,Processor=2];
+a [Weight=2,Start=0,Processor=0];
+d [Weight=5,Start=5,Processor=1];
+c [Weight=4,Start=10,Processor=2];
+b [Weight=4,Start=2,Processor=0];
+k [Weight=2,Start=18,Processor=1];
+j [Weight=3,Start=6,Processor=0];
+i [Weight=4,Start=13,Processor=0];
+g [Weight=2,Start=14,Processor=2];
+f [Weight=3,Start=9,Processor=0];
+h [Weight=5,Start=12,Processor=1];
+a -> b [Weight=6];
+a -> c [Weight=2];
+a -> d [Weight=3];
+a -> e [Weight=4];
+b -> f [Weight=4];
+b -> j [Weight=6];
+c -> g [Weight=2];
+d -> h [Weight=4];
+e -> h [Weight=2];
+e -> i [Weight=3];
+f -> i [Weight=4];
+g -> k [Weight=2];
+h -> k [Weight=3];
+j -> k [Weight=6];
+}
