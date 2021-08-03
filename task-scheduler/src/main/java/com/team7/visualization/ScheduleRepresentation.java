@@ -14,7 +14,7 @@ import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+//import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
     public static class ExtraData {
@@ -120,7 +120,7 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
 
     @Override
     protected void dataItemChanged(Data<X, Y> item) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override

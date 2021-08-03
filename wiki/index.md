@@ -10,3 +10,12 @@ It contains information about the meetings minutes, how tasks were distributed a
 - [Git Conventions](git-conventions.md)
 - [Interface Prototype](interface-prototype.md)
 - [Meeting Minutes](minutes/index.md)
+- [Algorithm](algorithm.md)
+
+## Work Logs
+
+- [Simon Cheng](work_logs_individual/Simon.md)
+- [Hajin Kim](work_logs_individual/Hajin.md)
+- [Shrey Tailor](work_logs_individual/Shrey.md)
+- [Oscar Li](work_logs_individual/Oscar.md)
+- [Josh Lim](work_logs_individual/Josh.md)
