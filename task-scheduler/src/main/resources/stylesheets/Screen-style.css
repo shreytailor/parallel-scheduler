@@ -20,3 +20,7 @@
 .icon:hover {
     -fx-opacity: 0.5;
 }
+
+.btn:hover, .icon:hover {
+    -fx-cursor: hand;
+}
