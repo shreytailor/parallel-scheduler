@@ -10,6 +10,7 @@ It contains information about the meetings minutes, how tasks were distributed a
 - [Git Conventions](git-conventions.md)
 - [Interface Prototype](interface-prototype.md)
 - [Meeting Minutes](minutes/index.md)
+- [Algorithm](algorithm.md)
 
 ## Work Logs
 
