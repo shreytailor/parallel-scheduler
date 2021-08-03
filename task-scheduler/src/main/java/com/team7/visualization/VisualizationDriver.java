@@ -7,6 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import static com.team7.visualization.ScheduleRepresentation.ExtraData;
+
+import java.util.*;
 
 public class VisualizationDriver extends Application {
     private static Config _config;
@@ -20,10 +23,13 @@ public class VisualizationDriver extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/SchedulerScreen.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SchedulerScreen.fxml"));
+        loader.setController(new SchedulerScreenController(_schedule, _config));
+        Parent root = loader.load();
         Scene scene = new Scene(root);
-
-        primaryStage.setTitle("The Marauders: Task Scheduler Visualization");
+        
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("The Marauders: Task Visualization");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
