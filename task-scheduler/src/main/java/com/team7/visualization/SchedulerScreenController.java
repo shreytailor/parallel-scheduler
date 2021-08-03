@@ -1,5 +1,13 @@
 package com.team7.visualization;
 
-public class SchedulerScreenController {
+import javafx.fxml.Initializable;
+import java.net.URL;
+import java.util.ResourceBundle;
 
+public class SchedulerScreenController implements Initializable {
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
 }
