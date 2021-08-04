@@ -19,8 +19,6 @@ public class RAMUtilizationProvider extends UtilizationProvider {
     }
 
     public double memoryToGb(double memory) {
-        System.out.println(memory / Math.pow(1024, 3));
-//        return (int) (memory / Math.pow(1024, 3));
         return memory / Math.pow(1024, 3);
     }
 }
