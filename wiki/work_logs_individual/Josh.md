@@ -22,3 +22,26 @@
 ### 29 Jul
 
 - Started high-fidelity prototype
+
+### 30 Jul
+
+- Started UML diagram
+- Confirm with team and finalize UML
+
+### 1 Aug
+
+- Setup Javafx for visualization
+- Setup fxml for visualization screen
+- Setup controller for fxml
+- Finished basic layout of the visualization screen
+
+### 2 Aug
+
+- Add some styles to visualization screen
+- Find svg icons for close, dark mode, reset, and minimize
+- Realised svg is not supported by current version Java and switched to using image
+
+### 3 Aug
+
+- Merge visualization screen with final schedule
+- Get the timer running for visualization screen
