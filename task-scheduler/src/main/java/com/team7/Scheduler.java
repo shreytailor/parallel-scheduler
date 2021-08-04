@@ -5,8 +5,10 @@ import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 
-import javax.xml.bind.SchemaOutputResolver;
 import java.util.*;
+
+import static com.team7.algoutils.Preprocess.*;
+import static com.team7.algoutils.ScheduleCalculator.getEarliestTimeToSchedule;
 
 public class Scheduler {
     int processors;
@@ -15,8 +17,15 @@ public class Scheduler {
     int[] taskBottomLevelMap;
     int[] taskStaticLevelMap;
     byte[] taskRequirementsMap;
-    Queue<Task> beginnableTasks = new PriorityQueue<>((a, b) -> taskBottomLevelMap[b.getUniqueID()] + taskTopLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()] - taskTopLevelMap[a.getUniqueID()]);
+    Queue<Task> beginnableTasks = new PriorityQueue<>(getTaskComparator());
+
     Schedule feasibleSchedule;
+
+    private Comparator<Task> getTaskComparator() {
+        return (a, b) -> {
+            return taskBottomLevelMap[b.getUniqueID()] + taskTopLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()] - taskTopLevelMap[a.getUniqueID()];
+        };
+    }
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -31,57 +40,10 @@ public class Scheduler {
         taskRequirementsMap = new byte[numTasks];
     }
 
-    public void calculateTaskStaticAndBottomLevels() {
-        for (int i = 0; i < tasks.length; i++) {
-            Task task = tasks[i];
-            if (task.getOutgoingEdges().size() == 0) {
-                taskBottomLevelMap[i] = task.getWeight();
-                taskStaticLevelMap[i] = task.getWeight();
-                Queue<Task> taskQueue = new LinkedList<>();
-                taskQueue.add(task);
-                while (taskQueue.size() > 0) {
-                    Task t = taskQueue.poll();
-                    for (Edge e : t.getIngoingEdges()) {
-                        int neighbour = e.getTail().getUniqueID();
-                        taskBottomLevelMap[neighbour] = Math.max(taskBottomLevelMap[neighbour], taskBottomLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight() + e.getWeight());
-                        taskStaticLevelMap[neighbour] = Math.max(taskStaticLevelMap[neighbour], taskStaticLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight());
-                        taskQueue.add(tasks[neighbour]);
-                    }
-                }
-            }
-        }
-    }
-
-    public void calculateTaskTopLevels() {
-        for (int i = 0; i < tasks.length; i++) {
-            Task task = tasks[i];
-            if (task.getIngoingEdges().size() == 0) {
-                taskTopLevelMap[i] = 0;
-                Queue<Task> taskQueue = new LinkedList<>();
-                taskQueue.add(task);
-                while (taskQueue.size() > 0) {
-                    Task t = taskQueue.poll();
-                    for (Edge e : t.getOutgoingEdges()) {
-                        int neighbour = e.getHead().getUniqueID();
-                        taskTopLevelMap[neighbour] = Math.max(taskTopLevelMap[neighbour], taskTopLevelMap[t.getUniqueID()] + t.getWeight() + e.getWeight());
-                        taskQueue.add(tasks[neighbour]);
-                    }
-                }
-            }
-        }
-    }
-
     public void preprocess() {
-        calculateTaskStaticAndBottomLevels();
-        calculateTaskTopLevels();
-
-        for (Task task : tasks) {
-            if (task.getIngoingEdges().size() != 0) {
-                taskRequirementsMap[task.getUniqueID()] = (byte) task.getIngoingEdges().size();
-            } else {
-                beginnableTasks.add(task);
-            }
-        }
+        calculateTaskStaticAndBottomLevels(taskBottomLevelMap, taskStaticLevelMap, tasks);
+        calculateTaskTopLevels(taskTopLevelMap, tasks);
+        calculateRequirements(tasks, taskRequirementsMap, beginnableTasks);
     }
 
     public Schedule findFeasibleSchedule() {
@@ -128,11 +90,15 @@ public class Scheduler {
         preprocess();
         findFeasibleSchedule();
 
+        // (1) OPEN priority queue, sorted by f
         Queue<Schedule> scheduleQueue = generateInitialSchedules();
+
         while (scheduleQueue.size() != 0) {
+            // (2) Remove from OPEN the search state s with the smallest f
             Schedule s = scheduleQueue.poll();
 
-            //Check if the schedule is complete
+            // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
+            // otherwise, go to the next step.
             if (s.getNumberOfTasks() == tasks.length) {
                 return s;
             } else {
@@ -160,25 +126,5 @@ public class Scheduler {
         return feasibleSchedule;
     }
 
-    /**
-     * On the given processor, find the earliest time we can schedule the given task
-     *
-     * @param schedule
-     * @param task
-     * @param processor
-     * @return
-     */
-    private int getEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
-        int earliestStartTime = schedule.getProcessorFinishTime(processor);
-        byte[] taskProcessorMap = schedule.getTaskProcessorMap();
-        for (Edge e : task.getIngoingEdges()) {
-            int finishTime = schedule.getTaskFinishTime(e.getTail());
-            if (taskProcessorMap[e.getTail().getUniqueID()] == processor) {
-                earliestStartTime = Math.max(earliestStartTime, finishTime);
-            } else {
-                earliestStartTime = Math.max(earliestStartTime, finishTime + e.getWeight());
-            }
-        }
-        return earliestStartTime;
-    }
+
 }
