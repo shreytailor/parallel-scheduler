@@ -24,26 +24,23 @@ class SchedulerTest {
     /**
      * DOES NOT ASSERT
      * Allocate a graph of 3 tasks onto 1 processor
-     *
      */
     @Test
     void AStar_singleProcessor3TasksNoDependency() {
 //        Given
-        Scheduler scheduler = new Scheduler();
-        int numProcessors = 1;
-        List<Task> tasks = new ArrayList<>();
-
-        Task task1 = new Task("a",3);
+        Task.resetID();
+        Task task1 = new Task("a", 3);
         Task task2 = new Task("b", 4);
         Task task3 = new Task("c", 5);
-        tasks.addAll(Arrays.asList(task1, task2, task3));
-
-
+        List<Task> tasks = new ArrayList<>(Arrays.asList(task1, task2, task3));
+        Graph g = new Graph(tasks, new ArrayList<>());
+        int numProcessors = 1;
+        Scheduler scheduler = new Scheduler(g, numProcessors);
 //        When
-        Schedule result = scheduler.findOptimalSchedule(tasks, numProcessors);
+        Schedule result = scheduler.findOptimalSchedule();
 
 //        Then
-        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
+        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, numProcessors));
     }
 
 
@@ -54,11 +51,8 @@ class SchedulerTest {
     @Test
     void AStar_singleProcessor3Tasks() {
 //        Given
-        Scheduler scheduler = new Scheduler();
-        int numProcessors = 1;
-        List<Task> tasks = new ArrayList<>();
-
-        Task task1 = new Task("a",3);
+        Task.resetID();
+        Task task1 = new Task("a", 3);
         Task task2 = new Task("b", 4);
         Task task3 = new Task("c", 5);
 
@@ -75,11 +69,15 @@ class SchedulerTest {
         task2.addIngoingEdge(edge3);
         task3.addOutgoingEdge(edge3);
 
-        tasks.addAll(Arrays.asList(task1, task2, task3));
+        List<Task> tasks = new ArrayList<>(Arrays.asList(task1, task2, task3));
+        List<Edge> edges = new ArrayList<>(Arrays.asList(edge1, edge2, edge3));
+        Graph graph = new Graph(tasks, edges);
+        int numProcessors = 1;
+        Scheduler scheduler = new Scheduler(graph, numProcessors);
 
 //        When
-        Schedule result = scheduler.findOptimalSchedule(tasks, numProcessors);
-        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
+        Schedule result = scheduler.findOptimalSchedule();
+        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, graph, numProcessors));
     }
 
     @TestFactory
@@ -91,31 +89,28 @@ class SchedulerTest {
             tests.add(
                     DynamicTest.dynamicTest(
                             file.getName(),
-                            ()->testAStarWithDotFile(file)
+                            () -> testAStarWithDotFile(file)
                     ));
         }
 
         return tests;
     }
 
-    private void testAStarWithDotFile(File file){
+    private void testAStarWithDotFile(File file) {
         // given
         try {
             Graph g = DOTParser.read(file.toString());
-            List<Task> tasks = g.getNodes();
-            List<Edge> edges = g.getEdges();
-            Scheduler scheduler = new Scheduler();
-
             // when
             int numProcessors = 2;
-            Schedule result = scheduler.findOptimalSchedule(tasks, numProcessors);
+            Scheduler scheduler = new Scheduler(g, numProcessors);
+            Schedule result = scheduler.findOptimalSchedule();
 
             // then
-            if(shouldBeNullSchedule(file)){
+            if (shouldBeNullSchedule(file)) {
                 assertNull(result);
-            }else{
-                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, numProcessors, edges));
+            } else {
+                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, numProcessors));
+                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
             }
 
             System.out.println("schedule = " + result);
@@ -128,9 +123,6 @@ class SchedulerTest {
     private boolean shouldBeNullSchedule(File file) {
         String fileName = file.getName();
 
-        if(fileName.contains("cycle") || fileName.contains("empty")){
-            return true;
-        }
-        return false;
+        return fileName.contains("cycle") || fileName.contains("empty");
     }
 }

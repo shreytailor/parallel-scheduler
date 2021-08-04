@@ -18,12 +18,12 @@ public class Entrypoint {
             Graph graph = dotParser.read(config.getInputName());
 
             // Processing the input graph by using the scheduler, and storing the output.
-            Scheduler scheduler = new Scheduler();
-            Schedule schedule = scheduler.findOptimalSchedule(graph.getNodes(), config.getNumOfProcessors());
-            dotParser.write(config.getOutputName(),schedule, graph.getEdges());
+            Scheduler scheduler = new Scheduler(graph, config.getNumOfProcessors());
+            Schedule schedule = scheduler.findOptimalSchedule();
+            dotParser.write(config.getOutputName(),schedule, graph);
 
             // Showing the visualization of the output schedule.
-            VisualizationDriver.main(schedule, config);
+            VisualizationDriver.main(schedule, graph, config);
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);

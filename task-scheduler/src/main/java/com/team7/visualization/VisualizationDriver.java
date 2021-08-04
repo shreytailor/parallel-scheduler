@@ -1,5 +1,6 @@
 package com.team7.visualization;
 
+import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
@@ -12,6 +13,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
 import static com.team7.visualization.ScheduleRepresentation.ExtraData;
 
 import java.util.*;
@@ -19,10 +21,12 @@ import java.util.*;
 public class VisualizationDriver extends Application {
     private static Config _config;
     private static Schedule _schedule;
+    private static Graph _graph;
 
-    public static void main(Schedule schedule, Config config) {
+    public static void main(Schedule schedule, Graph graph, Config config) {
         _config = config;
         _schedule = schedule;
+        _graph = graph;
         launch();
     }
 
@@ -53,7 +57,7 @@ public class VisualizationDriver extends Application {
         }
 
         // Inserting each task into the graph, by iterating through them.
-        for (Task t : _schedule.getTasks()) {
+        for (Task t : _graph.getNodes()) {
             String machine = String.valueOf(_schedule.getTaskProcessor(t));
             int startTime = _schedule.getTaskStartTime(t);
             int length = t.getWeight();

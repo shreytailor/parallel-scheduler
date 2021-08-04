@@ -23,11 +23,13 @@ public class DOTParser {
         GraphParser parser = new GraphParser(new FileInputStream(filename));
         Map<String, GraphNode> nodeMap = parser.getNodes();
         Map<String, GraphEdge> edgeMap = parser.getEdges();
+        Task.resetID();
 
         for (GraphNode n : nodeMap.values()) {
             String name = n.getId();
             int weight = Integer.parseInt((String) n.getAttribute("Weight"));
-            tasks.put(name, new Task(name, weight));
+            Task t=new Task(name, weight);
+            tasks.put(name, t);
         }
 
         for (GraphEdge e : edgeMap.values()) {
@@ -45,13 +47,13 @@ public class DOTParser {
         return new Graph(new ArrayList<>(tasks.values()), edges);
     }
 
-    public static void write(String path, Schedule schedule, List<Edge> edges) {
+    public static void write(String path, Schedule schedule, Graph graph) {
         try (FileWriter writer = new FileWriter(path)) {
             writer.write("digraph output {\n");
-            for (Task t : schedule.getTaskProcessorMap().keySet()) {
+            for (Task t : graph.getNodes()) {
                 writer.append(t.getName()).append(" [Weight=").append(String.valueOf(t.getWeight())).append(",Start=").append(String.valueOf(schedule.getTaskStartTime(t))).append(",Processor=").append(String.valueOf(schedule.getTaskProcessor(t))).append("];\n");
             }
-            for (Edge e : edges) {
+            for (Edge e : graph.getEdges()) {
                 writer.append(e.getTail().getName()).append(" -> ").append(e.getHead().getName()).append(" [Weight=").append(String.valueOf(e.getWeight())).append("];\n");
             }
             writer.append("}");

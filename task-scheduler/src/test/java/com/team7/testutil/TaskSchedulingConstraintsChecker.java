@@ -1,6 +1,7 @@
 package com.team7.testutil;
 
 import com.team7.model.Edge;
+import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 
@@ -12,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class TaskSchedulingConstraintsChecker {
 
-    public static boolean isProcessorConstraintMet(Schedule schedule, int numOfProcessors) {
+    public static boolean isProcessorConstraintMet(Schedule schedule, Graph graph, int numOfProcessors) {
 //        make a list of tasks that are assigned to each processor
-        List<Task>[] processors = getTaskPopulatedProcessors(schedule, numOfProcessors);
+        List<Task>[] processors = getTaskPopulatedProcessors(schedule, graph, numOfProcessors);
 
 
 //        for each processor, check that each pair of tasks meet processor requirement
@@ -41,10 +42,10 @@ public class TaskSchedulingConstraintsChecker {
 
 
     private static boolean isTaskPairCompatible(Task taskOne, Task taskTwo, Schedule schedule) {
-        Map<Task, Integer> taskStartTimeMap = schedule.getTaskStartTimeMap();
+        int[] taskStartTimeMap = schedule.getTaskStartTimeMap();
 
-        Integer taskOneStartingTime = taskStartTimeMap.get(taskOne);
-        Integer taskTwoStartingTime = taskStartTimeMap.get(taskTwo);
+        Integer taskOneStartingTime = taskStartTimeMap[taskOne.getUniqueID()];
+        Integer taskTwoStartingTime = taskStartTimeMap[taskTwo.getUniqueID()];
 
         // only need to satisfy two conditions as OR
         boolean conditionOne = taskOneStartingTime + taskOne.getWeight() <= taskTwoStartingTime;
@@ -58,41 +59,40 @@ public class TaskSchedulingConstraintsChecker {
     }
 
 
-    private static List<Task>[] getTaskPopulatedProcessors(Schedule schedule, int numOfProcessors) {
+    private static List<Task>[] getTaskPopulatedProcessors(Schedule schedule, Graph graph, int numOfProcessors) {
         List<Task>[] processors = new ArrayList[numOfProcessors];
         if (schedule == null) {
             fail("Schedule is null. This means that the schedule must have not been generated, or the input graph itself was empty");
         }
-        for (Map.Entry<Task, Integer> taskProcessorPair : schedule.getTaskProcessorMap().entrySet()) {
-            int pid = taskProcessorPair.getValue();
-            Task task = taskProcessorPair.getKey();
 
+        for (Task t : graph.getNodes()) {
+            int pid = schedule.getTaskProcessor(t);
             if (processors[pid] == null) {
                 processors[pid] = new ArrayList<>();
             }
-            processors[pid].add(task);
+            processors[pid].add(t);
         }
 
         return processors;
     }
 
-    public static boolean isPrecedenceConstraintMet(Schedule schedule, int numOfProcessors, List<Edge> edges) {
+    public static boolean isPrecedenceConstraintMet(Schedule schedule, List<Edge> edges) {
 //         for each edge ij (i being the tail task, j being the head task)
 //        if p_i != p_j, then
 //        ts_j => ts_i + w_i + c_e (cost of edge)
 //        else, ts_j => ts_i + w_i
 
-        Map<Task, Integer> taskProcessorMap = schedule.getTaskProcessorMap();
-        Map<Task, Integer> taskStartTimeMap = schedule.getTaskStartTimeMap();
+        short[] taskProcessorMap = schedule.getTaskProcessorMap();
+        int[] taskStartTimeMap = schedule.getTaskStartTimeMap();
 
 
         for (Edge edge : edges) {
             Task tail = edge.getTail();
             Task head = edge.getHead();
-            int tailPid = taskProcessorMap.get(tail);
-            int headPid = taskProcessorMap.get(head);
-            Integer tailStartTime = taskStartTimeMap.get(tail);
-            Integer headStartTime = taskStartTimeMap.get(head);
+            int tailPid = taskProcessorMap[tail.getUniqueID()];
+            int headPid = taskProcessorMap[head.getUniqueID()];
+            Integer tailStartTime = taskStartTimeMap[tail.getUniqueID()];
+            Integer headStartTime = taskStartTimeMap[head.getUniqueID()];
 
             int commCost = (tailPid == headPid)?0:edge.getWeight();
             boolean isConstraintMet = headStartTime >= tailStartTime + tail.getWeight() + commCost;

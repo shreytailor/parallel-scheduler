@@ -5,16 +5,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class Task {
+    private static short id = 0;
     private String name;
     private int weight;
     private List<Edge> inEdges;
     private List<Edge> outEdges;
+    private short uniqueID;
 
     public Task(String name, int weight) {
         this.name = name;
         this.weight = weight;
         inEdges = new ArrayList<>();
         outEdges = new ArrayList<>();
+        uniqueID = id;
+        id++;
     }
 
     public String getName() {
@@ -39,6 +43,14 @@ public class Task {
 
     public int getWeight() {
         return weight;
+    }
+
+    public short getUniqueID() {
+        return this.uniqueID;
+    }
+
+    public static void resetID() {
+        id=0;
     }
 
     @Override
