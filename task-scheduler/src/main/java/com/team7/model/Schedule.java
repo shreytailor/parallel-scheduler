@@ -3,23 +3,23 @@ package com.team7.model;
 import java.util.*;
 
 public class Schedule {
-    short[] taskProcessorMap;
+    byte[] taskProcessorMap;
     int[] taskStartTimeMap;
-    short[] taskRequirementsMap;
+    byte[] taskRequirementsMap;
     Queue<Task> beginnableTasks;
     int estimatedFinishTime = 0;
-    short tasksCompleted = 0;
+    byte tasksCompleted = 0;
     int[] processorFinishTimes;
 
-    public Schedule(int numTasks, int numProcessors, short[] taskRequirementsMap, Queue<Task> beginnableTasks) {
-        taskProcessorMap = new short[numTasks];
+    public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap, Queue<Task> beginnableTasks) {
+        taskProcessorMap = new byte[numTasks];
         taskStartTimeMap = new int[numTasks];
         this.taskRequirementsMap = taskRequirementsMap;
         this.beginnableTasks = beginnableTasks;
         processorFinishTimes = new int[numProcessors];
     }
 
-    public Schedule(short[] taskProcessorMap, int[] taskStartTimeMap, short[] taskRequirementsMap, Queue<Task> beginnableTasks, int[] processorFinishTimes, int estimatedFinishTime, short tasksCompleted) {
+    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap, byte[] taskRequirementsMap, Queue<Task> beginnableTasks, int[] processorFinishTimes, int estimatedFinishTime, byte tasksCompleted) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
@@ -30,7 +30,7 @@ public class Schedule {
     }
 
     public void addTask(Task n, int processor, int startTime) {
-        taskProcessorMap[n.getUniqueID()] = (short) processor;
+        taskProcessorMap[n.getUniqueID()] = (byte) processor;
         taskStartTimeMap[n.getUniqueID()] = startTime;
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap[out.getHead().getUniqueID()]--;
@@ -38,14 +38,11 @@ public class Schedule {
                 beginnableTasks.add(out.getHead());
             }
         }
-        if (processorFinishTimes[processor] > startTime) {
-            throw new RuntimeException("Something went wrong");
-        }
         processorFinishTimes[processor] = startTime + n.getWeight();
         tasksCompleted++;
     }
 
-    public short[] getTaskProcessorMap() {
+    public byte[] getTaskProcessorMap() {
         return taskProcessorMap;
     }
 

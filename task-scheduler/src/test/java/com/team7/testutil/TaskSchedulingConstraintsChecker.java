@@ -22,7 +22,7 @@ public class TaskSchedulingConstraintsChecker {
 //        this check is only done if there's an edge between those pair of tasks
         for (List<Task> processor : processors) {
 //            if a processor doesn't have any tasks assigned, break
-            if(processor == null){
+            if (processor == null) {
                 break;
             }
             for (Task taskOne : processor) {
@@ -82,7 +82,7 @@ public class TaskSchedulingConstraintsChecker {
 //        ts_j => ts_i + w_i + c_e (cost of edge)
 //        else, ts_j => ts_i + w_i
 
-        short[] taskProcessorMap = schedule.getTaskProcessorMap();
+        byte[] taskProcessorMap = schedule.getTaskProcessorMap();
         int[] taskStartTimeMap = schedule.getTaskStartTimeMap();
 
 
@@ -94,7 +94,7 @@ public class TaskSchedulingConstraintsChecker {
             Integer tailStartTime = taskStartTimeMap[tail.getUniqueID()];
             Integer headStartTime = taskStartTimeMap[head.getUniqueID()];
 
-            int commCost = (tailPid == headPid)?0:edge.getWeight();
+            int commCost = (tailPid == headPid) ? 0 : edge.getWeight();
             boolean isConstraintMet = headStartTime >= tailStartTime + tail.getWeight() + commCost;
 
             if (!isConstraintMet) {

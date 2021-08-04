@@ -9,28 +9,26 @@ import javax.xml.bind.SchemaOutputResolver;
 import java.util.*;
 
 public class Scheduler {
-    Graph graph;
     int processors;
     Task[] tasks;
     int[] taskTopLevelMap;
     int[] taskBottomLevelMap;
     int[] taskStaticLevelMap;
-    short[] taskRequirementsMap;
+    byte[] taskRequirementsMap;
     Queue<Task> beginnableTasks = new PriorityQueue<>((a, b) -> taskBottomLevelMap[b.getUniqueID()] + taskTopLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()] - taskTopLevelMap[a.getUniqueID()]);
     Schedule feasibleSchedule;
 
     public Scheduler(Graph g, int numOfProcessors) {
-        graph = g;
         processors = numOfProcessors;
-        int numTasks = graph.getNodes().size();
+        int numTasks = g.getNodes().size();
         tasks = new Task[numTasks];
-        for (Task t : graph.getNodes()) {
+        for (Task t : g.getNodes()) {
             tasks[t.getUniqueID()] = t;
         }
         taskTopLevelMap = new int[numTasks];
         taskBottomLevelMap = new int[numTasks];
         taskStaticLevelMap = new int[numTasks];
-        taskRequirementsMap = new short[numTasks];
+        taskRequirementsMap = new byte[numTasks];
     }
 
     public void calculateTaskStaticAndBottomLevels() {
@@ -79,7 +77,7 @@ public class Scheduler {
 
         for (Task task : tasks) {
             if (task.getIngoingEdges().size() != 0) {
-                taskRequirementsMap[task.getUniqueID()] = (short) task.getIngoingEdges().size();
+                taskRequirementsMap[task.getUniqueID()] = (byte) task.getIngoingEdges().size();
             } else {
                 beginnableTasks.add(task);
             }
@@ -172,7 +170,7 @@ public class Scheduler {
      */
     private int getEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
         int earliestStartTime = schedule.getProcessorFinishTime(processor);
-        short[] taskProcessorMap = schedule.getTaskProcessorMap();
+        byte[] taskProcessorMap = schedule.getTaskProcessorMap();
         for (Edge e : task.getIngoingEdges()) {
             int finishTime = schedule.getTaskFinishTime(e.getTail());
             if (taskProcessorMap[e.getTail().getUniqueID()] == processor) {
