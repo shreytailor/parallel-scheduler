@@ -1,14 +1,16 @@
 package com.team7.visualization;
 
 import com.team7.model.Schedule;
+import com.team7.model.Task;
 import com.team7.parsing.Config;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.paint.Color;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ScheduleProvider {
     private Config _config;
@@ -19,13 +21,14 @@ public class ScheduleProvider {
         _schedule = schedule;
     }
 
-    public ScheduleRepresentation GetSchedule() {
+    public ScheduleRepresentation getSchedule() {
+
         // Creating and configuring the chart.
         final NumberAxis xAxis = new NumberAxis();
         final CategoryAxis yAxis = new CategoryAxis();
         final ScheduleRepresentation<Number, String> chart = new ScheduleRepresentation<>(xAxis, yAxis);
         chart.setLegendVisible(true);
-        chart.setBlockHeight(10);
+        chart.setBlockHeight(15);
 
         // Configuring the axis.
         xAxis.setTickLabelFill(Color.CHOCOLATE);
@@ -42,17 +45,25 @@ public class ScheduleProvider {
         }
 
         // Getting the important parts of the schedule.
-        List<Integer> taskProcess = new ArrayList<>(_schedule.getTaskProcessorMap().values());
-        List<Integer> taskStartTime = new ArrayList(_schedule.getTaskStartTimeMap().values());
-        List<Integer> taskEndTime = new ArrayList(_schedule.getTaskFinishTimeMap().values());
+        Map<Task, Integer> taskMap = _schedule.getTaskProcessorMap();
+        Map<Task, Integer> taskStartTime = _schedule.getTaskStartTimeMap();
+        Iterator iterator = taskMap.entrySet().iterator();
 
         // Inserting each task into the graph, by iterating through them.
-        for (int counter = 0; counter < _schedule.getNumberOfTasks(); counter++) {
-            String machine = processorTitles.get(taskProcess.get(counter));
-            int startTime = taskStartTime.get(counter);
-            int length = taskEndTime.get(counter) - startTime;
-            XYChart.Series series = processorSeries.get(taskProcess.get(counter));
-            series.getData().add(new XYChart.Data(taskStartTime.get(counter), machine, new ScheduleRepresentation.ExtraData(length, "status-grey")));
+        while (iterator.hasNext()) {
+            Map.Entry pair = (Map.Entry) iterator.next();
+            Task task = (Task) pair.getKey();
+
+            String machine = String.valueOf(pair.getValue());
+            int startTime = taskStartTime.get(pair.getKey());
+            int length = task.getWeight();
+
+            XYChart.Series series = processorSeries.get((int) pair.getValue());
+            XYChart.Data<Number, String> data = new XYChart.Data(
+                    startTime, machine,
+                    new ScheduleRepresentation.ExtraData(length, "status-grey", task.getName()));
+
+            series.getData().add(data);
         }
 
         // Adding each series to the final graph.

@@ -7,25 +7,19 @@ import com.team7.visualization.system.RAMUtilizationProvider;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.animation.AnimationTimer;
 import javafx.util.Duration;
 
 import java.net.URL;
-import java.text.DateFormat;
 import java.util.*;
 
 public class SchedulerScreenController implements Initializable {
@@ -93,6 +87,6 @@ public class SchedulerScreenController implements Initializable {
         timeline.play();
 
         ScheduleProvider scheduleProvider = new ScheduleProvider(_schedule, _config);
-        stateGraphContainer.setCenter(scheduleProvider.GetSchedule());
+        stateGraphContainer.setCenter(scheduleProvider.getSchedule());
     }
 }
