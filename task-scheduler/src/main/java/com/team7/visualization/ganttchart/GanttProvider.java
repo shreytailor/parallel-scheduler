@@ -1,4 +1,4 @@
-package com.team7.visualization;
+package com.team7.visualization.ganttchart;
 
 import com.team7.model.Schedule;
 import com.team7.model.Task;
@@ -12,21 +12,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class ScheduleProvider {
+public class GanttProvider {
     private Config _config;
     private Schedule _schedule;
 
-    public ScheduleProvider(Schedule schedule, Config config) {
+    public GanttProvider(Schedule schedule, Config config) {
         _config = config;
         _schedule = schedule;
     }
 
-    public ScheduleRepresentation getSchedule() {
+    public GanttComponent getSchedule() {
 
         // Creating and configuring the chart.
         final NumberAxis xAxis = new NumberAxis();
         final CategoryAxis yAxis = new CategoryAxis();
-        final ScheduleRepresentation<Number, String> chart = new ScheduleRepresentation<>(xAxis, yAxis);
+        final GanttComponent<Number, String> chart = new GanttComponent<>(xAxis, yAxis);
         chart.setLegendVisible(true);
         chart.setBlockHeight(15);
 
@@ -61,7 +61,7 @@ public class ScheduleProvider {
             XYChart.Series series = processorSeries.get((int) pair.getValue());
             XYChart.Data<Number, String> data = new XYChart.Data(
                     startTime, machine,
-                    new ScheduleRepresentation.ExtraData(length, "status-grey", task.getName()));
+                    new GanttComponent.ExtraData(length, "status-grey", task.getName()));
 
             series.getData().add(data);
         }
@@ -72,7 +72,7 @@ public class ScheduleProvider {
         }
 
         // Setting properties for the primary stage, and showing it.
-        chart.getStylesheets().add(getClass().getResource("/stylesheets/schedule-representation.css").toExternalForm());
+        chart.getStylesheets().add(getClass().getResource("/stylesheets/Gantt.css").toExternalForm());
         return chart;
     }
 }

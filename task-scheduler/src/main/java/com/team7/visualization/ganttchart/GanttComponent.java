@@ -1,4 +1,4 @@
-package com.team7.visualization;
+package com.team7.visualization.ganttchart;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +17,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
-public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
+public class GanttComponent<X,Y> extends XYChart<X,Y> {
     public static class ExtraData {
         public long length;
         public String styleClass;
@@ -57,11 +57,11 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
 
     private double blockHeight = 10;
 
-    public ScheduleRepresentation(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis) {
+    public GanttComponent(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis) {
         this(xAxis, yAxis, FXCollections.<Series<X, Y>>observableArrayList());
     }
 
-    public ScheduleRepresentation(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis, @NamedArg("data") ObservableList<Series<X,Y>> data) {
+    public GanttComponent(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis, @NamedArg("data") ObservableList<Series<X,Y>> data) {
         super(xAxis, yAxis);
         if (!(xAxis instanceof ValueAxis && yAxis instanceof CategoryAxis)) {
             throw new IllegalArgumentException("Axis type incorrect, X and Y should both be NumberAxis");

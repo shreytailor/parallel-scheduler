@@ -2,6 +2,7 @@ package com.team7.visualization;
 
 import com.team7.model.Schedule;
 import com.team7.parsing.Config;
+import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
 import javafx.animation.Animation;
@@ -86,7 +87,7 @@ public class SchedulerScreenController implements Initializable {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
 
-        ScheduleProvider scheduleProvider = new ScheduleProvider(_schedule, _config);
+        GanttProvider scheduleProvider = new GanttProvider(_schedule, _config);
         stateGraphContainer.setCenter(scheduleProvider.getSchedule());
     }
 }
