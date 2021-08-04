@@ -27,7 +27,8 @@ public class GanttProvider {
         final NumberAxis xAxis = new NumberAxis();
         final CategoryAxis yAxis = new CategoryAxis();
         final GanttComponent<Number, String> chart = new GanttComponent<>(xAxis, yAxis);
-        chart.setLegendVisible(true);
+        chart.setTitle("Schedule Visualization");
+        chart.setLegendVisible(false);
         chart.setBlockHeight(15);
 
         // Configuring the axis.

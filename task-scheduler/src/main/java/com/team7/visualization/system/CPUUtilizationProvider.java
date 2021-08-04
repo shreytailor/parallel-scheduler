@@ -3,8 +3,8 @@ package com.team7.visualization.system;
 import javafx.scene.chart.LineChart;
 
 public class CPUUtilizationProvider extends UtilizationProvider {
-    public CPUUtilizationProvider(LineChart<String, Number> chart) {
-        super(chart);
+    public CPUUtilizationProvider(LineChart<String, Number> chart, String title) {
+        super(chart, title);
     }
 
     @Override

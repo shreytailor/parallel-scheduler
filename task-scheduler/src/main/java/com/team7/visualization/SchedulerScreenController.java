@@ -61,7 +61,7 @@ public class SchedulerScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart);
+        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization");
         cpuUtilizationProvider.startTracking();
 
         NumberAxis cpuYAxis = (NumberAxis) cpuUsageChart.getYAxis();
@@ -69,7 +69,7 @@ public class SchedulerScreenController implements Initializable {
         cpuYAxis.setLabel("Usage (%)");
         cpuYAxis.setUpperBound(cpuUtilizationProvider.getUpperBound());
 
-        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart);
+        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization");
         ramUtilizationProvider.startTracking();
 
         NumberAxis ramYAxis = (NumberAxis) ramUsageChart.getYAxis();

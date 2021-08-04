@@ -16,9 +16,11 @@ public abstract class UtilizationProvider {
     private LineChart<String, Number> chart;
     protected final OperatingSystemMXBean bean;
 
-    public UtilizationProvider(LineChart<String, Number> chart) {
+    public UtilizationProvider(LineChart<String, Number> chart, String title) {
         this.time = 0;
         this.chart = chart;
+        chart.setTitle(title);
+        chart.setLegendVisible(false);
         bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     }
 

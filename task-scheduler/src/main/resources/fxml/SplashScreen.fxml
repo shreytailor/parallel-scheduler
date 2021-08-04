@@ -124,13 +124,6 @@
                </padding>
             </VBox>
             <BorderPane stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="1">
-               <top>
-                  <Label styleClass="graph-label" stylesheets="@../stylesheets/Splash.css" text="CPU Usage" BorderPane.alignment="CENTER">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Label>
-               </top>
                <center>
                   <LineChart fx:id="cpuUsageChart" BorderPane.alignment="CENTER">
                     <xAxis>
@@ -143,13 +136,6 @@
                </center>
             </BorderPane>
             <BorderPane stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="2">
-               <top>
-                  <Label styleClass="graph-label" stylesheets="@../stylesheets/Splash.css" text="RAM Usage" BorderPane.alignment="CENTER">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Label>
-               </top>
                <center>
                   <LineChart fx:id="ramUsageChart" BorderPane.alignment="CENTER">
                     <xAxis>
@@ -161,15 +147,7 @@
                   </LineChart>
                </center>
             </BorderPane>
-            <BorderPane fx:id="stateGraphContainer" prefHeight="200.0" prefWidth="200.0" stylesheets="@../stylesheets/Splash.css" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <top>
-                  <Label styleClass="graph-label" stylesheets="@../stylesheets/Splash.css" text="Current State" BorderPane.alignment="CENTER">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Label>
-               </top>
-            </BorderPane>
+            <BorderPane fx:id="stateGraphContainer" prefHeight="200.0" prefWidth="200.0" stylesheets="@../stylesheets/Splash.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </children>
