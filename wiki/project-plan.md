@@ -11,3 +11,9 @@
 ## Gantt Chart
 
 ![Gantt Chart](images/gantt-chart.png)
+
+
+
+## UML
+
+![UML Diagram](images/UML.png)
