@@ -12,16 +12,17 @@ import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
 
 public abstract class UtilizationProvider {
-    int time;
+
     private LineChart<String, Number> chart;
     protected final OperatingSystemMXBean bean;
+    private TimeProvider timeProvider;
 
-    public UtilizationProvider(LineChart<String, Number> chart, String title) {
-        this.time = 0;
+    public UtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider tp) {
         this.chart = chart;
         chart.setTitle(title);
         chart.setLegendVisible(false);
         bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        timeProvider = tp;
     }
 
     public void startTracking() {
@@ -32,9 +33,8 @@ public abstract class UtilizationProvider {
 
         EventHandler<ActionEvent> chartUpdater = event -> {
             ObservableList currentData = series.getData();
-            currentData.add(new XYChart.Data<>(String.valueOf(time), getData()));
+            currentData.add(new XYChart.Data<>(String.valueOf(timeProvider.getCurrentSec()), getData()));
             if (currentData.size() == 20) currentData.remove(0);
-            time++;
         };
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), chartUpdater));

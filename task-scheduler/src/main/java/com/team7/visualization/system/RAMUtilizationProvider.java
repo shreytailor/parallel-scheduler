@@ -3,8 +3,8 @@ package com.team7.visualization.system;
 import javafx.scene.chart.LineChart;
 
 public class RAMUtilizationProvider extends UtilizationProvider {
-    public RAMUtilizationProvider(LineChart<String, Number> chart, String title) {
-        super(chart, title);
+    public RAMUtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider tp) {
+        super(chart, title, tp);
     }
 
     @Override

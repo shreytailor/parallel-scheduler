@@ -78,7 +78,7 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Label stylesheets="@../stylesheets/Splash.css" text="Elapsed time (ms):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label stylesheets="@../stylesheets/Splash.css" text="Elapsed time (s):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
