@@ -34,8 +34,10 @@ public class GanttProvider {
         // Configuring the axis.
         xAxis.setTickLabelFill(Color.CHOCOLATE);
         xAxis.setMinorTickCount(4);
+        xAxis.setLabel("Time (weight)");
         yAxis.setTickLabelFill(Color.CHOCOLATE);
         yAxis.setTickLabelGap(10);
+        yAxis.setLabel("Processor");
 
         // Registering the processors.
         List<String> processorTitles = new ArrayList<>();
