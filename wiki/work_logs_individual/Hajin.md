@@ -1,3 +1,6 @@
+### 5 Aug
+- Explored different options of profilers to detect what objects are created. [VisualVM](https://visualvm.github.io) comes as part of JDK8, so it was fit for initial choice.
+- Execution file can be found from /Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home/bin/jvisualvm. After running the program on IntelliJ, the process (com.team7.EntryPoint) on the left pane. 
 
 ### 4 Aug
 - Refactored com.team7.Scheduler into more modular methods to increase each method's testability and reduce chains of dependencies. Created 2 additional util classes (algoutils.Preprocess, ScheduleCalculator). Undertook this refactoring while constantly checking against tests we have (this saved me because sometimes things would unexpectedly break. yay to TDD!).
