@@ -52,10 +52,10 @@ public class DOTParser {
             writer.write("digraph ");
             writer.append(graph.getName()).append(" {\n");
             for (Task t : graph.getNodes()) {
-                writer.append(t.getName()).append(" [Weight=").append(String.valueOf(t.getWeight())).append(",Start=").append(String.valueOf(schedule.getTaskStartTime(t))).append(",Processor=").append(String.valueOf(schedule.getTaskProcessor(t))).append("];\n");
+                writer.append("\t").append(t.getName()).append("\t").append(" [Weight=").append(String.valueOf(t.getWeight())).append(",Start=").append(String.valueOf(schedule.getTaskStartTime(t))).append(",Processor=").append(String.valueOf(schedule.getTaskProcessor(t)+1)).append("];\n");
             }
             for (Edge e : graph.getEdges()) {
-                writer.append(e.getTail().getName()).append(" -> ").append(e.getHead().getName()).append(" [Weight=").append(String.valueOf(e.getWeight())).append("];\n");
+                writer.append("\t").append(e.getTail().getName()).append(" -> ").append(e.getHead().getName()).append("\t").append(" [Weight=").append(String.valueOf(e.getWeight())).append("];\n");
             }
             writer.append("}");
         } catch (IOException e) {
