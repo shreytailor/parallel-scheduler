@@ -3,13 +3,13 @@ package com.team7.model;
 import java.util.*;
 
 public class Schedule {
-    byte[] taskProcessorMap;
-    int[] taskStartTimeMap;
-    byte[] taskRequirementsMap;
-    Queue<Task> beginnableTasks;
-    int estimatedFinishTime = 0;
-    byte tasksCompleted = 0;
-    int[] processorFinishTimes;
+    private byte[] taskProcessorMap;
+    private int[] taskStartTimeMap;
+    private byte[] taskRequirementsMap;
+    private Queue<Task> beginnableTasks;
+    private int estimatedFinishTime = 0;
+    private byte tasksCompleted = 0;
+    private int[] processorFinishTimes;
 
     public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap, Queue<Task> beginnableTasks) {
         taskProcessorMap = new byte[numTasks];
@@ -86,14 +86,6 @@ public class Schedule {
     public Schedule clone() {
         return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), new PriorityQueue<>(beginnableTasks), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted);
     }
-
-//    private <T, S> String mapToString(Map<T, S> map) {
-//        StringBuilder sb = new StringBuilder();
-//        for (Map.Entry<T, S> e : map.entrySet()) {
-//            sb.append("\t\t" + e.getKey() + " : " + e.getValue() + "\n");
-//        }
-//        return sb.toString();
-//    }
 
     @Override
     public String toString() {

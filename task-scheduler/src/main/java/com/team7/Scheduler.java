@@ -10,13 +10,13 @@ import static com.team7.algoutils.Preprocess.*;
 import static com.team7.algoutils.ScheduleCalculator.*;
 
 public class Scheduler {
-    int processors;
-    Task[] tasks;
-    int[] taskTopLevelMap;
-    int[] taskBottomLevelMap;
-    int[] taskStaticLevelMap;
-    byte[] taskRequirementsMap;
-    Queue<Task> beginnableTasks = new PriorityQueue<>(getTaskComparator());
+    private int processors;
+    private Task[] tasks;
+    private int[] taskTopLevelMap;
+    private int[] taskBottomLevelMap;
+    private int[] taskStaticLevelMap;
+    private byte[] taskRequirementsMap;
+    private Queue<Task> beginnableTasks = new PriorityQueue<>(getTaskComparator());
 
     Schedule feasibleSchedule;
 
