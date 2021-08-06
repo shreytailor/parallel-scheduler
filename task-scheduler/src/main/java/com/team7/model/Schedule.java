@@ -82,10 +82,6 @@ public class Schedule {
         return estimatedFinishTime;
     }
 
-//    public Collection<Task> getTasks() {
-//        return taskProcessorMap.keySet();
-//    }
-
     @Override
     public Schedule clone() {
         return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), new PriorityQueue<>(beginnableTasks), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted);

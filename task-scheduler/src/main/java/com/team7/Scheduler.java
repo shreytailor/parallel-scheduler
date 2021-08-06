@@ -47,7 +47,6 @@ public class Scheduler {
     }
 
     public Schedule findOptimalSchedule() {
-        preprocess();
         findFeasibleSchedule();
 
         // (1) OPEN priority queue, sorted by f
@@ -71,6 +70,8 @@ public class Scheduler {
     }
 
     public Schedule findFeasibleSchedule() {
+        preprocess();
+
         Schedule schedule =
                 new Schedule(tasks.length, processors, taskRequirementsMap.clone(), new PriorityQueue<>(beginnableTasks));
         Queue<Task> tasksToSchedule = schedule.getBeginnableTasks();
@@ -117,6 +118,4 @@ public class Scheduler {
             tasksToSchedule.add(t);
         }
     }
-
-
 }

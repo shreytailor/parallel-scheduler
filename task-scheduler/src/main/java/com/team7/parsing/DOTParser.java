@@ -44,12 +44,13 @@ public class DOTParser {
             edges.add(edge);
         }
 
-        return new Graph(new ArrayList<>(tasks.values()), edges);
+        return new Graph(parser.getGraphId(), new ArrayList<>(tasks.values()), edges);
     }
 
     public static void write(String path, Schedule schedule, Graph graph) {
         try (FileWriter writer = new FileWriter(path)) {
-            writer.write("digraph output {\n");
+            writer.write("digraph ");
+            writer.append(graph.getName()).append(" {\n");
             for (Task t : graph.getNodes()) {
                 writer.append(t.getName()).append(" [Weight=").append(String.valueOf(t.getWeight())).append(",Start=").append(String.valueOf(schedule.getTaskStartTime(t))).append(",Processor=").append(String.valueOf(schedule.getTaskProcessor(t))).append("];\n");
             }
