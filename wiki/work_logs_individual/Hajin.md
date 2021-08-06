@@ -1,3 +1,15 @@
+### 5 Aug
+- Explored different options of profilers to detect what objects are created. [VisualVM](https://visualvm.github.io) comes as part of JDK8, so it was fit for initial choice.
+- Execution file can be found from /Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home/bin/jvisualvm. After running the program on IntelliJ, the process (com.team7.EntryPoint) on the left pane. 
+
+### 4 Aug
+- Refactored com.team7.Scheduler into more modular methods to increase each method's testability and reduce chains of dependencies. Created 2 additional util classes (algoutils.Preprocess, ScheduleCalculator). Undertook this refactoring while constantly checking against tests we have (this saved me because sometimes things would unexpectedly break. yay to TDD!).
+- com.team7.Scheduler#findOptimalSchedule() should look more closer to the pseudocode. Also it's more readable and maintainable this way.
+- Added new test suite (factory) called SchedulerTestLectureExample, which makes it easy to test solely lecture examples. Since it tests both optimality (expected vs actual finish time) and the validity, it was necessary to separate this from test cases that only check constraints not optimality.
+
+### 2 Aug
+- Researched parallelisation and pruning techniques from [this paper](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.62.8293&rep=rep1&type=pdf)
+
 ### 30 Jul
 - Created a dot file that reflects two graphs from lecture slides
 - Communicated solutions to the team about some of the issues I encountered while getting Shrey's newly built JavaFX application to run. 
