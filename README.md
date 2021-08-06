@@ -18,7 +18,7 @@ The command line arguments which can be used to interact with this program are s
 
 **Note:** Milestone 1 only supports the required arguments.
 
-Example usage: java -jar task-scheduler.jar Nodes_11_OutTree.dot 2
+Example usage: ```java -jar task-scheduler.jar Nodes_11_OutTree.dot 2```
 
 ## Team
 
