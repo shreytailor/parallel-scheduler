@@ -24,3 +24,8 @@
 .btn:hover, .icon:hover {
     -fx-cursor: hand;
 }
+
+
+.graph-container-padding {
+    -fx-padding: 15px 30px;
+}

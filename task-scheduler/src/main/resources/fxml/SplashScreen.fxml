@@ -123,7 +123,7 @@
                   <Insets bottom="50.0" left="60.0" right="100.0" />
                </padding>
             </VBox>
-            <BorderPane stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="1">
+            <BorderPane styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="1">
                <center>
                   <LineChart fx:id="cpuUsageChart" BorderPane.alignment="CENTER">
                     <xAxis>
@@ -135,7 +135,7 @@
                   </LineChart>
                </center>
             </BorderPane>
-            <BorderPane stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="2">
+            <BorderPane styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="2">
                <center>
                   <LineChart fx:id="ramUsageChart" BorderPane.alignment="CENTER">
                     <xAxis>
