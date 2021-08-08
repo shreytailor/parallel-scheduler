@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane stylesheets="@../stylesheets/Splash.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane styleClass="root" stylesheets="@../stylesheets/Splash.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <GridPane layoutX="5.0" layoutY="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1200.0" style="-fx-pref-width: 1200;" stylesheets="@../stylesheets/Splash.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -125,7 +125,7 @@
             </VBox>
             <BorderPane styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="1">
                <center>
-                  <LineChart fx:id="cpuUsageChart" BorderPane.alignment="CENTER">
+                  <LineChart fx:id="cpuUsageChart" style="-fx-background-color: F6F8FA;" BorderPane.alignment="CENTER">
                     <xAxis>
                       <CategoryAxis side="BOTTOM" />
                     </xAxis>
@@ -147,7 +147,7 @@
                   </LineChart>
                </center>
             </BorderPane>
-            <BorderPane fx:id="stateGraphContainer" prefHeight="200.0" prefWidth="200.0" stylesheets="@../stylesheets/Splash.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <BorderPane fx:id="stateGraphContainer" prefHeight="200.0" prefWidth="200.0" styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </children>

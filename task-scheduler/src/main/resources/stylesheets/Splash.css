@@ -1,3 +1,7 @@
+.root {
+    -fx-background-color:  F6F8FA;
+}
+
 .header-container {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0.5, 0.0, 0.0);
     -fx-background-color: white;
@@ -28,4 +32,15 @@
 
 .graph-container-padding {
     -fx-padding: 15px 30px;
+}
+
+/*For color and background color of graphs except gantt chart*/
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.default-color0.chart-series-line {
+    -fx-stroke: #563BFF;
+}
+.default-color0.chart-line-symbol {
+    -fx-background-color: #563BFF, white;
 }

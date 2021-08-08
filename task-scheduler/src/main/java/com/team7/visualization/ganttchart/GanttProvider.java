@@ -32,10 +32,10 @@ public class GanttProvider {
         chart.setBlockHeight(15);
 
         // Configuring the axis.
-        xAxis.setTickLabelFill(Color.CHOCOLATE);
+//        xAxis.setTickLabelFill(Color.CHOCOLATE);
         xAxis.setMinorTickCount(4);
         xAxis.setLabel("Time (weight)");
-        yAxis.setTickLabelFill(Color.CHOCOLATE);
+//        yAxis.setTickLabelFill(Color.CHOCOLATE);
         yAxis.setTickLabelGap(10);
         yAxis.setLabel("Processor");
 

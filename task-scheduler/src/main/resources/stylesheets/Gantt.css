@@ -4,5 +4,5 @@
 
 .status-grey {
     -fx-border-color: white;
-    -fx-background-color: rgba(103, 128, 159, 1);
+    -fx-background-color: #563BFF;
 }
