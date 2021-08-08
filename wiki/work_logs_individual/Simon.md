@@ -1,5 +1,20 @@
 ## Simon's Work Log
 
+### 08/08/2021
+Tested the release scheduler.jar file on a few test cases in two Linux Virtual Machines via using Oracle VM VirtualBox Manager.
+
+---
+
+### 07/08/2021
+Collobrating with Josh to work on the "Tools and Technologies" part of the milestone I report, modify the content inside of the report to allow extra space for details. Refactor, modify and polish the report for better readability.
+
+---
+
+### 05/08/2021
+Made a wiki page of team 7 at https://github.com/SoftEng306-2021/project-1-project-1-team-7/wiki/Wiki-Homepage
+
+---
+
 ### 04/08/2021
 Outline key points of Implementation, Development Process, Reflection and write up a draft for milestone 1's report.
 
