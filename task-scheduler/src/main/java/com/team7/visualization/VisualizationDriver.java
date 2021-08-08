@@ -20,9 +20,11 @@ public class VisualizationDriver extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // Load the .fxml file from the resources' folder, and create a scene from it.
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/SchedulerScreen.fxml"));
         Scene scene = new Scene(root);
 
+        // Start the stage after setting the scene, and applying some properties.
         primaryStage.setTitle("The Marauders: Task Scheduler Visualization");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);

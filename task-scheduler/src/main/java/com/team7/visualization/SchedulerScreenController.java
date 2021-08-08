@@ -41,17 +41,21 @@ public class SchedulerScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Registering the CPU chart to a custom provider, and starting to track data.
         cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart);
         cpuUtilizationProvider.startTracking();
 
+        // Applying custom properties to the CPU chart.
         NumberAxis cpuYAxis = (NumberAxis) cpuUsageChart.getYAxis();
         cpuUsageChart.getXAxis().setLabel("Time (seconds)");
         cpuYAxis.setLabel("Usage (%)");
         cpuYAxis.setUpperBound(cpuUtilizationProvider.getUpperBound());
 
+        // Registering the RAM chart to a custom provider, and starting to track data.
         ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart);
         ramUtilizationProvider.startTracking();
 
+        // Applying custom properties to the RAM chart.
         NumberAxis ramYAxis = (NumberAxis) ramUsageChart.getYAxis();
         ramUsageChart.getXAxis().setLabel("Time (seconds)");
         ramYAxis.setLabel("Usage (%)");
