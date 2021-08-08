@@ -25,6 +25,14 @@ During the next iteration of this prototype, we decided to include the represent
 
 The images below show the improved low-fidelity prototype, where there is a toggle button for the user to switch between the CPU and RAM utilization, and visualization of the input graph.
 
-![High Fidelity Prototype](images/low-fidelity-prototype-1.png)
+![Low Fidelity Prototype](images/low-fidelity-prototype-1.png)
 
-![High Fidelity Prototype](images/low-fidelity-prototype-2.png)
+![Low Fidelity Prototype](images/low-fidelity-prototype-2.png)
+
+## High-Fidelity Prototype
+
+Below is the high-fidelity prototype for visualization screen:
+
+![High fidelity prototype](/images/High-fidelity-prototype.png)
+
+We have decided to change the position of utilization graphs and the schedule graph because it will be easier to swap input graph with utilization graphs.
