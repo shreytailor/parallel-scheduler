@@ -45,3 +45,18 @@
 
 - Merge visualization screen with final schedule
 - Get the timer running for visualization screen
+
+### 6 Aug
+
+- Started on report for milestone 1 and expanding most of the contents
+- Research on creating jar file with Maven
+
+### 7 Aug
+
+- Finalising the report and make more space in case we need to add more contents
+
+### 8 Aug
+
+- Worked on High Fidelity Prototype
+- Worked on the layout of visualization screen
+- Worked on the look of the visualization screen
