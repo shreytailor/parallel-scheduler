@@ -32,12 +32,15 @@ public class Schedule {
     public void addTask(Task n, int processor, int startTime) {
         taskProcessorMap[n.getUniqueID()] = (byte) processor;
         taskStartTimeMap[n.getUniqueID()] = startTime;
+
+        //Checking whether there are any new tasks that we can begin
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap[out.getHead().getUniqueID()]--;
             if (taskRequirementsMap[out.getHead().getUniqueID()] == 0) {
                 beginnableTasks.add(out.getHead());
             }
         }
+
         processorFinishTimes[processor] = startTime + n.getWeight();
         tasksCompleted++;
     }

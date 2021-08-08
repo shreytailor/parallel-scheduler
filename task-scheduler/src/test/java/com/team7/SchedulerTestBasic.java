@@ -1,5 +1,6 @@
 package com.team7;
 
+import com.team7.algorithm.Scheduler;
 import com.team7.model.Edge;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;

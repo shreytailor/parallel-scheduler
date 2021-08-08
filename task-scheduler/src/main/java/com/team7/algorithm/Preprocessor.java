@@ -1,4 +1,4 @@
-package com.team7.algoutils;
+package com.team7.algorithm;
 
 import com.team7.model.Edge;
 import com.team7.model.Task;
@@ -6,11 +6,11 @@ import com.team7.model.Task;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Preprocess {
+public class Preprocessor {
 
     /**
-     * Static Level: Static level of a node is b-level without counting edge costs
-     * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node
+     * Static Level: Static level of a node is its bottom level without counting edge costs.
+     * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node.
      * @param taskBottomLevelMap
      * @param taskStaticLevelMap
      * @param tasks
@@ -75,5 +75,4 @@ public class Preprocess {
             }
         }
     }
-
 }

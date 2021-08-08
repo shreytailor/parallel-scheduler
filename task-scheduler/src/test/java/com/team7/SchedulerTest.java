@@ -1,13 +1,11 @@
 package com.team7;
 
-import com.team7.model.Edge;
+import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
-import com.team7.model.Task;
 import com.team7.parsing.DOTParser;
 import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;

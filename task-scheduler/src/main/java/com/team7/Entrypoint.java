@@ -1,5 +1,6 @@
 package com.team7;
 
+import com.team7.algorithm.Scheduler;
 import com.team7.exceptions.CommandLineException;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -22,7 +23,7 @@ public class Entrypoint {
             DOTParser.write(config.getOutputName(),schedule, graph);
             System.out.println("Feasible schedule generated with makespan of " + schedule.getEstimatedFinishTime());
 
-            // Showing the visualization, if requested by the user. Note: not implemented for milestone 1
+            // Showing the visualization, if requested by the user. Note: not included in milestone 1
             //if (config.isVisualised()) {
             //    beginVisualisation(schedule, config);
             //}

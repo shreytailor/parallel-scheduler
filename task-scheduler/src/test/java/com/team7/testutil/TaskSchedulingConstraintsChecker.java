@@ -7,7 +7,6 @@ import com.team7.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -44,18 +43,14 @@ public class TaskSchedulingConstraintsChecker {
     private static boolean isTaskPairCompatible(Task taskOne, Task taskTwo, Schedule schedule) {
         int[] taskStartTimeMap = schedule.getTaskStartTimeMap();
 
-        Integer taskOneStartingTime = taskStartTimeMap[taskOne.getUniqueID()];
-        Integer taskTwoStartingTime = taskStartTimeMap[taskTwo.getUniqueID()];
+        int taskOneStartingTime = taskStartTimeMap[taskOne.getUniqueID()];
+        int taskTwoStartingTime = taskStartTimeMap[taskTwo.getUniqueID()];
 
         // only need to satisfy two conditions as OR
         boolean conditionOne = taskOneStartingTime + taskOne.getWeight() <= taskTwoStartingTime;
         boolean conditionTwo = taskTwoStartingTime + taskTwo.getWeight() <= taskOneStartingTime;
 
-        if (conditionOne || conditionTwo) {
-            return true;
-        }
-
-        return false;
+        return conditionOne || conditionTwo;
     }
 
 
@@ -91,8 +86,8 @@ public class TaskSchedulingConstraintsChecker {
             Task head = edge.getHead();
             int tailPid = taskProcessorMap[tail.getUniqueID()];
             int headPid = taskProcessorMap[head.getUniqueID()];
-            Integer tailStartTime = taskStartTimeMap[tail.getUniqueID()];
-            Integer headStartTime = taskStartTimeMap[head.getUniqueID()];
+            int tailStartTime = taskStartTimeMap[tail.getUniqueID()];
+            int headStartTime = taskStartTimeMap[head.getUniqueID()];
 
             int commCost = (tailPid == headPid) ? 0 : edge.getWeight();
             boolean isConstraintMet = headStartTime >= tailStartTime + tail.getWeight() + commCost;
@@ -104,6 +99,4 @@ public class TaskSchedulingConstraintsChecker {
 
         return true;
     }
-
-
 }
