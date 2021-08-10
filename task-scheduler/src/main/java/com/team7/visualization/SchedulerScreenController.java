@@ -40,9 +40,6 @@ public class SchedulerScreenController implements Initializable {
     public Button viewToggleButton;
 
     @FXML
-    public ImageView restartButton;
-
-    @FXML
     public ImageView themeToggleButton;
 
     @FXML

@@ -3,6 +3,6 @@
 }
 
 .status-grey {
-    -fx-border-color: white;
+    -fx-border-color: #563BFF;
     -fx-background-color: #563BFF;
 }
