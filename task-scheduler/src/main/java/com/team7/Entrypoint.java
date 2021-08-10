@@ -19,9 +19,8 @@ public class Entrypoint {
 
             // Processing the input graph by using the scheduler, and storing the output.
             Scheduler scheduler = new Scheduler(graph, config.getNumOfProcessors());
-            Schedule schedule = scheduler.findFeasibleSchedule();
+            Schedule schedule = scheduler.findOptimalSchedule();
             DOTParser.write(config.getOutputName(),schedule, graph);
-            System.out.println("Feasible schedule generated with makespan of " + schedule.getEstimatedFinishTime());
 
             // Showing the visualization, if requested by the user. Note: not included in milestone 1
             //if (config.isVisualised()) {

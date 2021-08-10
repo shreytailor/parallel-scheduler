@@ -6,24 +6,23 @@ public class Schedule {
     private byte[] taskProcessorMap;
     private int[] taskStartTimeMap;
     private byte[] taskRequirementsMap;
-    private Queue<Task> beginnableTasks;
     private int estimatedFinishTime = 0;
     private byte tasksCompleted = 0;
     private int[] processorFinishTimes;
+    private int idleTime = 0;
+    private byte partialExpansionIndex=-1;
 
-    public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap, Queue<Task> beginnableTasks) {
+    public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap) {
         taskProcessorMap = new byte[numTasks];
         taskStartTimeMap = new int[numTasks];
         this.taskRequirementsMap = taskRequirementsMap;
-        this.beginnableTasks = beginnableTasks;
         processorFinishTimes = new int[numProcessors];
     }
 
-    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap, byte[] taskRequirementsMap, Queue<Task> beginnableTasks, int[] processorFinishTimes, int estimatedFinishTime, byte tasksCompleted) {
+    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap, byte[] taskRequirementsMap, int[] processorFinishTimes, int estimatedFinishTime, byte tasksCompleted) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
-        this.beginnableTasks = beginnableTasks;
         this.processorFinishTimes = processorFinishTimes;
         this.estimatedFinishTime = estimatedFinishTime;
         this.tasksCompleted = tasksCompleted;
@@ -32,13 +31,12 @@ public class Schedule {
     public void addTask(Task n, int processor, int startTime) {
         taskProcessorMap[n.getUniqueID()] = (byte) processor;
         taskStartTimeMap[n.getUniqueID()] = startTime;
+        idleTime+=startTime - processorFinishTimes[processor];
+        taskRequirementsMap[n.getUniqueID()]--;
 
         //Checking whether there are any new tasks that we can begin
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap[out.getHead().getUniqueID()]--;
-            if (taskRequirementsMap[out.getHead().getUniqueID()] == 0) {
-                beginnableTasks.add(out.getHead());
-            }
         }
 
         processorFinishTimes[processor] = startTime + n.getWeight();
@@ -53,8 +51,18 @@ public class Schedule {
         return taskStartTimeMap;
     }
 
-    public Queue<Task> getBeginnableTasks() {
+    public Queue<Integer> getBeginnableTasks() {
+        Queue<Integer> beginnableTasks = new LinkedList<>();
+        for (int i = partialExpansionIndex+1; i < taskRequirementsMap.length; i++) {
+            if (taskRequirementsMap[i] == 0) {
+                beginnableTasks.add(i);
+            }
+        }
         return beginnableTasks;
+    }
+
+    public boolean isBeginnable(Task t) {
+        return taskRequirementsMap[t.getUniqueID()] == 0;
     }
 
     public int getNumberOfTasks() {
@@ -85,9 +93,21 @@ public class Schedule {
         return estimatedFinishTime;
     }
 
+    public int getIdleTime() {
+        return idleTime;
+    }
+
+    public int getPartialExpansionIndex() {
+        return partialExpansionIndex;
+    }
+
+    public void setPartialExpansionIndex(byte n) {
+        partialExpansionIndex = n;
+    }
+
     @Override
     public Schedule clone() {
-        return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), new PriorityQueue<>(beginnableTasks), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted);
+        return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted);
     }
 
     @Override

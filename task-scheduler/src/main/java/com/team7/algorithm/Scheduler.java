@@ -14,8 +14,8 @@ public class Scheduler {
     private int[] taskBottomLevelMap;
     private int[] taskStaticLevelMap;
     private byte[] taskRequirementsMap;
-    private Queue<Task> beginnableTasks = new PriorityQueue<>(getTaskComparator());
     private Schedule feasibleSchedule;
+    private int totalComputationTime = 0;
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -23,6 +23,7 @@ public class Scheduler {
         tasks = new Task[numTasks];
         for (Task t : g.getNodes()) {
             tasks[t.getUniqueID()] = t;
+            totalComputationTime += t.getWeight();
         }
         taskTopLevelMap = new int[numTasks];
         taskBottomLevelMap = new int[numTasks];
@@ -36,7 +37,7 @@ public class Scheduler {
     public void preprocess() {
         Preprocessor.calculateTaskStaticAndBottomLevels(taskBottomLevelMap, taskStaticLevelMap, tasks);
         Preprocessor.calculateTaskTopLevels(taskTopLevelMap, tasks);
-        Preprocessor.calculateRequirements(tasks, taskRequirementsMap, beginnableTasks);
+        Preprocessor.calculateRequirements(tasks, taskRequirementsMap);
     }
 
     /**
@@ -49,7 +50,7 @@ public class Scheduler {
 
         // (1) OPEN priority queue, sorted by f
         Queue<Schedule> scheduleQueue =
-                generateInitialSchedules(tasks, processors, taskRequirementsMap, beginnableTasks, taskStaticLevelMap, tasks.length);
+                generateInitialSchedules(tasks, processors, taskRequirementsMap, taskStaticLevelMap, tasks.length);
 
         while (scheduleQueue.size() != 0) {
             // (2) Remove from OPEN the search state s with the smallest f
@@ -77,8 +78,12 @@ public class Scheduler {
         preprocess();
 
         Schedule schedule =
-                new Schedule(tasks.length, processors, taskRequirementsMap.clone(), new PriorityQueue<>(beginnableTasks));
-        Queue<Task> tasksToSchedule = schedule.getBeginnableTasks();
+                new Schedule(tasks.length, processors, taskRequirementsMap.clone());
+        Queue<Task> tasksToSchedule = new PriorityQueue<>(getTaskComparator());
+        for (Integer i : schedule.getBeginnableTasks()) {
+            tasksToSchedule.add(tasks[i]);
+        }
+
         while (tasksToSchedule.size() > 0) {
             Task t = tasksToSchedule.poll();
 
@@ -95,6 +100,12 @@ public class Scheduler {
 
             schedule.addTask(t, earliestStartProcessor, earliestStartTime);
             schedule.setEstimatedFinishTime(Math.max(schedule.getEstimatedFinishTime(), earliestStartTime + taskStaticLevelMap[t.getUniqueID()]));
+
+            for (Edge e : t.getOutgoingEdges()) {
+                if (schedule.isBeginnable(e.getHead())) {
+                    tasksToSchedule.add(e.getHead());
+                }
+            }
         }
         feasibleSchedule = schedule;
         return feasibleSchedule;
@@ -105,26 +116,36 @@ public class Scheduler {
      * nodes to the processors. Each matching produces a new state s'.
      * Compute f(s') = g(s')+h(s') for each new state s'.
      * Put all the new states in OPEN.
+     *
      * @param scheduleQueue
      * @param s
      */
     public void expandSchedule(Queue<Schedule> scheduleQueue, Schedule s) {
-        //Get a list of tasks that haven't been allocated to the current schedule 's'
-        Queue<Task> tasksToSchedule = s.getBeginnableTasks();
-        List<Task> copy = new ArrayList<>(tasksToSchedule);
-
         //Expanding the schedule s, and insert them into the scheduleQueue
-        for (Task t : copy) {
-            tasksToSchedule.remove(t);
-            int minDistanceToEnd = taskStaticLevelMap[t.getUniqueID()];
+        for (Integer t : s.getBeginnableTasks()) {
+            int minDistanceToEnd = taskStaticLevelMap[tasks[t].getUniqueID()];
+
+            boolean normalised = false;
             for (int i = 0; i < processors; i++) {
-                Schedule newSchedule = generateNewSchedule(s, t, minDistanceToEnd, i);
+                if (s.getProcessorFinishTime(i) == 0) {
+                    if (normalised) {
+                        continue;
+                    }
+                    normalised = true;
+                }
+                Schedule newSchedule = generateNewSchedule(s, tasks[t], minDistanceToEnd, i);
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime()) {
-                    scheduleQueue.add(newSchedule);
+                    if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
+                        scheduleQueue.add(newSchedule);
+                        s.setPartialExpansionIndex(t.byteValue());
+                        scheduleQueue.add(s);
+                        return;
+                    } else {
+                        scheduleQueue.add(newSchedule);
+                    }
                 }
             }
-            tasksToSchedule.add(t);
         }
     }
 
@@ -134,25 +155,23 @@ public class Scheduler {
      * @param tasks
      * @param processors
      * @param taskRequirementsMap
-     * @param beginnableTasks
      * @param taskStaticLevelMap
      * @param length
      * @return a list schedules, each with one task
      */
-    private Queue<Schedule> generateInitialSchedules(Task[] tasks, int processors, byte[] taskRequirementsMap, Queue<Task> beginnableTasks, int[] taskStaticLevelMap, int length) {
+    private Queue<Schedule> generateInitialSchedules(Task[] tasks, int processors, byte[] taskRequirementsMap, int[] taskStaticLevelMap, int length) {
         Queue<Schedule> scheduleQueue = new PriorityQueue<>(Comparator.comparingInt(Schedule::getEstimatedFinishTime));
 
         //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
-        for (Task t : tasks) {
-            if (t.getIngoingEdges().size() == 0) {
-                beginnableTasks.remove(t);
-                Schedule s = new Schedule(length, processors, taskRequirementsMap.clone(), new PriorityQueue<>(beginnableTasks));
-                s.addTask(t, 0, 0);
-                s.setEstimatedFinishTime(taskStaticLevelMap[t.getUniqueID()]);
+        for (int i = 0; i < tasks.length; i++) {
+            if (taskRequirementsMap[i] == 0) {
+                Schedule s = new Schedule(length, processors, taskRequirementsMap.clone());
+                s.addTask(tasks[i], 0, 0);
+                s.setEstimatedFinishTime(taskStaticLevelMap[i]);
                 scheduleQueue.add(s);
-                beginnableTasks.add(t);
             }
         }
+
         return scheduleQueue;
     }
 
@@ -192,7 +211,22 @@ public class Scheduler {
         //Compute the earliest time to schedule the task ('t') on this processor (processor 'i')
         int earliestStartTime = calculateEarliestTimeToSchedule(newSchedule, t, processor);
         newSchedule.addTask(t, processor, earliestStartTime);
-        newSchedule.setEstimatedFinishTime(Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime + minDistanceToEnd));
+        int lowerBound = Math.max((newSchedule.getIdleTime() + totalComputationTime) / processors, //The schedule length is then bounded by the sum of total idle time and the total weight (execution time) of all nodes divided by the number of processors,
+                Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime + minDistanceToEnd));  //Computation bottom level of task t
+
+        for (Integer beginnable : newSchedule.getBeginnableTasks()) {
+            Task task = tasks[beginnable];
+            int nextEarliestStartTime = Integer.MAX_VALUE;
+            for (int i = 0; i < processors; i++) {
+                int start = calculateEarliestTimeToSchedule(newSchedule, task, i);
+                if (start < nextEarliestStartTime) {
+                    nextEarliestStartTime = start;
+                }
+            }
+            lowerBound = Math.max(lowerBound, nextEarliestStartTime + taskStaticLevelMap[beginnable]);
+        }
+
+        newSchedule.setEstimatedFinishTime(lowerBound);
         return newSchedule;
     }
 

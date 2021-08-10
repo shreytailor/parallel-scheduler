@@ -64,15 +64,10 @@ public class Preprocessor {
      * Record each task as having prerequisites (requirements) or beginnable (no requirements).
      * @param tasks
      * @param taskRequirementsMap
-     * @param beginnableTasks
      */
-    public static void calculateRequirements(Task[] tasks, byte[] taskRequirementsMap, Queue<Task> beginnableTasks) {
+    public static void calculateRequirements(Task[] tasks, byte[] taskRequirementsMap) {
         for (Task task : tasks) {
-            if (task.getIngoingEdges().size() != 0) {
-                taskRequirementsMap[task.getUniqueID()] = (byte) task.getIngoingEdges().size();
-            } else {
-                beginnableTasks.add(task);
-            }
+            taskRequirementsMap[task.getUniqueID()] = (byte) task.getIngoingEdges().size();
         }
     }
 }
