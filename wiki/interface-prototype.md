@@ -33,6 +33,16 @@ The images below show the improved low-fidelity prototype, where there is a togg
 
 Below is the high-fidelity prototype for visualization screen:
 
+We have decided to change the position of utilization graphs and the schedule graph (differed from low fidelity prototype) because it will be easier to swap input graph with utilization graphs.
+
 ![High fidelity prototype](/images/High-fidelity-prototype.png)
 
-We have decided to change the position of utilization graphs and the schedule graph because it will be easier to swap input graph with utilization graphs.
+
+
+Below is the high-fidelity prototype after removing title bar for light mode and dark mode:
+
+After consideration, we have decided to add close button, minimize button, and a dark mode option for the visualization. This means we can remove the title bar and have a custom one.
+
+![High fidelity prototype (light mode)](/images/High-fidelity-light-prototype.png)
+
+![High fidelity prototype (dark mode)](/images/High-fidelity-dark-prototype.png)
