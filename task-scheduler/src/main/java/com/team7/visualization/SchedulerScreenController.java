@@ -96,8 +96,7 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
-        System.out.println("Start:");
-        System.out.println(sheets);
+        
         if (isLightMode) {
             themeToggleIcon.setImage(SUN_IMAGE);
             closeIcon.setImage(DARK_CLOSE_IMAGE);
