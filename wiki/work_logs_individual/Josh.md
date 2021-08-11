@@ -60,3 +60,18 @@
 - Worked on High Fidelity Prototype
 - Worked on the layout of visualization screen
 - Worked on the look of the visualization screen
+
+### 10 Aug
+
+- Started dark mode high fidelity prototype design
+- More decisions made for light mode high fidelity prototype
+  - Remove title bar
+  - Add close, minimize button
+  - Remove restart option
+
+### 11 Aug
+
+- Implemented light mode visualization screen
+- Finished dark mode high fidelity prototype
+- Implemented dark mode visualization screen
+- Added functionality to close, minimize, and switch mode button
