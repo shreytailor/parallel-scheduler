@@ -1,12 +1,12 @@
 package com.team7.visualization;
 
-import com.sun.management.OperatingSystemMXBean;
 import com.team7.model.Schedule;
 import com.team7.parsing.Config;
 import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
 import com.team7.visualization.system.TimeProvider;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
@@ -15,10 +15,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
-import java.lang.management.ManagementFactory;
 import java.net.URL;
-import java.util.*;
+import java.util.ResourceBundle;
 
 public class SchedulerScreenController implements Initializable {
 
@@ -40,7 +40,13 @@ public class SchedulerScreenController implements Initializable {
     public Button viewToggleButton;
 
     @FXML
-    public ImageView themeToggleButton;
+    public ImageView themeToggleIcon;
+
+    @FXML
+    public ImageView minimizeIcon;
+
+    @FXML
+    public ImageView closeIcon;
 
     @FXML
     public LineChart<String, Number> cpuUsageChart;
@@ -74,6 +80,22 @@ public class SchedulerScreenController implements Initializable {
 
         GanttProvider scheduleProvider = new GanttProvider(_schedule, _config);
         stateGraphContainer.setCenter(scheduleProvider.getSchedule());
+    }
+
+    @FXML
+    private void handleToggleTheme() {
+
+    }
+
+    @FXML
+    private void handleMinimize() {
+        Stage stage = (Stage) minimizeIcon.getScene().getWindow();
+        stage.setIconified(true);
+    }
+
+    @FXML
+    private void handleClose() {
+        Platform.exit();
     }
 }
 

@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class VisualizationDriver extends Application {
     private static Config _config;
@@ -24,11 +25,13 @@ public class VisualizationDriver extends Application {
         loader.setController(new SchedulerScreenController(_schedule, _config));
         Parent root = loader.load();
         Scene scene = new Scene(root);
-        
+
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("The Marauders: Task Visualization");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
     }
 }

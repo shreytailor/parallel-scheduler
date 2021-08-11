@@ -32,7 +32,7 @@
          <children>
             <BorderPane styleClass="header-container" stylesheets="@../stylesheets/Splash.css" GridPane.columnSpan="2">
                <left>
-                  <Label nodeOrientation="RIGHT_TO_LEFT" text="The Marauders: Task Scheduler Visualization" BorderPane.alignment="CENTER">
+                  <Label nodeOrientation="RIGHT_TO_LEFT" styleClass="main-font-color" text="The Marauders: Task Scheduler Visualization" BorderPane.alignment="CENTER">
                      <font>
                         <Font name="System Bold" size="30.0" />
                      </font>
@@ -45,7 +45,7 @@
                   <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                      <children>
                         <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" stylesheets="@../stylesheets/Splash.css" text="Show Input Graph" />
-                        <ImageView fx:id="themeToggleButton" fitHeight="29.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+                        <ImageView fx:id="themeToggleIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleToggleTheme" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/moon.png" />
                            </image>
@@ -53,12 +53,12 @@
                               <Insets />
                            </HBox.margin>
                         </ImageView>
-                        <ImageView fitHeight="29.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+                        <ImageView fx:id="minimizeIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleMinimize" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/minimise.png" />
                            </image>
                         </ImageView>
-                        <ImageView fitHeight="29.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+                        <ImageView fx:id="closeIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleClose" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/close.png" />
                            </image>
@@ -71,7 +71,7 @@
                <children>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
                      <children>
-                        <Label stylesheets="@../stylesheets/Splash.css" text="Status:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="Status:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -80,26 +80,12 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
                      <children>
-                        <Label stylesheets="@../stylesheets/Splash.css" text="Elapsed time (s):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="Elapsed time (s):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label fx:id="timerLabel" layoutX="10.0" layoutY="10.0" text="0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <font>
-                              <Font size="20.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
-                     <children>
-                        <Label stylesheets="@../stylesheets/Splash.css" text="State Space Node Visited:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <font>
-                              <Font size="20.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="10.0" layoutY="10.0" text="236,756,454" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label fx:id="timerLabel" layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -108,12 +94,26 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
                      <children>
-                        <Label stylesheets="@../stylesheets/Splash.css" text="No. of Pruned States:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="State Space Node Visited:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label layoutX="10.0" layoutY="10.0" text="245,354" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="236,756,454" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
+                     <children>
+                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="No. of Pruned States:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="245,354" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
