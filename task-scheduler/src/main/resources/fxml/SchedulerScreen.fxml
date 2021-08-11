@@ -44,7 +44,7 @@
                <right>
                   <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" stylesheets="@../stylesheets/Screen-style.css" text="Show Input Graph" />
+                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" stylesheets="@../stylesheets/Screen-style.css" text="Show Input Graph" onAction="#handleViewToggleButton"/>
                         <ImageView fx:id="restartButton" fitHeight="27.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/refresh.png" />
