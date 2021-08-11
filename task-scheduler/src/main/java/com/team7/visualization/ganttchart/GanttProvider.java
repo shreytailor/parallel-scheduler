@@ -64,7 +64,7 @@ public class GanttProvider {
             XYChart.Series series = processorSeries.get((int) pair.getValue());
             XYChart.Data<Number, String> data = new XYChart.Data(
                     startTime, machine,
-                    new GanttComponent.ExtraData(length, "status-grey", task.getName()));
+                    new GanttComponent.ExtraData(length, "status-bar", task.getName()));
 
             series.getData().add(data);
         }
@@ -74,8 +74,6 @@ public class GanttProvider {
             chart.getData().add(counter, processorSeries.get(counter));
         }
 
-        // Setting properties for the primary stage, and showing it.
-        chart.getStylesheets().add(getClass().getResource("/stylesheets/Gantt.css").toExternalForm());
         return chart;
     }
 }
