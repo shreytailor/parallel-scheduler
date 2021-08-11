@@ -7,12 +7,14 @@ import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
 import com.team7.visualization.system.TimeProvider;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -21,6 +23,15 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class SchedulerScreenController implements Initializable {
+
+    private final Image SUN_IMAGE = new Image("/images/sun.png");
+    private final Image MOON_IMAGE = new Image("/images/moon.png");
+    private final Image DARK_MIN_IMAGE = new Image("/images/minimise-dark.png");
+    private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
+    private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
+    private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
+
+    private boolean isLightMode = true;
 
     private Config _config;
     private Schedule _schedule;
@@ -84,7 +95,29 @@ public class SchedulerScreenController implements Initializable {
 
     @FXML
     private void handleToggleTheme() {
+        ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
+        System.out.println("Start:");
+        System.out.println(sheets);
+        if (isLightMode) {
+            themeToggleIcon.setImage(SUN_IMAGE);
+            closeIcon.setImage(DARK_CLOSE_IMAGE);
+            minimizeIcon.setImage(DARK_MIN_IMAGE);
 
+            sheets.clear();
+            sheets.add("/stylesheets/SplashDarkMode.css");
+
+            isLightMode = !isLightMode;
+        }
+        else {
+            themeToggleIcon.setImage(MOON_IMAGE);
+            closeIcon.setImage(LIGHT_CLOSE_IMAGE);
+            minimizeIcon.setImage(LIGHT_MIN_IMAGE);
+
+            sheets.clear();
+            sheets.add("/stylesheets/SplashLightMode.css");
+
+            isLightMode = !isLightMode;
+        }
     }
 
     @FXML

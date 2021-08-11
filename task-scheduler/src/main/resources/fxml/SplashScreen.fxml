@@ -17,9 +17,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane styleClass="root" stylesheets="@../stylesheets/Splash.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<?import java.net.URL?>
+<AnchorPane styleClass="root" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <GridPane layoutX="5.0" layoutY="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1200.0" style="-fx-pref-width: 1200;" stylesheets="@../stylesheets/Splash.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <GridPane layoutX="5.0" layoutY="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1200.0" style="-fx-pref-width: 1200;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="45.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="55.0" prefWidth="100.0" />
@@ -30,7 +31,7 @@
           <RowConstraints maxHeight="489.0" minHeight="10.0" percentHeight="46.0" prefHeight="223.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <BorderPane styleClass="header-container" stylesheets="@../stylesheets/Splash.css" GridPane.columnSpan="2">
+            <BorderPane styleClass="header-container" GridPane.columnSpan="2">
                <left>
                   <Label nodeOrientation="RIGHT_TO_LEFT" styleClass="main-font-color" text="The Marauders: Task Scheduler Visualization" BorderPane.alignment="CENTER">
                      <font>
@@ -44,7 +45,7 @@
                <right>
                   <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" stylesheets="@../stylesheets/Splash.css" text="Show Input Graph" />
+                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" text="Show Input Graph" />
                         <ImageView fx:id="themeToggleIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleToggleTheme" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/moon.png" />
@@ -55,32 +56,32 @@
                         </ImageView>
                         <ImageView fx:id="minimizeIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleMinimize" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
-                              <Image url="@../images/minimise.png" />
+                              <Image url="@../images/minimise-light.png" />
                            </image>
                         </ImageView>
                         <ImageView fx:id="closeIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleClose" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
-                              <Image url="@../images/close.png" />
+                              <Image url="@../images/close-light.png" />
                            </image>
                         </ImageView>
                      </children>
                   </HBox>
                </right>
             </BorderPane>
-            <VBox prefHeight="200.0" prefWidth="100.0" spacing="35.0" stylesheets="@../stylesheets/Splash.css" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="35.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
                      <children>
-                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="Status:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" text="Status:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
                         </Label>
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
                      <children>
-                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="Elapsed time (s):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" text="Elapsed time (s):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -92,9 +93,9 @@
                         </Label>
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
                      <children>
-                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="State Space Node Visited:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" text="State Space Node Visited:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -106,9 +107,9 @@
                         </Label>
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container" stylesheets="@../stylesheets/Splash.css">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
                      <children>
-                        <Label styleClass="main-font-color" stylesheets="@../stylesheets/Splash.css" text="No. of Pruned States:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label styleClass="main-font-color" text="No. of Pruned States:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -125,7 +126,7 @@
                   <Insets bottom="40.0" left="30.0" right="30.0" top="20.0" />
                </padding>
             </VBox>
-            <BorderPane fx:id="stateGraphContainer" prefHeight="200.0" prefWidth="200.0" styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <BorderPane fx:id="stateGraphContainer" prefHeight="200.0" prefWidth="200.0" styleClass="graph-container-padding" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <GridPane GridPane.rowIndex="1" GridPane.rowSpan="2">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -135,7 +136,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <BorderPane styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css">
+                  <BorderPane styleClass="graph-container-padding">
                      <center>
                         <LineChart fx:id="cpuUsageChart" BorderPane.alignment="CENTER">
                           <xAxis>
@@ -147,7 +148,7 @@
                         </LineChart>
                      </center>
                   </BorderPane>
-                  <BorderPane styleClass="graph-container-padding" stylesheets="@../stylesheets/Splash.css" GridPane.rowIndex="1">
+                  <BorderPane styleClass="graph-container-padding" GridPane.rowIndex="1">
                      <center>
                         <LineChart fx:id="ramUsageChart" BorderPane.alignment="CENTER">
                           <xAxis>
@@ -164,4 +165,7 @@
          </children>
       </GridPane>
    </children>
+    <stylesheets>
+        <URL value="@/stylesheets/SplashLightMode.css"/>
+    </stylesheets>
 </AnchorPane>
