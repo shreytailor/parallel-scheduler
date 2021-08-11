@@ -17,6 +17,16 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
+/**
+ * This class is created to provide a Gantt Chart implementation to display the current schedule.
+ * Inspiration for creating this class has come from the website below:
+ * https://stackoverflow.com/questions/27975898/gantt-chart-from-scratch
+ *
+ * Note that all public contributions on StackOverflow are automatically registered under Creative
+ * Commons Attribution-ShareAlike licence.
+ * https://stackoverflow.com/help/licensing
+ * https://creativecommons.org/licenses/by-sa/4.0/
+ */
 public class GanttComponent<X,Y> extends XYChart<X,Y> {
     public static class ExtraData {
         public long length;

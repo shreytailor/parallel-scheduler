@@ -26,7 +26,6 @@ public class VisualizationDriver extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root);
 
-
         primaryStage.setScene(scene);
         primaryStage.setTitle("The Marauders: Task Visualization");
         primaryStage.setResizable(false);

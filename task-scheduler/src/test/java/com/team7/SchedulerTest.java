@@ -1,13 +1,11 @@
 package com.team7;
 
-import com.team7.model.Edge;
+import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
-import com.team7.model.Task;
 import com.team7.parsing.DOTParser;
 import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
@@ -21,101 +19,40 @@ class SchedulerTest {
 
     public static final String DOT_TEST_FILE_DIRECTORY = "src/dot-tests";
 
-    /**
-     * DOES NOT ASSERT
-     * Allocate a graph of 3 tasks onto 1 processor
-     *
-     */
-    @Test
-    void AStar_singleProcessor3TasksNoDependency() {
-//        Given
-        Scheduler scheduler = new Scheduler();
-        int numProcessors = 1;
-        List<Task> tasks = new ArrayList<>();
-
-        Task task1 = new Task("a",3);
-        Task task2 = new Task("b", 4);
-        Task task3 = new Task("c", 5);
-        tasks.addAll(Arrays.asList(task1, task2, task3));
-
-
-//        When
-        Schedule result = scheduler.AStar(tasks, numProcessors);
-
-//        Then
-        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-    }
-
-
-    /**
-     * DOES NOT ASSERT
-     * This tests AStar algorithm's handling of dependencies, for single processor task allocation
-     */
-    @Test
-    void AStar_singleProcessor3Tasks() {
-//        Given
-        Scheduler scheduler = new Scheduler();
-        int numProcessors = 1;
-        List<Task> tasks = new ArrayList<>();
-
-        Task task1 = new Task("a",3);
-        Task task2 = new Task("b", 4);
-        Task task3 = new Task("c", 5);
-
-        Edge edge1 = new Edge(task1, task2, 3);
-        Edge edge2 = new Edge(task1, task3, 4);
-        Edge edge3 = new Edge(task2, task3, 5);
-
-        task1.addIngoingEdge(edge1);
-        task2.addOutgoingEdge(edge1);
-
-        task1.addIngoingEdge(edge2);
-        task3.addOutgoingEdge(edge2);
-
-        task2.addIngoingEdge(edge3);
-        task3.addOutgoingEdge(edge3);
-
-        tasks.addAll(Arrays.asList(task1, task2, task3));
-
-//        When
-        Schedule result = scheduler.AStar(tasks, numProcessors);
-        assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-    }
-
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() {
         List<DynamicTest> tests = new ArrayList<>();
 
         File directory = new File(DOT_TEST_FILE_DIRECTORY);
         for (File file : directory.listFiles()) {
+            if (shouldBeSkipped(file)) {
+                continue;
+            }
             tests.add(
                     DynamicTest.dynamicTest(
                             file.getName(),
-                            ()->testAStarWithDotFile(file)
+                            () -> testAStarWithDotFile(file)
                     ));
         }
 
         return tests;
     }
 
-    private void testAStarWithDotFile(File file){
+    private void testAStarWithDotFile(File file) {
         // given
         try {
             Graph g = DOTParser.read(file.toString());
-            List<Task> tasks = g.getNodes();
-            List<Edge> edges = g.getEdges();
-            Scheduler scheduler = new Scheduler();
-
             // when
             int numProcessors = 2;
-            Schedule result = scheduler.AStar(tasks, numProcessors);
+            Scheduler scheduler = new Scheduler(g, numProcessors);
+            Schedule result = scheduler.findOptimalSchedule();
 
             // then
-            if(shouldBeNullSchedule(file)){
+            if (shouldBeNullSchedule(file)) {
                 assertNull(result);
-            }else{
-                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, numProcessors));
-                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, numProcessors, edges));
+            } else {
+                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, numProcessors));
+                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
             }
 
             System.out.println("schedule = " + result);
@@ -125,12 +62,14 @@ class SchedulerTest {
         }
     }
 
+    private boolean shouldBeSkipped(File file) {
+        String fileName = file.getName();
+
+        return fileName.contains("cycle") || fileName.contains("empty") || fileName.contains("large");
+    }
     private boolean shouldBeNullSchedule(File file) {
         String fileName = file.getName();
 
-        if(fileName.contains("cycle") || fileName.contains("empty")){
-            return true;
-        }
-        return false;
+        return fileName.contains("cycle") || fileName.contains("empty");
     }
 }

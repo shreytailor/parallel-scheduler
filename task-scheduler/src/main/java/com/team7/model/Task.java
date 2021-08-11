@@ -5,16 +5,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class Task {
+    private static short id = 0;
     private String name;
     private int weight;
     private List<Edge> inEdges;
     private List<Edge> outEdges;
+    private short uniqueID;
 
     public Task(String name, int weight) {
         this.name = name;
         this.weight = weight;
         inEdges = new ArrayList<>();
         outEdges = new ArrayList<>();
+        uniqueID = id;
+        id++;
     }
 
     public String getName() {
@@ -41,6 +45,14 @@ public class Task {
         return weight;
     }
 
+    public short getUniqueID() {
+        return this.uniqueID;
+    }
+
+    public static void resetID() {
+        id=0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,7 +65,8 @@ public class Task {
     public int hashCode() {
         return Objects.hash(name, weight);
     }
-    
+
+    @Override
     public String toString() {
         return "Task{" +
                 "name='" + name + '\'' +

@@ -4,9 +4,9 @@ This is the project repository for Group 7 (*The Marauders*). It consists of the
 
 ## Usage Instructions
 
-This task scheduler will take in a directed graph (*.dot* file) as an input. The weighed nodes in this graph will represent tasks with their computation times, while the communication costs between these tasks will be represented by the weighed edges. 
+This task scheduler will take in a directed graph (*.dot* file) as an input. Tasks and their computation times are represented in the graph as weighted nodes, while the communication costs between these tasks will be represented by the weighted edges. Dot files should be placed in the same folder as the jar file.
 
-Note that a task here represents a unit of work, which can be scheduled on a processor. The command line arguments which can be used to interact with this program are shown below.
+The command line arguments which can be used to interact with this program are shown below.
 
 | Arguments (required arguments in italics) | Description |
 | --- | --- |
@@ -15,6 +15,10 @@ Note that a task here represents a unit of work, which can be scheduled on a pro
 | -p N | Use N cores for executing the algorithm in parallel (default is sequential) |
 | -v | Visualize the scheduling algorithm. |
 | -o OUTPUT | Output file is named OUTPUT (default is INPUT-output.dot) |
+
+**Note:** Milestone 1 only supports the required arguments.
+
+Example usage: ```java -jar scheduler.jar Nodes_11_OutTree.dot 2```
 
 ## Team
 

@@ -18,7 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -76,6 +75,7 @@ public class SchedulerScreenController implements Initializable {
         cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", timeProvider);
         cpuUtilizationProvider.startTracking();
 
+        // Applying custom properties to the CPU chart.
         NumberAxis cpuYAxis = (NumberAxis) cpuUsageChart.getYAxis();
         cpuUsageChart.getXAxis().setLabel("Time (seconds)");
         cpuYAxis.setLabel("Usage (%)");
@@ -84,6 +84,7 @@ public class SchedulerScreenController implements Initializable {
         ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization", timeProvider);
         ramUtilizationProvider.startTracking();
 
+        // Applying custom properties to the RAM chart.
         NumberAxis ramYAxis = (NumberAxis) ramUsageChart.getYAxis();
         ramUsageChart.getXAxis().setLabel("Time (seconds)");
         ramYAxis.setLabel("Usage (%)");

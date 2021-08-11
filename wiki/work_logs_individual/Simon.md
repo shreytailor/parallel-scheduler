@@ -1,11 +1,35 @@
 ## Simon's Work Log
 
+### 08/08/2021
+Tested the release scheduler.jar file on a few test cases in two Linux Virtual Machines via using Oracle VM VirtualBox Manager.
+
+---
+
+### 07/08/2021
+Collobrating with Josh to work on the "Tools and Technologies" part of the milestone I report, modify the content inside of the report to allow extra space for details. Refactor, modify and polish the report for better readability.
+
+---
+
+### 05/08/2021
+Made a wiki page of team 7 at https://github.com/SoftEng306-2021/project-1-project-1-team-7/wiki/Wiki-Homepage
+
+---
+
+### 04/08/2021
+Outline key points of Implementation, Development Process, Reflection and write up a draft for milestone 1's report.
+
+---
+
 ### 31/08/2021
-Write on the development process part of the milestone 1 report
+Read through milestone 1's requirements and brainstorm.
+
+---
 
 ### 29/07/2021
 
 Discussion with teammates about the task delegation, start on researching java packages that can be used to output digraph visualization.
+
+---
 
 ### 28/07/2021
 
@@ -15,18 +39,28 @@ Write up a script for efficient generating DOT files.
 
 Discussion with Shrey about wanted/unwanted cases for unit testing.
 
+---
+
 ### 27/07/2021
 
 Write up the most of the paragraph for the Gantt chart section in the planning report. Briefly describing the key deliverables of each milestone in the Gannt chart and the purpose of the Gantt chart.
+
+---
 
 ### 26/07/2021
 
 Group collaboration of finalizing WBS, and Network Diagram.
 
+---
+
 ### 23/07/2021
 
 A walk through of WBS and Network Diagram, reviewing the gantt chart which was created by following the dependencies identified in the Network Diagram. Spotted on the incorrectness of having a total development time frame over 7 weeks, modify it to make it meeting the requirement identified in the project brief.
 
+---
+
 ### 22/07/2021
 
 Collaboration with the other 4 group members of accomplishing WBS and Network Diagram.
+
+---

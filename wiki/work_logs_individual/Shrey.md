@@ -1,5 +1,44 @@
 # Shrey's Work Log
 
+## 10/08/2021
+- Currently, the visualization is only useful to check the final schedule once the algorithm has completed its execution. However, for the next iteration of the application, the GUI would be required to show the schedule as the algorithm runs (so we can see the *best schedule yet*.)
+- Before starting the implementation, it was important to research on how this part of the application would be architectured so I used the following resources to learn more about JavaFX. 
+  - https://edencoding.com/force-refresh-scene/
+  - https://www.developer.com/java/data/understanding-java-observable-and-javafx-observable/
+
+---
+
+## 08/08/2021
+- Reviewing the report for Milestone 1 and the implementation itself, and checking where all the client requirements have been met.
+- Refactoring the `visualisation` package by renaming some classes and writing extensive JavaDoc for all the classes and comments.
+
+---
+
+## 07/08/2021
+- Since most of the implementation was completed for Milestone 1 (except for some documentation, commenting, and refactoring which wouldn't change the functionality), I had worked on the report for this milestone.
+  - Wrote up content for the following sections
+    - *Major Work Tasks*
+    - *Individual Contributions* - Reflecting on meeting notes to see who has worked on which tasks.
+    - *Development Processes*
+    - *Tools and Technology* - Also explaining why these choices were the ideal for our group environment.
+
+---
+
+## 05/08/2021
+- Had a discussion with Josh about the next steps for the visualization development, so we both made a plan for the next tasks.
+- We also sat together and slightly changed the current high-fidelity prototype in Figma, by including accent colours and custom fonts to the layout.
+
+---
+
+## 04/08/2021
+- Completely refactored  directories storing files for the visualization. 
+  - This process included creating new packages and renaming classes, because a lot of the current classes were named really similarly (either had prefix of `Visualisation...` or `Schedule...`).
+  - Removed files which are not required and used anymore.
+- Added a new feature to the schedule representation.
+  - It enables the viewers to see which bar (in the *gantt chart*) belongs to which task from the `.dot` file.
+
+---
+
 ## 03/08/2021
 - For the initial GUI of the application, I started out by implementing the graphs for CPU and RAM utilization. These were chosen as the first step (before working on the dynamically changing graph), as they do not depend on the event-emitting system which is yet to be created by us.
 - The `OperatingSystemMXBean` was used to get important information about the computer, from Java. This bean also provides more useful data such as the time since the process started, which is going to be useful later to develop the other parts of the interface.
