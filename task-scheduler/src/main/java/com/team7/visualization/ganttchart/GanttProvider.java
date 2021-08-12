@@ -1,24 +1,25 @@
 package com.team7.visualization.ganttchart;
 
+import com.team7.algorithm.Scheduler;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.paint.Color;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class GanttProvider {
     private Config _config;
     private Schedule _schedule;
+    private Task[] _tasks;
 
-    public GanttProvider(Schedule schedule, Config config) {
+    public GanttProvider(Task[] tasks, Schedule schedule, Config config) {
         _config = config;
         _schedule = schedule;
+        _tasks = tasks;
     }
 
     public GanttComponent getSchedule() {
@@ -32,10 +33,8 @@ public class GanttProvider {
         chart.setBlockHeight(15);
 
         // Configuring the axis.
-//        xAxis.setTickLabelFill(Color.CHOCOLATE);
         xAxis.setMinorTickCount(4);
         xAxis.setLabel("Time (weight)");
-//        yAxis.setTickLabelFill(Color.CHOCOLATE);
         yAxis.setTickLabelGap(10);
         yAxis.setLabel("Processor");
 
@@ -48,23 +47,20 @@ public class GanttProvider {
         }
 
         // Getting the important parts of the schedule.
-        Map<Task, Integer> taskMap = _schedule.getTaskProcessorMap();
-        Map<Task, Integer> taskStartTime = _schedule.getTaskStartTimeMap();
-        Iterator iterator = taskMap.entrySet().iterator();
+        byte[] taskMap = _schedule.getTaskProcessorMap();
+        int[] taskStartTime = _schedule.getTaskStartTimeMap();
 
-        // Inserting each task into the graph, by iterating through them.
-        while (iterator.hasNext()) {
-            Map.Entry pair = (Map.Entry) iterator.next();
-            Task task = (Task) pair.getKey();
+        for (int counter = 0; counter < _tasks.length; counter++) {
+            Task currentTask = _tasks[counter];
+            short uniqueId = currentTask.getUniqueID();
+            String processor = String.valueOf(taskMap[uniqueId]);
+            int startTime = taskStartTime[uniqueId];
+            int length = currentTask.getWeight();
 
-            String machine = String.valueOf(pair.getValue());
-            int startTime = taskStartTime.get(pair.getKey());
-            int length = task.getWeight();
-
-            XYChart.Series series = processorSeries.get((int) pair.getValue());
+            XYChart.Series series = processorSeries.get(Integer.valueOf(taskMap[uniqueId]));
             XYChart.Data<Number, String> data = new XYChart.Data(
-                    startTime, machine,
-                    new GanttComponent.ExtraData(length, "status-bar", task.getName()));
+                    startTime, processor,
+                    new GanttComponent.ExtraData(length, "status-bar", currentTask.getName()));
 
             series.getData().add(data);
         }

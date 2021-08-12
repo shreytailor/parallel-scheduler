@@ -1,6 +1,7 @@
 package com.team7.visualization;
 
 import com.team7.model.Schedule;
+import com.team7.model.Task;
 import com.team7.parsing.Config;
 import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.system.CPUUtilizationProvider;
@@ -29,15 +30,16 @@ public class SchedulerScreenController implements Initializable {
     private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
-
     private boolean isLightMode = true;
 
     private Config _config;
     private Schedule _schedule;
+    private final Task[] _tasks;
 
-    public SchedulerScreenController(Schedule schedule, Config config) {
+    public SchedulerScreenController(Task[] tasks, Schedule schedule, Config config) {
         _config = config;
         _schedule = schedule;
+        _tasks = tasks;
     }
 
     @FXML
@@ -90,7 +92,7 @@ public class SchedulerScreenController implements Initializable {
         ramYAxis.setLabel("Usage (%)");
         ramYAxis.setUpperBound(ramUtilizationProvider.getUpperBound());
 
-        GanttProvider scheduleProvider = new GanttProvider(_schedule, _config);
+        GanttProvider scheduleProvider = new GanttProvider(_tasks, _schedule, _config);
         stateGraphContainer.setCenter(scheduleProvider.getSchedule());
     }
 
