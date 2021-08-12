@@ -6,36 +6,29 @@ import com.team7.parsing.Config;
 import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
+import com.team7.visualization.system.TimeProvider;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import com.team7.visualization.system.TimeProvider;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-import java.io.*;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -48,16 +41,41 @@ public class SchedulerScreenController implements Initializable {
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
     private boolean isLightMode = true;
+    private boolean isShowingUtilization = true;
 
     private Config _config;
     private Schedule _schedule;
     private final Task[] _tasks;
 
+    private BorderPane inputGraphContainer = new BorderPane();
+
     public SchedulerScreenController(Task[] tasks, Schedule schedule, Config config) {
         _config = config;
         _schedule = schedule;
         _tasks = tasks;
+
+        try (InputStream dot = new FileInputStream(_config.getInputName())) {
+            // parse the dot file and generate an image
+            MutableGraph g = new Parser().read(dot);
+            BufferedImage imBuffer = Graphviz.fromGraph(g).height(650).width(500).render(Format.SVG).toImage();
+
+            // convert the image to javafx component
+            ImageView inputGraph = new ImageView(SwingFXUtils.toFXImage(imBuffer, null));
+            inputGraphContainer.setCenter(inputGraph);
+        } catch (FileNotFoundException e) {
+            viewToggleButton.setDisable(true);
+            viewToggleButton.setTooltip(new Tooltip("Input file not found"));
+        } catch (IOException e) {
+            viewToggleButton.setDisable(true);
+            viewToggleButton.setTooltip(new Tooltip("Some problems occurred in the input file"));
+        }
     }
+
+    @FXML
+    private GridPane utilGraphContainer;
+
+    @FXML
+    private GridPane mainGrid;
 
     @FXML
     private BorderPane stateGraphContainer;
@@ -111,6 +129,10 @@ public class SchedulerScreenController implements Initializable {
 
         GanttProvider scheduleProvider = new GanttProvider(_tasks, _schedule, _config);
         stateGraphContainer.setCenter(scheduleProvider.getSchedule());
+
+        // For input graph
+        mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
+        inputGraphContainer.setVisible(false);
     }
 
     @FXML
@@ -150,30 +172,17 @@ public class SchedulerScreenController implements Initializable {
         Platform.exit();
     }
 
-    // Shows the Input Image in a popup window
     @FXML
-    public void handleViewToggleButton() throws IOException {
-
-        // This command is useful for debugging to determine the directory
-        // System.out.println(System.getProperty("user.dir"));
-
-        try (InputStream dot = new FileInputStream("task-scheduler/src/dot-tests/large.DOT")) {
-
-            // parse the dot file and generate an image
-            File imageFile = new File("tmp/tmp.png");
-            MutableGraph g = new Parser().read(dot);
-            Graphviz.fromGraph(g).width(700).render(Format.PNG).toFile(imageFile);
-
-            // convert the image file to javafx component
-            Image image = new Image(imageFile.toURI().toString());
-            ImageView imageView = new ImageView(image);
-
-            // Shows the input graph in a pop up window
-            Stage popupwindow = new Stage();
-            popupwindow.initModality(Modality.APPLICATION_MODAL);
-            popupwindow.setTitle("Input Graph");
-            popupwindow.setScene(new Scene(new Pane(imageView)));
-            popupwindow.showAndWait();
+    public void handleViewToggleButton() {
+        if (isShowingUtilization) {
+            utilGraphContainer.setVisible(false);
+            inputGraphContainer.setVisible(true);
+            isShowingUtilization = !isShowingUtilization;
+        }
+        else {
+            inputGraphContainer.setVisible(false);
+            utilGraphContainer.setVisible(true);
+            isShowingUtilization = !isShowingUtilization;
         }
     }
 }
