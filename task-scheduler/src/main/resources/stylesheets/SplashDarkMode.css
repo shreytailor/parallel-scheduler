@@ -70,6 +70,6 @@
 }
 
 .status-bar {
-    -fx-border-color: #3D6EF4;
+    -fx-border-color: black;
     -fx-background-color: #3D6EF4;
 }
