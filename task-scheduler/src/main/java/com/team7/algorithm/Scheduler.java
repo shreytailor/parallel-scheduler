@@ -16,6 +16,8 @@ public class Scheduler {
     private byte[] taskRequirementsMap;
     private Schedule feasibleSchedule;
     private int totalComputationTime = 0;
+    private Queue<Schedule> scheduleQueue;
+    private Set<Schedule> visitedSchedules;
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -29,6 +31,32 @@ public class Scheduler {
         taskBottomLevelMap = new int[numTasks];
         taskStaticLevelMap = new int[numTasks];
         taskRequirementsMap = new byte[numTasks];
+        scheduleQueue = new PriorityQueue<>((a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
+        });
+        visitedSchedules = new TreeSet<>((a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                int m = b.getNumberOfTasks() - a.getNumberOfTasks();
+                if (m == 0) {
+                    for (int i=0;i<tasks.length;i++) {
+                        if (a.getTaskProcessorMap()[i] != b.getTaskProcessorMap()[i]) {
+                            return a.getTaskProcessorMap()[i] - b.getTaskProcessorMap()[i];
+                        }
+                        if (a.getTaskStartTimeMap()[i] != b.getTaskStartTimeMap()[i]) {
+                            return a.getTaskStartTimeMap()[i] - b.getTaskStartTimeMap()[i];
+                        }
+                    }
+                    return 0;
+                }
+                return m;
+            }
+            return n;
+        });
     }
 
     /**
@@ -49,8 +77,7 @@ public class Scheduler {
         findFeasibleSchedule();
 
         // (1) OPEN priority queue, sorted by f
-        Queue<Schedule> scheduleQueue =
-                generateInitialSchedules(tasks, processors, taskRequirementsMap, taskStaticLevelMap, tasks.length);
+        generateInitialSchedules();
 
         while (scheduleQueue.size() != 0) {
             // (2) Remove from OPEN the search state s with the smallest f
@@ -63,7 +90,7 @@ public class Scheduler {
             }
 
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
-            expandSchedule(scheduleQueue, s);
+            expandSchedule(s);
         }
 
         return feasibleSchedule;
@@ -117,62 +144,52 @@ public class Scheduler {
      * Compute f(s') = g(s')+h(s') for each new state s'.
      * Put all the new states in OPEN.
      *
-     * @param scheduleQueue
      * @param s
      */
-    public void expandSchedule(Queue<Schedule> scheduleQueue, Schedule s) {
+    public void expandSchedule(Schedule s) {
         //Expanding the schedule s, and insert them into the scheduleQueue
         for (Integer t : s.getBeginnableTasks()) {
             int minDistanceToEnd = taskStaticLevelMap[tasks[t].getUniqueID()];
 
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
-                if (s.getProcessorFinishTime(i) == 0) {
+                if (calculateEarliestTimeToSchedule(s,tasks[t],i) == 0 && t>s.getNormalisationIndex()) {
                     if (normalised) {
                         continue;
                     }
                     normalised = true;
                 }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], minDistanceToEnd, i);
+
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
-                if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime()) {
+                if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() && !visitedSchedules.contains(newSchedule)) {
+                    scheduleQueue.add(newSchedule);
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
-                        scheduleQueue.add(newSchedule);
                         s.setPartialExpansionIndex(t.byteValue());
                         scheduleQueue.add(s);
                         return;
-                    } else {
-                        scheduleQueue.add(newSchedule);
                     }
                 }
             }
         }
+        visitedSchedules.add(s);
     }
 
     /**
      * Generates a list of schedules (formally, States), each with one task scheduled that has no prerequisites.
      *
-     * @param tasks
-     * @param processors
-     * @param taskRequirementsMap
-     * @param taskStaticLevelMap
-     * @param length
      * @return a list schedules, each with one task
      */
-    private Queue<Schedule> generateInitialSchedules(Task[] tasks, int processors, byte[] taskRequirementsMap, int[] taskStaticLevelMap, int length) {
-        Queue<Schedule> scheduleQueue = new PriorityQueue<>(Comparator.comparingInt(Schedule::getEstimatedFinishTime));
-
+    private void generateInitialSchedules() {
         //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
         for (int i = 0; i < tasks.length; i++) {
             if (taskRequirementsMap[i] == 0) {
-                Schedule s = new Schedule(length, processors, taskRequirementsMap.clone());
+                Schedule s = new Schedule(tasks.length, processors, taskRequirementsMap.clone());
                 s.addTask(tasks[i], 0, 0);
                 s.setEstimatedFinishTime(taskStaticLevelMap[i]);
                 scheduleQueue.add(s);
             }
         }
-
-        return scheduleQueue;
     }
 
     /**

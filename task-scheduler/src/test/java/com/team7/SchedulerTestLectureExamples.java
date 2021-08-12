@@ -74,9 +74,6 @@ public class SchedulerTestLectureExamples {
         String fileName = file.getName();
 
         if (no_processor == 2) {
-            if(fileName.contains("Nodes_9_SeriesParallel")){
-                System.out.println("hi!");
-            }
             expectedFinishTime =
                     fileName.contains("Nodes_7_OutTree") ? 28 :
                             fileName.contains("Nodes_8_Random") ? 581 :

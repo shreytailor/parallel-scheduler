@@ -9,29 +9,39 @@ public class Schedule {
     private int estimatedFinishTime = 0;
     private byte tasksCompleted = 0;
     private int[] processorFinishTimes;
-    private int idleTime = 0;
-    private byte partialExpansionIndex=-1;
+    private int idleTime;
+    private byte partialExpansionIndex = -1;
+    private byte normalisationIndex;
 
     public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap) {
         taskProcessorMap = new byte[numTasks];
+        Arrays.fill(taskProcessorMap, (byte) -1);
         taskStartTimeMap = new int[numTasks];
+        Arrays.fill(taskStartTimeMap, -1);
         this.taskRequirementsMap = taskRequirementsMap;
         processorFinishTimes = new int[numProcessors];
+        idleTime = 0;
+        normalisationIndex = -1;
     }
 
-    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap, byte[] taskRequirementsMap, int[] processorFinishTimes, int estimatedFinishTime, byte tasksCompleted) {
+    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap, byte[] taskRequirementsMap, int[] processorFinishTimes, int estimatedFinishTime, byte tasksCompleted, int idleTime, byte normalisationIndex) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
         this.processorFinishTimes = processorFinishTimes;
         this.estimatedFinishTime = estimatedFinishTime;
         this.tasksCompleted = tasksCompleted;
+        this.idleTime = idleTime;
+        this.normalisationIndex = normalisationIndex;
     }
 
     public void addTask(Task n, int processor, int startTime) {
+        if (startTime == 0) {
+            normalisationIndex = (byte) n.getUniqueID();
+        }
         taskProcessorMap[n.getUniqueID()] = (byte) processor;
         taskStartTimeMap[n.getUniqueID()] = startTime;
-        idleTime+=startTime - processorFinishTimes[processor];
+        idleTime += startTime - processorFinishTimes[processor];
         taskRequirementsMap[n.getUniqueID()]--;
 
         //Checking whether there are any new tasks that we can begin
@@ -53,7 +63,7 @@ public class Schedule {
 
     public Queue<Integer> getBeginnableTasks() {
         Queue<Integer> beginnableTasks = new LinkedList<>();
-        for (int i = partialExpansionIndex+1; i < taskRequirementsMap.length; i++) {
+        for (int i = partialExpansionIndex + 1; i < taskRequirementsMap.length; i++) {
             if (taskRequirementsMap[i] == 0) {
                 beginnableTasks.add(i);
             }
@@ -97,17 +107,32 @@ public class Schedule {
         return idleTime;
     }
 
-    public int getPartialExpansionIndex() {
-        return partialExpansionIndex;
-    }
-
     public void setPartialExpansionIndex(byte n) {
         partialExpansionIndex = n;
     }
 
+    public byte getNormalisationIndex() {
+        return normalisationIndex;
+    }
+
     @Override
     public Schedule clone() {
-        return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted);
+        return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted, idleTime, normalisationIndex);
+    }
+
+    public byte[] getTaskRequirementsMap() {
+        return taskRequirementsMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        Schedule other = (Schedule) o;
+        if (this.getEstimatedFinishTime() != other.getEstimatedFinishTime() || this.getNumberOfTasks() != other.getNumberOfTasks()) {
+            return false;
+        }
+        return Arrays.equals(taskProcessorMap,other.getTaskProcessorMap()) && Arrays.equals(taskStartTimeMap ,other.getTaskStartTimeMap());
     }
 
     @Override
