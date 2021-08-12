@@ -1,4 +1,4 @@
-package com.team7.visualization;
+package com.team7.visualization.ganttchart;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,8 +12,10 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 
 /**
  * This class is created to provide a Gantt Chart implementation to display the current schedule.
@@ -25,15 +27,17 @@ import javafx.scene.shape.Rectangle;
  * https://stackoverflow.com/help/licensing
  * https://creativecommons.org/licenses/by-sa/4.0/
  */
-public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
+public class GanttComponent<X,Y> extends XYChart<X,Y> {
     public static class ExtraData {
         public long length;
         public String styleClass;
+        public String label;
 
-        public ExtraData(long length, String styleClass) {
+        public ExtraData(long length, String styleClass, String label) {
             super();
             this.length = length;
             this.styleClass = styleClass;
+            this.label = label;
         }
 
         public long getLength() {
@@ -51,15 +55,23 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
         public void setStyleClass(String styleClass) {
             this.styleClass = styleClass;
         }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
     }
 
     private double blockHeight = 10;
 
-    public ScheduleRepresentation(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis) {
+    public GanttComponent(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis) {
         this(xAxis, yAxis, FXCollections.<Series<X, Y>>observableArrayList());
     }
 
-    public ScheduleRepresentation(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis, @NamedArg("data") ObservableList<Series<X,Y>> data) {
+    public GanttComponent(@NamedArg("xAxis") Axis<X> xAxis, @NamedArg("yAxis") Axis<Y> yAxis, @NamedArg("data") ObservableList<Series<X,Y>> data) {
         super(xAxis, yAxis);
         if (!(xAxis instanceof ValueAxis && yAxis instanceof CategoryAxis)) {
             throw new IllegalArgumentException("Axis type incorrect, X and Y should both be NumberAxis");
@@ -90,7 +102,7 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
                         StackPane region = (StackPane)item.getNode();
 
                         if (region.getShape() == null) {
-                            ellipse = new Rectangle( getLength( item.getExtraValue()), getBlockHeight());
+                            ellipse = new Rectangle(getLength(item.getExtraValue()), getBlockHeight());
                         } else if (region.getShape() instanceof Rectangle) {
                             ellipse = (Rectangle)region.getShape();
                         } else {
@@ -106,6 +118,12 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
                         region.setScaleShape(false);
                         region.setCenterShape(false);
                         region.setCacheShape(false);
+                        System.out.println(getLabel(item.getExtraValue()));
+
+                        Label label = new Label(getLabel(item.getExtraValue()));
+                        label.setFont(new Font(20));
+
+                        region.getChildren().add(label);
                         block.setLayoutX(x);
                         block.setLayoutY(y);
                     }
@@ -159,7 +177,7 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
             item.setNode(container);
         }
 
-        container.getStyleClass().add( getStyleClass( item.getExtraValue()));
+        container.getStyleClass().add(getStyleClass(item.getExtraValue()));
         return container;
     }
 
@@ -190,12 +208,16 @@ public class ScheduleRepresentation<X,Y> extends XYChart<X,Y> {
         }
     }
 
-    private static String getStyleClass( Object obj) {
+    private static String getStyleClass (Object obj) {
         return ((ExtraData) obj).getStyleClass();
     }
 
-    private static double getLength( Object obj) {
+    private static double getLength (Object obj) {
         return ((ExtraData) obj).getLength();
+    }
+
+    public static String getLabel (Object obj) {
+        return ((ExtraData) obj).getLabel();
     }
 
     public double getBlockHeight() {

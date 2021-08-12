@@ -4,6 +4,7 @@ import com.team7.algorithm.Scheduler;
 import com.team7.exceptions.CommandLineException;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
+import com.team7.model.Task;
 import com.team7.parsing.Config;
 import com.team7.parsing.CLIParser;
 import com.team7.parsing.DOTParser;
@@ -24,18 +25,18 @@ public class Entrypoint {
             System.out.println("Feasible schedule generated with makespan of " + schedule.getEstimatedFinishTime());
 
             // Showing the visualization, if requested by the user. Note: not included in milestone 1
-            //if (config.isVisualised()) {
-            //    beginVisualisation(schedule, config);
-            //}
+            if (config.isVisualised()) {
+                beginVisualisation(scheduler.getTasks() ,schedule, config);
+            }
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);
         }
     }
 
-    private static void beginVisualisation(Schedule schedule, Config config) {
+    private static void beginVisualisation(Task[] tasks, Schedule schedule, Config config) {
         new Thread(() -> {
-            VisualizationDriver.main(schedule, config);
+            VisualizationDriver.show(tasks ,schedule, config);
         }).start();
     }
 }

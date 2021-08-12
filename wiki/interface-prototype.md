@@ -25,6 +25,24 @@ During the next iteration of this prototype, we decided to include the represent
 
 The images below show the improved low-fidelity prototype, where there is a toggle button for the user to switch between the CPU and RAM utilization, and visualization of the input graph.
 
-![High Fidelity Prototype](images/low-fidelity-prototype-1.png)
+![Low Fidelity Prototype](images/low-fidelity-prototype-1.png)
 
-![High Fidelity Prototype](images/low-fidelity-prototype-2.png)
+![Low Fidelity Prototype](images/low-fidelity-prototype-2.png)
+
+## High-Fidelity Prototype
+
+Below is the high-fidelity prototype for visualization screen:
+
+We have decided to change the position of utilization graphs and the schedule graph (differed from low fidelity prototype) because it will be easier to swap input graph with utilization graphs.
+
+![High fidelity prototype](/images/High-fidelity-prototype.png)
+
+
+
+Below is the high-fidelity prototype after removing title bar for light mode and dark mode:
+
+After consideration, we have decided to add close button, minimize button, and a dark mode option for the visualization. This means we can remove the title bar and have a custom one.
+
+![High fidelity prototype (light mode)](/images/High-fidelity-light-prototype.png)
+
+![High fidelity prototype (dark mode)](/images/High-fidelity-dark-prototype.png)
