@@ -17,18 +17,17 @@ import java.lang.management.ManagementFactory;
  * of this class, depending on what sort of data you want to display on the graph.
  */
 public abstract class UtilizationProvider {
-    int time;
+
     private LineChart<String, Number> chart;
     protected final OperatingSystemMXBean bean;
+    private TimeProvider timeProvider;
 
-    /**
-     * The default constructor for this class.
-     * @param chart the chart to which you want to provide tracking data.
-     */
-    public UtilizationProvider(LineChart<String, Number> chart) {
-        this.time = 0;
+    public UtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider tp) {
         this.chart = chart;
+        chart.setTitle(title);
+        chart.setLegendVisible(false);
         bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        timeProvider = tp;
     }
 
     /**
@@ -44,9 +43,8 @@ public abstract class UtilizationProvider {
         // Create an event handler which fetches the data from the custom getData() method.
         EventHandler<ActionEvent> chartUpdater = event -> {
             ObservableList currentData = series.getData();
-            currentData.add(new XYChart.Data<>(String.valueOf(time), getData()));
+            currentData.add(new XYChart.Data<>(String.valueOf(timeProvider.getCurrentSec()), getData()));
             if (currentData.size() == 20) currentData.remove(0);
-            time++;
         };
 
         // Finally register the event listener.

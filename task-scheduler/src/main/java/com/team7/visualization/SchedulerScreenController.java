@@ -1,5 +1,9 @@
 package com.team7.visualization;
 
+import com.team7.model.Schedule;
+import com.team7.model.Task;
+import com.team7.parsing.Config;
+import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
 import guru.nidi.graphviz.engine.Format;
@@ -10,12 +14,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import com.team7.visualization.system.TimeProvider;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,22 +30,52 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.*;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import java.net.URL;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 public class SchedulerScreenController implements Initializable {
+
+    private final Image SUN_IMAGE = new Image("/images/sun.png");
+    private final Image MOON_IMAGE = new Image("/images/moon.png");
+    private final Image DARK_MIN_IMAGE = new Image("/images/minimise-dark.png");
+    private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
+    private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
+    private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
+    private boolean isLightMode = true;
+
+    private Config _config;
+    private Schedule _schedule;
+    private final Task[] _tasks;
+
+    public SchedulerScreenController(Task[] tasks, Schedule schedule, Config config) {
+        _config = config;
+        _schedule = schedule;
+        _tasks = tasks;
+    }
+
+    @FXML
+    private BorderPane stateGraphContainer;
+
+    @FXML
+    private Label timerLabel;
 
     @FXML
     public Button viewToggleButton;
 
     @FXML
-    public ImageView restartButton;
+    public ImageView themeToggleIcon;
 
     @FXML
-    public ImageView themeToggleButton;
+    public ImageView minimizeIcon;
+
+    @FXML
+    public ImageView closeIcon;
 
     @FXML
     public LineChart<String, Number> cpuUsageChart;
@@ -52,8 +88,10 @@ public class SchedulerScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Registering the CPU chart to a custom provider, and starting to track data.
-        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart);
+        TimeProvider timeProvider = new TimeProvider();
+        timeProvider.registerLabel(timerLabel);
+
+        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", timeProvider);
         cpuUtilizationProvider.startTracking();
 
         // Applying custom properties to the CPU chart.
@@ -62,8 +100,7 @@ public class SchedulerScreenController implements Initializable {
         cpuYAxis.setLabel("Usage (%)");
         cpuYAxis.setUpperBound(cpuUtilizationProvider.getUpperBound());
 
-        // Registering the RAM chart to a custom provider, and starting to track data.
-        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart);
+        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization", timeProvider);
         ramUtilizationProvider.startTracking();
 
         // Applying custom properties to the RAM chart.
@@ -71,6 +108,46 @@ public class SchedulerScreenController implements Initializable {
         ramUsageChart.getXAxis().setLabel("Time (seconds)");
         ramYAxis.setLabel("Usage (%)");
         ramYAxis.setUpperBound(ramUtilizationProvider.getUpperBound());
+
+        GanttProvider scheduleProvider = new GanttProvider(_tasks, _schedule, _config);
+        stateGraphContainer.setCenter(scheduleProvider.getSchedule());
+    }
+
+    @FXML
+    private void handleToggleTheme() {
+        ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
+        
+        if (isLightMode) {
+            themeToggleIcon.setImage(SUN_IMAGE);
+            closeIcon.setImage(DARK_CLOSE_IMAGE);
+            minimizeIcon.setImage(DARK_MIN_IMAGE);
+
+            sheets.clear();
+            sheets.add("/stylesheets/SplashDarkMode.css");
+
+            isLightMode = !isLightMode;
+        }
+        else {
+            themeToggleIcon.setImage(MOON_IMAGE);
+            closeIcon.setImage(LIGHT_CLOSE_IMAGE);
+            minimizeIcon.setImage(LIGHT_MIN_IMAGE);
+
+            sheets.clear();
+            sheets.add("/stylesheets/SplashLightMode.css");
+
+            isLightMode = !isLightMode;
+        }
+    }
+
+    @FXML
+    private void handleMinimize() {
+        Stage stage = (Stage) minimizeIcon.getScene().getWindow();
+        stage.setIconified(true);
+    }
+
+    @FXML
+    private void handleClose() {
+        Platform.exit();
     }
 
     // Shows the Input Image in a popup window
@@ -99,3 +176,4 @@ public class SchedulerScreenController implements Initializable {
         }
     }
 }
+

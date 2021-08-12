@@ -206,4 +206,8 @@ public class Scheduler {
         return (a, b) -> taskBottomLevelMap[b.getUniqueID()] + taskTopLevelMap[b.getUniqueID()]
                 - taskBottomLevelMap[a.getUniqueID()] - taskTopLevelMap[a.getUniqueID()];
     }
+    
+    public Task[] getTasks() {
+        return tasks;
+    }
 }
