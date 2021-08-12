@@ -45,7 +45,7 @@
                <right>
                   <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" text="Show Input Graph" />
+                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" styleClass="btn" text="Show Input Graph" onAction="#handleViewToggleButton" />
                         <ImageView fx:id="themeToggleIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleToggleTheme" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/moon.png" />

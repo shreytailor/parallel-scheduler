@@ -151,6 +151,7 @@ public class SchedulerScreenController implements Initializable {
     }
 
     // Shows the Input Image in a popup window
+    @FXML
     public void handleViewToggleButton() throws IOException {
 
         // This command is useful for debugging to determine the directory
