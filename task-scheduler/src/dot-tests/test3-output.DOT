@@ -1,0 +1,7 @@
+digraph test {
+	a	 [Weight=1,Start=0,Processor=1];
+	b	 [Weight=1,Start=1,Processor=1];
+	c	 [Weight=1,Start=2,Processor=1];
+	a -> b	 [Weight=1];
+	a -> c	 [Weight=1];
+}
