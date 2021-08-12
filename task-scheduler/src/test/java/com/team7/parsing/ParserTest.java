@@ -6,15 +6,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class ParserTest {
 
     /**
-     * Test common case for Parser#parseCommandLineArguments method
-     * where numOfCores, inputName, isVisualised, outputName are provided
+     * Test a common case for Parser#parseCommandLineArguments method.
+     * Where numOfCores, inputName, isVisualised, outputName are provided.
      */
     @Test
     void parseCommandLineArguments_commonCase() {
-//        Given
+        // Given
         String cliString = "sampleInput.dot 2 -p 3 -v -o outputName";
 
-//        When
+        // When
         String[] arguments = cliString.split(" ");
         Config config = null;
         try {
@@ -29,21 +29,20 @@ class ParserTest {
                 "outputName.dot",
                 "sampleInput.dot");
 
-//      Then
+        // Then
         assertEquals(expectedConfig, config);
     }
 
     /**
-     * Test for Parser#parseCommandLineArguments method
-     * where outputName is not given
-     * The output name should be <inputName>-output.dot by default
+     * Test a common case for Parser#parseCommandLineArguments method.
+     * Where outputName is not given. The output name should be <inputName>-output.dot by default.
      */
     @Test
     void parseCommandLineArguments_noOutputNameProvided() {
-//        Given
+        // Given
         String cliString = "sampleInput.dot 4 -p 3 -v";
 
-//        When
+        // When
         String[] arguments = cliString.split(" ");
         Config config = null;
         try {
@@ -58,20 +57,20 @@ class ParserTest {
                 "sampleInput-output.dot",
                 "sampleInput.dot");
 
-//        Then
+        // Then
         assertEquals(expectedConfig, config);
     }
 
     /**
-     * Test for Parser#parseCommandLineArguments method
-     * where -v flag is not set
+     * Test for the Parser#parseCommandLineArguments method.
+     * Where -v flag is not set, so visualisation should be off.
      */
     @Test
     void parseCommandLineArguments_doNotVisualise() {
-//        Given
+        // Given
         String cliString = "sampleInput.dot 2 -p 3 -o outputName";
 
-//        When
+        // When
         String[] arguments = cliString.split(" ");
         Config config = null;
         try {
@@ -86,22 +85,23 @@ class ParserTest {
                 "outputName.dot",
                 "sampleInput.dot");
 
-//        Then
+        // Then
         assertEquals(expectedConfig, config);
     }
 
     /**
-     * Test for Parser#parseCommandLineArguments method
-     * where none of the optional arguments are specified
-     * ie., no -v, no -p, no -o
+     * Test for the Parser#parseCommandLineArguments method.
+     * Where none of the optional arguments are specified, so the test case should pass without
+     * throwing any exceptions, and it should populate Config with default parameters.
      *
+     * i.e., no -v, -p, or -o flag.
      */
     @Test
     void parseCommandLineArguments_noOptionalArgumentSpecified() {
-//        Given
+        // Given
         String cliString = "sampleInput.dot 2";
 
-//        When
+        // When
         String[] arguments = cliString.split(" ");
         Config config = null;
         try {
@@ -116,26 +116,24 @@ class ParserTest {
                 "sampleInput-output.dot",
                 "sampleInput.dot");
 
-//        Then
+        // Then
         assertEquals(expectedConfig, config);
     }
 
 
     /**
-     * Test for Parser#parseCommandLineArguments method
-     * where a weird flag is put in
-     *
+     * Test for the Parser#parseCommandLineArguments method.
+     * Where an unrecognised and invalid flag is put is input by the user.
      */
     @Test
     void parseCommandLineArguments_unrecognisedFlagThrowsException() {
-//        Given
+        // Given
         String cliString = "sampleInput.dot 3 -w 123";
 
-//        When
+        // When
         String[] arguments = cliString.split(" ");
 
-//        Then
-//        TODO: change Exception to appropriate assertion, with appropriate message
+        // Then
         try {
             Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
@@ -145,19 +143,18 @@ class ParserTest {
     }
 
     /**
-     * Test for Parser#parseCommandLineArguments method
-     * where a weird flag is put in
-     *
+     * Test for the Parser#parseCommandLineArguments method.
+     * Where the input string is empty so no parameters are provided by the user.
      */
     @Test
     void parseCommandLineArguments_nothingSpecified() {
-//        Given
+        // Given
         String cliString = "";
 
-//        When
+        // When
         String[] arguments = cliString.split("");
 
-//        Then
+        // Then
         try {
             Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
@@ -167,8 +164,8 @@ class ParserTest {
     }
 
     /**
-     * Test for Parser#parseCommandLineArguments method where only the input string has been
-     * specified out of the require parameters.
+     * Test for Parser#parseCommandLineArguments method.
+     * Where only the input string has been specified out of the required parameters.
      */
     @Test
     void parseCommandLineArguments_onlyInputStringSpecified() {
