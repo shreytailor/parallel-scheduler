@@ -140,7 +140,7 @@ class ParserTest {
             Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
-            assertEquals("Flag unrecognised", e.getMessage());
+            assertEquals("An error has occured while parsing your command line argument, please try again.", e.getMessage());
         }
     }
 
@@ -158,12 +158,31 @@ class ParserTest {
         String[] arguments = cliString.split("");
 
 //        Then
-//        TODO: change Exception to appropriate assertion, with appropriate message
         try {
             Config config = CLIParser.parseCommandLineArguments(arguments);
             fail();
         } catch (Exception e) {
-            assertEquals("Not enough parameters specified", e.getMessage());
+            assertEquals("Not enough parameters specified.", e.getMessage());
+        }
+    }
+
+    /**
+     * Test for Parser#parseCommandLineArguments method where only the input string has been
+     * specified out of the require parameters.
+     */
+    @Test
+    void parseCommandLineArguments_onlyInputStringSpecified() {
+        // Given
+        String cliString = "sampleInput.dot";
+
+        // When
+        String[] arguments = cliString.split(" ");
+
+        // Then
+        try {
+            Config config = CLIParser.parseCommandLineArguments(arguments);
+        } catch (CommandLineException exception) {
+            assertEquals("Not enough parameters specified.", exception.getMessage());
         }
     }
 }
