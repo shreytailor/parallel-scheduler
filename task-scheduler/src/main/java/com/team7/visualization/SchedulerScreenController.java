@@ -7,11 +7,11 @@ import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
 import com.team7.visualization.system.TimeProvider;
+import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
-import com.team7.visualization.system.TimeProvider;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -29,15 +29,10 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import java.io.*;
-import javafx.scene.control.Label;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -56,6 +51,8 @@ public class SchedulerScreenController implements Initializable {
     private Schedule _schedule;
     private final Task[] _tasks;
 
+    private ImageView inputGraphLight;
+    private ImageView inputGraphDark;
     private BorderPane inputGraphContainer = new BorderPane();
 
     public SchedulerScreenController(Task[] tasks, Schedule schedule, Config config) {
@@ -65,12 +62,20 @@ public class SchedulerScreenController implements Initializable {
 
         try (InputStream dot = new FileInputStream(_config.getInputName())) {
             // parse the dot file and generate an image
-            MutableGraph g = new Parser().read(dot);
-            BufferedImage imBuffer = Graphviz.fromGraph(g).height(650).width(500).render(Format.SVG).toImage();
+            MutableGraph lg = new Parser().read(dot);
+            lg.graphAttrs().add(Color.TRANSPARENT.background());
+            MutableGraph dg = lg.copy();
+            dg.linkAttrs().add(Color.WHITE);
+            dg.nodeAttrs().add(Color.WHITE);
+            dg.nodeAttrs().add(Color.WHITE.font());
+
+            BufferedImage imBufferLight = Graphviz.fromGraph(lg).height(650).width(500).render(Format.SVG).toImage();
+            BufferedImage imBufferDark = Graphviz.fromGraph(dg).height(650).width(500).render(Format.SVG).toImage();
 
             // convert the image to javafx component
-            ImageView inputGraph = new ImageView(SwingFXUtils.toFXImage(imBuffer, null));
-            inputGraphContainer.setCenter(inputGraph);
+            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(imBufferLight, null));
+            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(imBufferDark, null));
+            inputGraphContainer.setCenter(inputGraphLight);
         } catch (FileNotFoundException e) {
             viewToggleButton.setDisable(true);
             viewToggleButton.setTooltip(new Tooltip("Input file not found"));
@@ -152,6 +157,7 @@ public class SchedulerScreenController implements Initializable {
             themeToggleIcon.setImage(SUN_IMAGE);
             closeIcon.setImage(DARK_CLOSE_IMAGE);
             minimizeIcon.setImage(DARK_MIN_IMAGE);
+            inputGraphContainer.setCenter(inputGraphDark);
 
             sheets.clear();
             sheets.add("/stylesheets/SplashDarkMode.css");
@@ -162,6 +168,7 @@ public class SchedulerScreenController implements Initializable {
             themeToggleIcon.setImage(MOON_IMAGE);
             closeIcon.setImage(LIGHT_CLOSE_IMAGE);
             minimizeIcon.setImage(LIGHT_MIN_IMAGE);
+            inputGraphContainer.setCenter(inputGraphLight);
 
             sheets.clear();
             sheets.add("/stylesheets/SplashLightMode.css");
