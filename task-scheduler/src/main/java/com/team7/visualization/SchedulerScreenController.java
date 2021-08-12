@@ -11,6 +11,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
+import com.team7.visualization.system.TimeProvider;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -29,6 +30,14 @@ import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.*;
+import javafx.scene.control.Label;
 import java.net.URL;
 import java.util.ResourceBundle;
 
