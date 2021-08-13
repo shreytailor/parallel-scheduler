@@ -19,7 +19,10 @@ public class Entrypoint {
 
             // Processing the input graph by using the scheduler, and storing the output.
             Scheduler scheduler = new Scheduler(graph, config.getNumOfProcessors());
+            long start = System.currentTimeMillis();
             Schedule schedule = scheduler.findOptimalSchedule();
+            long finish = System.currentTimeMillis();
+            System.out.println(finish-start);
             DOTParser.write(config.getOutputName(),schedule, graph);
 
             // Showing the visualization, if requested by the user. Note: not included in milestone 1

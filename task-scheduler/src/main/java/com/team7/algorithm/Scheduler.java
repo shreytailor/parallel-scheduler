@@ -14,6 +14,7 @@ public class Scheduler {
     private int[] taskBottomLevelMap;
     private int[] taskStaticLevelMap;
     private byte[] taskRequirementsMap;
+    private List[] taskEquivalences;
     private Schedule feasibleSchedule;
     private int totalComputationTime = 0;
     private Queue<Schedule> scheduleQueue;
@@ -39,10 +40,8 @@ public class Scheduler {
             return n;
         });
         visitedSchedules = new TreeSet<>((a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                int m = b.getNumberOfTasks() - a.getNumberOfTasks();
-                if (m == 0) {
+            if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
+                if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
                     for (int i=0;i<tasks.length;i++) {
                         if (a.getTaskProcessorMap()[i] != b.getTaskProcessorMap()[i]) {
                             return a.getTaskProcessorMap()[i] - b.getTaskProcessorMap()[i];
@@ -53,10 +52,11 @@ public class Scheduler {
                     }
                     return 0;
                 }
-                return m;
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
             }
-            return n;
+            return a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
         });
+        preprocess();
     }
 
     /**
@@ -66,6 +66,7 @@ public class Scheduler {
         Preprocessor.calculateTaskStaticAndBottomLevels(taskBottomLevelMap, taskStaticLevelMap, tasks);
         Preprocessor.calculateTaskTopLevels(taskTopLevelMap, tasks);
         Preprocessor.calculateRequirements(tasks, taskRequirementsMap);
+        //taskEquivalences = Preprocessor.calculateEquivalentTasks(tasks);
     }
 
     /**
@@ -102,8 +103,6 @@ public class Scheduler {
      * @return a valid schedule
      */
     public Schedule findFeasibleSchedule() {
-        preprocess();
-
         Schedule schedule =
                 new Schedule(tasks.length, processors, taskRequirementsMap.clone());
         Queue<Task> tasksToSchedule = new PriorityQueue<>(getTaskComparator());
@@ -149,17 +148,16 @@ public class Scheduler {
     public void expandSchedule(Schedule s) {
         //Expanding the schedule s, and insert them into the scheduleQueue
         for (Integer t : s.getBeginnableTasks()) {
-            int minDistanceToEnd = taskStaticLevelMap[tasks[t].getUniqueID()];
-
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
-                if (calculateEarliestTimeToSchedule(s,tasks[t],i) == 0 && t>s.getNormalisationIndex()) {
+                int earliestStartTime = calculateEarliestTimeToSchedule(s,tasks[t],i);
+                if (earliestStartTime == 0 && t>s.getNormalisationIndex()) {
                     if (normalised) {
                         continue;
                     }
                     normalised = true;
                 }
-                Schedule newSchedule = generateNewSchedule(s, tasks[t], minDistanceToEnd, i);
+                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() && !visitedSchedules.contains(newSchedule)) {
@@ -219,18 +217,16 @@ public class Scheduler {
      *
      * @param s
      * @param t
-     * @param minDistanceToEnd
      * @param processor
+     * @param earliestStartTime
      * @return the new schedule
      */
-    private Schedule generateNewSchedule(Schedule s, Task t, int minDistanceToEnd, int processor) {
+    private Schedule generateNewSchedule(Schedule s, Task t, int processor, int earliestStartTime) {
         Schedule newSchedule = s.clone();
-        //Compute the earliest time to schedule the task ('t') on this processor (processor 'i')
-        int earliestStartTime = calculateEarliestTimeToSchedule(newSchedule, t, processor);
         newSchedule.addTask(t, processor, earliestStartTime);
-        int lowerBound = Math.max((newSchedule.getIdleTime() + totalComputationTime) / processors, //The schedule length is then bounded by the sum of total idle time and the total weight (execution time) of all nodes divided by the number of processors,
-                Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime + minDistanceToEnd));  //Computation bottom level of task t
 
+        int lowerBound = Math.max((newSchedule.getIdleTime() + totalComputationTime) / processors, //The schedule length is then bounded by the sum of total idle time and the total weight (execution time) of all nodes divided by the number of processors,
+                Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime + taskStaticLevelMap[t.getUniqueID()]));  //Computation bottom level of task t
         for (Integer beginnable : newSchedule.getBeginnableTasks()) {
             Task task = tasks[beginnable];
             int nextEarliestStartTime = Integer.MAX_VALUE;
@@ -242,19 +238,17 @@ public class Scheduler {
             }
             lowerBound = Math.max(lowerBound, nextEarliestStartTime + taskStaticLevelMap[beginnable]);
         }
-
         newSchedule.setEstimatedFinishTime(lowerBound);
         return newSchedule;
     }
 
     /**
-     * A comparator that sorts tasks in terms of their bottom and top levels.
-     * The greater the sum of the bottom and top levels of a task, the higher its priority.
+     * A comparator that sorts tasks in terms of their bottom levels.
+     * The greater the bottom level of a task, the higher its priority.
      *
      * @return a comparator to sort tasks
      */
     private Comparator<Task> getTaskComparator() {
-        return (a, b) -> taskBottomLevelMap[b.getUniqueID()] + taskTopLevelMap[b.getUniqueID()]
-                - taskBottomLevelMap[a.getUniqueID()] - taskTopLevelMap[a.getUniqueID()];
+          return (a, b) -> taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()];
     }
 }

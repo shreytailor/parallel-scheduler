@@ -3,14 +3,14 @@ package com.team7.algorithm;
 import com.team7.model.Edge;
 import com.team7.model.Task;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class Preprocessor {
 
     /**
      * Static Level: Static level of a node is its bottom level without counting edge costs.
      * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node.
+     *
      * @param taskBottomLevelMap
      * @param taskStaticLevelMap
      * @param tasks
@@ -38,6 +38,7 @@ public class Preprocessor {
 
     /**
      * Top level of a node is the length of the longest path from an entry node to the node
+     *
      * @param taskTopLevelMap
      * @param tasks
      */
@@ -62,6 +63,7 @@ public class Preprocessor {
 
     /**
      * Record each task as having prerequisites (requirements) or beginnable (no requirements).
+     *
      * @param tasks
      * @param taskRequirementsMap
      */
@@ -69,5 +71,57 @@ public class Preprocessor {
         for (Task task : tasks) {
             taskRequirementsMap[task.getUniqueID()] = (byte) task.getIngoingEdges().size();
         }
+    }
+
+    //Currently not in use
+    public static List[] calculateEquivalentTasks(Task[] tasks) {
+        List<Task>[] taskEquivalences = new List[tasks.length];
+        for (int i = 0; i < tasks.length; i++) {
+            List<Task> equivalent = new LinkedList<>();
+            Task task1 = tasks[i];
+            equivalent.add(task1);
+            taskEquivalences[task1.getUniqueID()] = equivalent;
+
+            for (int j = i + 1; j < tasks.length; j++) {
+                if (taskEquivalences[j] != null) {
+                    continue;
+                }
+                Task task2 = tasks[j];
+                boolean equal = true;
+                if (task1.getWeight() == task2.getWeight() &&
+                        task1.getOutgoingEdges().size() == task2.getOutgoingEdges().size() &&
+                        task1.getIngoingEdges().size() == task2.getIngoingEdges().size()) {
+                    List<Edge> task1Out = task1.getOutgoingEdges();
+                    List<Edge> task2Out = task2.getOutgoingEdges();
+                    task1Out.sort(Comparator.comparingInt(a -> a.getHead().getUniqueID()));
+                    task2Out.sort(Comparator.comparingInt(a -> a.getHead().getUniqueID()));
+                    for (int k = 0; k < task1Out.size(); k++) {
+                        if (task1Out.get(k).getHead().getUniqueID() != task2Out.get(k).getHead().getUniqueID()) {
+                            equal = false;
+                            break;
+                        }
+                    }
+
+                    List<Edge> task1In = task1.getIngoingEdges();
+                    List<Edge> task2In = task2.getIngoingEdges();
+                    task1In.sort(Comparator.comparingInt(a -> a.getTail().getUniqueID()));
+                    task2In.sort(Comparator.comparingInt(a -> a.getTail().getUniqueID()));
+                    for (int k = 0; k < task1In.size(); k++) {
+                        if (task1In.get(k).getTail().getUniqueID() != task2In.get(k).getTail().getUniqueID()) {
+                            equal = false;
+                            break;
+                        }
+                    }
+                } else {
+                    equal = false;
+                }
+                if (equal) {
+                    System.out.println(task1.getName() + " is equivalent to " + task2.getName());
+                    equivalent.add(task2);
+                    taskEquivalences[task2.getUniqueID()] = equivalent;
+                }
+            }
+        }
+        return taskEquivalences;
     }
 }

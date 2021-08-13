@@ -120,10 +120,6 @@ public class Schedule {
         return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted, idleTime, normalisationIndex);
     }
 
-    public byte[] getTaskRequirementsMap() {
-        return taskRequirementsMap;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
