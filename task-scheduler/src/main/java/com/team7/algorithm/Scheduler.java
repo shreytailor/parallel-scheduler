@@ -17,7 +17,7 @@ public class Scheduler {
     protected List[] taskEquivalences;
     protected Schedule feasibleSchedule;
     protected int totalComputationTime = 0;
-    protected Queue<Schedule> scheduleQueue;
+    protected static Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
 
     public Scheduler(Graph g, int numOfProcessors) {

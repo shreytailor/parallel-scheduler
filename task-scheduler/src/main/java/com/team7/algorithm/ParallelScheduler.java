@@ -26,6 +26,7 @@ public class ParallelScheduler extends Scheduler{
         protected void compute() {
             boolean expanded = false;
 
+            // if this is not present, the next one
             if(scheduleQueue.isEmpty()){
                 expandSchedule(s);
             }
@@ -46,6 +47,21 @@ public class ParallelScheduler extends Scheduler{
                 expandSchedule(s);
             }
         }
+    }
+
+    public static synchronized boolean isScheduleQueueEmpty(){
+        return scheduleQueue.isEmpty();
+    }
+
+    /**
+     *
+     * @return schedule either null or a schedule
+     */
+    public static synchronized Schedule pollSchedule(){
+        if(isScheduleQueueEmpty()){
+            return scheduleQueue.poll();
+        }
+        return null;
     }
 
     /**
