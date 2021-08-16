@@ -22,7 +22,6 @@ public class SchedulerTestBasic {
     @Test
     void AStar_singleProcessor3TasksNoDependency() {
 //        Given
-        Task.resetID();
         Task task1 = new Task("a", 3);
         Task task2 = new Task("b", 4);
         Task task3 = new Task("c", 5);
@@ -45,7 +44,6 @@ public class SchedulerTestBasic {
     @Test
     void AStar_singleProcessor3Tasks() {
 //        Given
-        Task.resetID();
         Task task1 = new Task("a", 3);
         Task task2 = new Task("b", 4);
         Task task3 = new Task("c", 5);

@@ -53,14 +53,6 @@ public class Schedule {
         tasksCompleted++;
     }
 
-    public byte[] getTaskProcessorMap() {
-        return taskProcessorMap;
-    }
-
-    public int[] getTaskStartTimeMap() {
-        return taskStartTimeMap;
-    }
-
     public Queue<Integer> getBeginnableTasks() {
         Queue<Integer> beginnableTasks = new LinkedList<>();
         for (int i = partialExpansionIndex + 1; i < taskRequirementsMap.length; i++) {
@@ -69,6 +61,14 @@ public class Schedule {
             }
         }
         return beginnableTasks;
+    }
+
+    public int[] getTaskStartTimeMap() {
+        return taskStartTimeMap;
+    }
+
+    public byte[] getTaskProcessorMap() {
+        return taskProcessorMap;
     }
 
     public boolean isBeginnable(Task t) {
@@ -128,7 +128,7 @@ public class Schedule {
         if (this.getEstimatedFinishTime() != other.getEstimatedFinishTime() || this.getNumberOfTasks() != other.getNumberOfTasks()) {
             return false;
         }
-        return Arrays.equals(taskProcessorMap,other.getTaskProcessorMap()) && Arrays.equals(taskStartTimeMap ,other.getTaskStartTimeMap());
+        return Arrays.equals(taskProcessorMap,other.taskProcessorMap) && Arrays.equals(taskStartTimeMap ,other.taskStartTimeMap);
     }
 
     @Override
