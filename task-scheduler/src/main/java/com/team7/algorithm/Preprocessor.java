@@ -6,20 +6,17 @@ import com.team7.model.Task;
 import java.util.*;
 
 public class Preprocessor {
-
     /**
      * Static Level: Static level of a node is its bottom level without counting edge costs.
      * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node.
      *
-     * @param taskBottomLevelMap
-     * @param taskStaticLevelMap
      * @param tasks
      */
-    public static void calculateTaskStaticAndBottomLevels(int[] taskBottomLevelMap, int[] taskStaticLevelMap, Task[] tasks) {
+    public static int[] calculateTaskStaticLevels(Task[] tasks) {
+        int[] taskStaticLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
             if (task.getOutgoingEdges().size() == 0) {
-                taskBottomLevelMap[i] = task.getWeight();
                 taskStaticLevelMap[i] = task.getWeight();
                 Queue<Task> taskQueue = new LinkedList<>();
                 taskQueue.add(task);
@@ -27,22 +24,43 @@ public class Preprocessor {
                     Task t = taskQueue.poll();
                     for (Edge e : t.getIngoingEdges()) {
                         int neighbour = e.getTail().getUniqueID();
-                        taskBottomLevelMap[neighbour] = Math.max(taskBottomLevelMap[neighbour], taskBottomLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight() + e.getWeight());
                         taskStaticLevelMap[neighbour] = Math.max(taskStaticLevelMap[neighbour], taskStaticLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight());
                         taskQueue.add(tasks[neighbour]);
                     }
                 }
             }
         }
+        return taskStaticLevelMap;
+    }
+
+    public static int[] calculateTaskBottomLevels(Task[] tasks) {
+        int[] taskBottomLevelMap = new int[tasks.length];
+        for (int i = 0; i < tasks.length; i++) {
+            Task task = tasks[i];
+            if (task.getOutgoingEdges().size() == 0) {
+                taskBottomLevelMap[i] = task.getWeight();
+                Queue<Task> taskQueue = new LinkedList<>();
+                taskQueue.add(task);
+                while (taskQueue.size() > 0) {
+                    Task t = taskQueue.poll();
+                    for (Edge e : t.getIngoingEdges()) {
+                        int neighbour = e.getTail().getUniqueID();
+                        taskBottomLevelMap[neighbour] = Math.max(taskBottomLevelMap[neighbour], taskBottomLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight() + e.getWeight());
+                        taskQueue.add(tasks[neighbour]);
+                    }
+                }
+            }
+        }
+        return taskBottomLevelMap;
     }
 
     /**
      * Top level of a node is the length of the longest path from an entry node to the node
      *
-     * @param taskTopLevelMap
      * @param tasks
      */
-    public static void calculateTaskTopLevels(int[] taskTopLevelMap, Task[] tasks) {
+    public static int[] calculateTaskTopLevels(Task[] tasks) {
+        int[] taskTopLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
             if (task.getIngoingEdges().size() == 0) {
@@ -59,18 +77,48 @@ public class Preprocessor {
                 }
             }
         }
+        return taskTopLevelMap;
     }
 
     /**
      * Record each task as having prerequisites (requirements) or beginnable (no requirements).
      *
      * @param tasks
-     * @param taskRequirementsMap
      */
-    public static void calculateRequirements(Task[] tasks, byte[] taskRequirementsMap) {
+    public static byte[] calculateRequirements(Task[] tasks) {
+        byte[] taskRequirementsMap = new byte[tasks.length];
         for (Task task : tasks) {
             taskRequirementsMap[task.getUniqueID()] = (byte) task.getIngoingEdges().size();
         }
+        return taskRequirementsMap;
+    }
+
+    public static Task[] getTopologicalOrder(List<Task> tasks) {
+        Task[] result = new Task[tasks.size()];
+        Map<Task,Integer> taskRequirementsMap = new HashMap<>();
+        Queue<Task> beginnable = new LinkedList<>();
+        for (Task t : tasks) {
+            taskRequirementsMap.put(t,t.getIngoingEdges().size());
+            if (t.getIngoingEdges().size() == 0) {
+                beginnable.add(t);
+            }
+        }
+        int index=0;
+        while (beginnable.size() > 0) {
+            Task t = beginnable.poll();
+            result[index] = t;
+            index++;
+            for (Edge e : t.getOutgoingEdges()) {
+                taskRequirementsMap.compute(e.getHead(), (k,v)-> {
+                    v--;
+                    if (v==0) {
+                        beginnable.add(k);
+                    }
+                    return v;
+                });
+            }
+        }
+        return result;
     }
 
     //Currently not in use

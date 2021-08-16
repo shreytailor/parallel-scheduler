@@ -22,16 +22,17 @@ public class Scheduler {
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
-        int numTasks = g.getNodes().size();
-        tasks = new Task[numTasks];
-        for (Task t : g.getNodes()) {
-            tasks[t.getUniqueID()] = t;
+        tasks = Preprocessor.getTopologicalOrder(g.getNodes());
+        for (int i = 0; i < tasks.length; i++) {
+            Task t = tasks[i];
+            t.setUniqueID((byte) i);
             totalComputationTime += t.getWeight();
         }
-        taskTopLevelMap = new int[numTasks];
-        taskBottomLevelMap = new int[numTasks];
-        taskStaticLevelMap = new int[numTasks];
-        taskRequirementsMap = new byte[numTasks];
+        taskRequirementsMap = Preprocessor.calculateRequirements(tasks);
+        taskTopLevelMap = Preprocessor.calculateTaskTopLevels(tasks);
+        taskBottomLevelMap = Preprocessor.calculateTaskBottomLevels(tasks);
+        taskStaticLevelMap = Preprocessor.calculateTaskStaticLevels(tasks);
+
         scheduleQueue = new PriorityQueue<>((a, b) -> {
             int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
             if (n == 0) {
@@ -42,12 +43,12 @@ public class Scheduler {
         visitedSchedules = new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
-                    for (int i=0;i<tasks.length;i++) {
-                        if (a.getTaskProcessorMap()[i] != b.getTaskProcessorMap()[i]) {
-                            return a.getTaskProcessorMap()[i] - b.getTaskProcessorMap()[i];
+                    for (Task t : tasks) {
+                        if (a.getTaskProcessor(t) != b.getTaskProcessor(t)) {
+                            return a.getTaskProcessor(t) - b.getTaskProcessor(t);
                         }
-                        if (a.getTaskStartTimeMap()[i] != b.getTaskStartTimeMap()[i]) {
-                            return a.getTaskStartTimeMap()[i] - b.getTaskStartTimeMap()[i];
+                        if (a.getTaskStartTime(t) != b.getTaskStartTime(t)) {
+                            return a.getTaskStartTime(t) - b.getTaskStartTime(t);
                         }
                     }
                     return 0;
@@ -56,17 +57,6 @@ public class Scheduler {
             }
             return a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
         });
-        preprocess();
-    }
-
-    /**
-     * Calculate the bottom, static and top levels of each task.
-     */
-    public void preprocess() {
-        Preprocessor.calculateTaskStaticAndBottomLevels(taskBottomLevelMap, taskStaticLevelMap, tasks);
-        Preprocessor.calculateTaskTopLevels(taskTopLevelMap, tasks);
-        Preprocessor.calculateRequirements(tasks, taskRequirementsMap);
-        //taskEquivalences = Preprocessor.calculateEquivalentTasks(tasks);
     }
 
     /**
@@ -105,7 +95,7 @@ public class Scheduler {
     public Schedule findFeasibleSchedule() {
         Schedule schedule =
                 new Schedule(tasks.length, processors, taskRequirementsMap.clone());
-        Queue<Task> tasksToSchedule = new PriorityQueue<>(getTaskComparator());
+        Queue<Task> tasksToSchedule = new PriorityQueue<>((a, b) -> taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()]);
         for (Integer i : schedule.getBeginnableTasks()) {
             tasksToSchedule.add(tasks[i]);
         }
@@ -150,9 +140,9 @@ public class Scheduler {
         for (Integer t : s.getBeginnableTasks()) {
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
-                int earliestStartTime = calculateEarliestTimeToSchedule(s,tasks[t],i);
-                if (earliestStartTime == 0 && t>s.getNormalisationIndex()) {
-                    if (normalised) {
+                int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
+                if (earliestStartTime == 0) {
+                    if (normalised || t < s.getNormalisationIndex()) {
                         continue;
                     }
                     normalised = true;
@@ -160,7 +150,9 @@ public class Scheduler {
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
-                if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() && !visitedSchedules.contains(newSchedule)) {
+                if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
+                        !containsEquivalentSchedule(newSchedule, tasks[t]) &&
+                        !visitedSchedules.contains(newSchedule)) {
                     scheduleQueue.add(newSchedule);
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
                         s.setPartialExpansionIndex(t.byteValue());
@@ -200,10 +192,9 @@ public class Scheduler {
      */
     private int calculateEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
         int earliestStartTime = schedule.getProcessorFinishTime(processor);
-        byte[] taskProcessorMap = schedule.getTaskProcessorMap();
         for (Edge e : task.getIngoingEdges()) {
             int finishTime = schedule.getTaskFinishTime(e.getTail());
-            if (taskProcessorMap[e.getTail().getUniqueID()] == processor) {
+            if (schedule.getTaskProcessor(e.getTail()) == processor) {
                 earliestStartTime = Math.max(earliestStartTime, finishTime);
             } else {
                 earliestStartTime = Math.max(earliestStartTime, finishTime + e.getWeight());
@@ -242,13 +233,97 @@ public class Scheduler {
         return newSchedule;
     }
 
-    /**
-     * A comparator that sorts tasks in terms of their bottom levels.
-     * The greater the bottom level of a task, the higher its priority.
-     *
-     * @return a comparator to sort tasks
-     */
-    private Comparator<Task> getTaskComparator() {
-          return (a, b) -> taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()];
+    private boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
+        int maxFinishTime = schedule.getTaskFinishTime(addedTask);
+        int processor = schedule.getTaskProcessor(addedTask);
+        List<Task> taskSet = new ArrayList<>();
+        for (Task t : tasks) {
+            if (schedule.getTaskProcessor(t) == processor) {
+                taskSet.add(t);
+            }
+        }
+        taskSet.sort((a, b) -> schedule.getTaskStartTime(b) - schedule.getTaskStartTime(a));
+
+        int[] original = schedule.getTaskStartTimeMap();
+        int[] taskStartTimes = schedule.getTaskStartTimeMap().clone();
+        byte[] taskProcessorMap = schedule.getTaskProcessorMap();
+        for (int i = 1; i < taskSet.size(); i++) {
+            Task t1 = taskSet.get(i - 1);
+            Task t2 = taskSet.get(i);
+            if (t2.getUniqueID() < t1.getUniqueID()) {
+                break;
+            }
+
+            int t1StartTime = 0;
+            if (i < taskSet.size() - 1) {
+                t1StartTime = taskStartTimes[taskSet.get(i + 1).getUniqueID()] + taskSet.get(i + 1).getWeight();
+            }
+            for (Edge e : t1.getIngoingEdges()) {
+                Task tail = e.getTail();
+                int finishTime = taskStartTimes[tail.getUniqueID()] + tail.getWeight();
+                if (taskProcessorMap[tail.getUniqueID()] == processor) {
+                    t1StartTime = Math.max(t1StartTime, finishTime);
+                } else {
+                    t1StartTime = Math.max(t1StartTime, finishTime + e.getWeight());
+                }
+            }
+            taskStartTimes[t1.getUniqueID()] = t1StartTime;
+
+            for (int j = i; j > 0; j--) {
+                Task current = taskSet.get(j);
+                Task prev = taskSet.get(j - 1);
+                int currentStartTime = taskStartTimes[prev.getUniqueID()] + prev.getWeight();
+                for (Edge e : current.getIngoingEdges()) {
+                    Task tail = e.getTail();
+                    int finishTime = taskStartTimes[tail.getUniqueID()] + tail.getWeight();
+                    if (taskProcessorMap[tail.getUniqueID()] == processor) {
+                        currentStartTime = Math.max(currentStartTime, finishTime);
+                    } else {
+                        currentStartTime = Math.max(currentStartTime, finishTime + e.getWeight());
+                    }
+                }
+                taskStartTimes[current.getUniqueID()] = currentStartTime;
+            }
+
+            if (taskStartTimes[taskSet.get(1).getUniqueID()] + taskSet.get(1).getWeight() <= maxFinishTime) {
+                boolean equivalent = true;
+                for (int k = i; k > 0; k--) {
+                    Task task = taskSet.get(k);
+                    if (taskStartTimes[task.getUniqueID()] > original[task.getUniqueID()]) {
+                        for (Edge e : task.getOutgoingEdges()) {
+                            int earliest = taskStartTimes[task.getUniqueID()] + task.getWeight() + e.getWeight();
+                            Task child = e.getHead();
+                            if (taskProcessorMap[child.getUniqueID()] != -1) {
+                                if (taskProcessorMap[child.getUniqueID()] != processor && earliest > taskStartTimes[child.getUniqueID()]) {
+                                    equivalent = false;
+                                }
+                            } else {
+                                for (int p = 0; p < processors; p++) {
+                                    if (p != processor) {
+                                        boolean scheduleLater = false;
+                                        for (Edge in : child.getIngoingEdges()) {
+                                            Task parent = in.getTail();
+                                            if (taskStartTimes[parent.getUniqueID()] + in.getWeight() > earliest) {
+                                                scheduleLater = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!scheduleLater) {
+                                            equivalent = false;;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                if (equivalent) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

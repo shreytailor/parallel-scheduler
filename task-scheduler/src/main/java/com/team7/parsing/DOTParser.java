@@ -38,7 +38,6 @@ public class DOTParser {
         GraphParser parser = new GraphParser(new FileInputStream(filename));
         Map<String, GraphNode> nodeMap = parser.getNodes();
         Map<String, GraphEdge> edgeMap = parser.getEdges();
-        Task.resetID();
 
         // Create tasks from the nodes of the graph, and then add them into the data structure.
         for (GraphNode n : nodeMap.values()) {

@@ -41,10 +41,9 @@ public class TaskSchedulingConstraintsChecker {
 
 
     private static boolean isTaskPairCompatible(Task taskOne, Task taskTwo, Schedule schedule) {
-        int[] taskStartTimeMap = schedule.getTaskStartTimeMap();
 
-        int taskOneStartingTime = taskStartTimeMap[taskOne.getUniqueID()];
-        int taskTwoStartingTime = taskStartTimeMap[taskTwo.getUniqueID()];
+        int taskOneStartingTime = schedule.getTaskStartTime(taskOne);
+        int taskTwoStartingTime = schedule.getTaskStartTime(taskTwo);
 
         // only need to satisfy two conditions as OR
         boolean conditionOne = taskOneStartingTime + taskOne.getWeight() <= taskTwoStartingTime;
@@ -77,17 +76,13 @@ public class TaskSchedulingConstraintsChecker {
 //        ts_j => ts_i + w_i + c_e (cost of edge)
 //        else, ts_j => ts_i + w_i
 
-        byte[] taskProcessorMap = schedule.getTaskProcessorMap();
-        int[] taskStartTimeMap = schedule.getTaskStartTimeMap();
-
-
         for (Edge edge : edges) {
             Task tail = edge.getTail();
             Task head = edge.getHead();
-            int tailPid = taskProcessorMap[tail.getUniqueID()];
-            int headPid = taskProcessorMap[head.getUniqueID()];
-            int tailStartTime = taskStartTimeMap[tail.getUniqueID()];
-            int headStartTime = taskStartTimeMap[head.getUniqueID()];
+            int tailPid = schedule.getTaskProcessor(tail);
+            int headPid = schedule.getTaskProcessor(head);
+            int tailStartTime = schedule.getTaskStartTime(tail);
+            int headStartTime = schedule.getTaskStartTime(head);
 
             int commCost = (tailPid == headPid) ? 0 : edge.getWeight();
             boolean isConstraintMet = headStartTime >= tailStartTime + tail.getWeight() + commCost;
