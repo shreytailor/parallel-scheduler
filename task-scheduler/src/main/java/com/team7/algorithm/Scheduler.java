@@ -8,17 +8,17 @@ import com.team7.model.Task;
 import java.util.*;
 
 public class Scheduler {
-    private int processors;
-    private Task[] tasks;
-    private int[] taskTopLevelMap;
-    private int[] taskBottomLevelMap;
-    private int[] taskStaticLevelMap;
-    private byte[] taskRequirementsMap;
-    private List[] taskEquivalences;
-    private Schedule feasibleSchedule;
-    private int totalComputationTime = 0;
-    private Queue<Schedule> scheduleQueue;
-    private Set<Schedule> visitedSchedules;
+    protected int processors;
+    protected Task[] tasks;
+    protected int[] taskTopLevelMap;
+    protected int[] taskBottomLevelMap;
+    protected int[] taskStaticLevelMap;
+    protected byte[] taskRequirementsMap;
+    protected List[] taskEquivalences;
+    protected Schedule feasibleSchedule;
+    protected int totalComputationTime = 0;
+    protected Queue<Schedule> scheduleQueue;
+    protected Set<Schedule> visitedSchedules;
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -69,7 +69,6 @@ public class Scheduler {
 
         // (1) OPEN priority queue, sorted by f
         generateInitialSchedules();
-
         while (scheduleQueue.size() != 0) {
             // (2) Remove from OPEN the search state s with the smallest f
             Schedule s = scheduleQueue.poll();
@@ -79,7 +78,6 @@ public class Scheduler {
             if (s.getNumberOfTasks() == tasks.length) {
                 return s;
             }
-
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
             expandSchedule(s);
         }
@@ -170,7 +168,7 @@ public class Scheduler {
      *
      * @return a list schedules, each with one task
      */
-    private void generateInitialSchedules() {
+    protected void generateInitialSchedules() {
         //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
         for (int i = 0; i < tasks.length; i++) {
             if (taskRequirementsMap[i] == 0) {
