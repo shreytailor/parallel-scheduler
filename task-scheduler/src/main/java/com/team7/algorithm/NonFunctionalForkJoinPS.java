@@ -8,10 +8,10 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
-public class ParallelScheduler extends Scheduler{
+public class NonFunctionalForkJoinPS extends Scheduler{
     private Schedule sharedOptimalSchedule;
 
-    public ParallelScheduler(Graph g, int numOfProcessors) {
+    public NonFunctionalForkJoinPS(Graph g, int numOfProcessors) {
         super(g, numOfProcessors);
     }
 
