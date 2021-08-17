@@ -324,4 +324,8 @@ public class Scheduler {
 
         return false;
     }
+    
+    public Task[] getTasks() {
+        return tasks;
+    }
 }
