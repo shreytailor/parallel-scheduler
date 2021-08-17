@@ -26,6 +26,10 @@
     -fx-effect: none;
 }
 
+.btn:hover {
+    -fx-background-color: #4262bb;
+}
+
 /*For color and background color of graphs except gantt chart*/
 .default-color0.chart-series-line {
     -fx-stroke: #3D6EF4;

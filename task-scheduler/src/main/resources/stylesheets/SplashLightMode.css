@@ -26,6 +26,9 @@
     -fx-effect: dropshadow(three-pass-box, #a1a1a1, 2, 0, 0.0, 3.0);
 }
 
+.btn:hover {
+    -fx-background-color: #6857ff;
+}
 
 /*For color and background color of graphs except gantt chart*/
 .default-color0.chart-series-line {

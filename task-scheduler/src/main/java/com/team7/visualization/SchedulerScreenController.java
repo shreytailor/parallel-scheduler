@@ -203,11 +203,13 @@ public class SchedulerScreenController implements Initializable {
         if (isShowingUtilization) {
             utilGraphContainer.setVisible(false);
             inputGraphContainer.setVisible(true);
+            viewToggleButton.setText("Show Utilization");
             isShowingUtilization = !isShowingUtilization;
         }
         else {
             inputGraphContainer.setVisible(false);
             utilGraphContainer.setVisible(true);
+            viewToggleButton.setText("Show Input Graph");
             isShowingUtilization = !isShowingUtilization;
         }
     }
