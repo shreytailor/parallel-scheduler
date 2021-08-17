@@ -7,6 +7,7 @@ import javafx.beans.NamedArg;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.CategoryAxis;
@@ -14,12 +15,11 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 
 /**
  * This class is created to provide a Gantt Chart implementation to display the current schedule.
@@ -123,10 +123,13 @@ public class GanttComponent<X,Y> extends XYChart<X,Y> {
                         region.setCenterShape(false);
                         region.setCacheShape(false);
 
+                        // This creates the label for the task name, and also centers it.
                         Label label = new Label(getLabel(item.getExtraValue()));
-                        label.setFont(new Font(20));
-
+                        label.setFont(new Font(16));
+                        label.setStyle("-fx-text-fill: #ffffff");
+                        label.setPadding(new Insets(ellipse.getHeight() / 1.3, 0, 0, ellipse.getWidth() / 1.1));
                         region.getChildren().add(label);
+
                         block.setLayoutX(x);
                         block.setLayoutY(y);
                     }

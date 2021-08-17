@@ -30,7 +30,7 @@ public class GanttProvider {
         final GanttComponent<Number, String> chart = new GanttComponent<>(xAxis, yAxis);
         chart.setTitle("Schedule Visualization");
         chart.setLegendVisible(false);
-        chart.setBlockHeight(15);
+        chart.setBlockHeight(18);
 
         // Configuring the axis.
         xAxis.setMinorTickCount(4);
