@@ -25,39 +25,47 @@ public class SchedulerTestCrawledExamples {
     Collection<DynamicTest> dynamicTestsWithCollection() {
         List<DynamicTest> tests = new ArrayList<>();
 
+
+        //only test ones that allocates to 2, 4 processors, and has less than 20 nodes
         File directory = new File(DOT_TEST_FILE_DIRECTORY);
         for (File file : directory.listFiles()) {
-            if (shouldBeSkipped(file)) {
-                continue;
+            GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
+
+            boolean numProcessorsTwoOrFour = graphInfo.numberOfTargetProcessors == 2 || graphInfo.numberOfTargetProcessors == 4;
+            boolean numNodesLessThanTwenty = graphInfo.numberOfTasks<20;
+
+            if(numProcessorsTwoOrFour && numNodesLessThanTwenty){
+                tests.add(
+                        DynamicTest.dynamicTest(
+                                file.getName(),
+                                () -> testAStarWithDotFile(file, graphInfo)
+                        ));
+
             }
-            tests.add(
-                    DynamicTest.dynamicTest(
-                            file.getName(),
-                            () -> testAStarWithDotFile(file)
-                    ));
         }
+
 
         return tests;
     }
 
-    private void testAStarWithDotFile(File file) {
+    private void testAStarWithDotFile(File file, GraphInfoUtil.GraphInfo graphInfo) {
         // given
         try {
             Graph g = DOTParser.read(file.toString());
-            GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
+
             System.out.println("graphInfo = " + graphInfo);
             // when
-            Scheduler scheduler = new ParallelSchedulerShareEachLoop(g, graphInfo.numberOfTargetProcessors);
-            Schedule result = scheduler.findOptimalSchedule();
-
-            // then
-            if (shouldBeNullSchedule(file)) {
-                assertNull(result);
-            } else {
-                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
-                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
-                assertEquals(graphInfo.totalScheduleLength,result.getEstimatedFinishTime());
+            // ignore case where it's not homogeneous - that is, when target system number of processors is parsed to be 0
+            if(graphInfo.numberOfTargetProcessors == 0){
+                fail("ignore this case");
             }
+            Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
+            Schedule result = scheduler.findOptimalSchedule();
+            // then
+
+            assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
+            assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
+            assertEquals(graphInfo.totalScheduleLength,result.getEstimatedFinishTime());
 
             System.out.println("schedule = " + result);
         } catch (IOException e) {
@@ -67,18 +75,6 @@ public class SchedulerTestCrawledExamples {
     }
 
 
-    private boolean shouldBeNullSchedule(File file) {
-        String fileName = file.getName();
-
-        return fileName.contains("cycle") || fileName.contains("empty");
-    }
-
-
-    private boolean shouldBeSkipped(File file) {
-        String fileName = file.getName();
-
-        return fileName.contains("cycle") || fileName.contains("empty") || fileName.contains("large");
-    }
 
 
 }
