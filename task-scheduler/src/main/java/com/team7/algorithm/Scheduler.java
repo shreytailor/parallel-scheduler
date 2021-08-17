@@ -203,6 +203,19 @@ public class Scheduler {
         return earliestStartTime;
     }
 
+    private int calculateEarliestTimeToSchedule(int[] taskStartTimes, byte[] taskProcessorMap, Task t1, int processor, int t1StartTime) {
+        int earliestStartTime = t1StartTime;
+        for (Edge e : t1.getIngoingEdges()) {
+            Task tail = e.getTail();
+            int finishTime = taskStartTimes[tail.getUniqueID()] + tail.getWeight();
+            if (taskProcessorMap[tail.getUniqueID()] == processor) {
+                earliestStartTime = Math.max(t1StartTime, finishTime);
+            } else {
+                earliestStartTime = Math.max(t1StartTime, finishTime + e.getWeight());
+            }
+        }
+        return earliestStartTime;
+    }
     /**
      * Creates a new schedule from schedule s which allocates task t to the given processor
      *
@@ -258,31 +271,13 @@ public class Scheduler {
             if (i < taskSet.size() - 1) {
                 t1StartTime = taskStartTimes[taskSet.get(i + 1).getUniqueID()] + taskSet.get(i + 1).getWeight();
             }
-            for (Edge e : t1.getIngoingEdges()) {
-                Task tail = e.getTail();
-                int finishTime = taskStartTimes[tail.getUniqueID()] + tail.getWeight();
-                if (taskProcessorMap[tail.getUniqueID()] == processor) {
-                    t1StartTime = Math.max(t1StartTime, finishTime);
-                } else {
-                    t1StartTime = Math.max(t1StartTime, finishTime + e.getWeight());
-                }
-            }
-            taskStartTimes[t1.getUniqueID()] = t1StartTime;
+            taskStartTimes[t1.getUniqueID()] = calculateEarliestTimeToSchedule(taskStartTimes,taskProcessorMap,t1,processor,t1StartTime);
 
             for (int j = i; j > 0; j--) {
                 Task current = taskSet.get(j);
                 Task prev = taskSet.get(j - 1);
                 int currentStartTime = taskStartTimes[prev.getUniqueID()] + prev.getWeight();
-                for (Edge e : current.getIngoingEdges()) {
-                    Task tail = e.getTail();
-                    int finishTime = taskStartTimes[tail.getUniqueID()] + tail.getWeight();
-                    if (taskProcessorMap[tail.getUniqueID()] == processor) {
-                        currentStartTime = Math.max(currentStartTime, finishTime);
-                    } else {
-                        currentStartTime = Math.max(currentStartTime, finishTime + e.getWeight());
-                    }
-                }
-                taskStartTimes[current.getUniqueID()] = currentStartTime;
+                taskStartTimes[current.getUniqueID()] = calculateEarliestTimeToSchedule(taskStartTimes,taskProcessorMap,current,processor,currentStartTime);
             }
 
             if (taskStartTimes[taskSet.get(1).getUniqueID()] + taskSet.get(1).getWeight() <= maxFinishTime) {

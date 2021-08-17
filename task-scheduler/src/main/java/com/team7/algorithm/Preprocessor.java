@@ -125,16 +125,19 @@ public class Preprocessor {
     public static List[] calculateEquivalentTasks(Task[] tasks) {
         List<Task>[] taskEquivalences = new List[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
-            List<Task> equivalent = new LinkedList<>();
             Task task1 = tasks[i];
+            if (taskEquivalences[task1.getUniqueID()] != null) {
+                continue;
+            }
+            List<Task> equivalent = new LinkedList<>();
             equivalent.add(task1);
             taskEquivalences[task1.getUniqueID()] = equivalent;
 
             for (int j = i + 1; j < tasks.length; j++) {
-                if (taskEquivalences[j] != null) {
+                Task task2 = tasks[j];
+                if (taskEquivalences[task2.getUniqueID()] != null) {
                     continue;
                 }
-                Task task2 = tasks[j];
                 boolean equal = true;
                 if (task1.getWeight() == task2.getWeight() &&
                         task1.getOutgoingEdges().size() == task2.getOutgoingEdges().size() &&
