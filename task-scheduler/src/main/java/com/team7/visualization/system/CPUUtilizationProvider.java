@@ -9,11 +9,10 @@ import javafx.scene.chart.LineChart;
 public class CPUUtilizationProvider extends UtilizationProvider {
 
     /**
-     * The default constructor of this class which calls the constructor of the parent class.
-     * @param chart the chart on which the usage information will be shown.
+     * The default constructor for this class.
      */
-    public CPUUtilizationProvider(LineChart<String, Number> chart) {
-        super(chart);
+    public CPUUtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider tp) {
+        super(chart, title, tp);
     }
 
     /**

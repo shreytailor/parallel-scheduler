@@ -1,3 +1,11 @@
+### 17 Aug
+- Implemented a working parallel scheduler 'ParallelSchedulerShareEachLoop', which produces an optimal schedule. This uses Executor service to have a fixed number of threads in the pool. When the while loop is entered, we create at least as many workers as there are threads, and we assign a state to explore for each of them. 
+- Implemented a parser and utility that parses the gxl files crawled from [optimal schedule database of UoA Parallel Lab](https://parallel.auckland.ac.nz/OptimalTaskScheduling/OptimalSchedules.html). GraphInfo also stores extra information regarding expected optimal time, number of processors we are allocating task to, and number of tasks to allocate.
+- Implemented test class that runs tests for the cases of our interest - so less than 20 tasks, less than 8 processors, and homogeneous tasks. I've added a timeout to the test cases so that the test factory is not stuck. 
+
+### 16 Aug
+- Implemented a Parallel scheduler that uses ForkJoinPool. The idea is that we keep generating worker for each expansion. However, this did not produce an optimal schedule
+
 ### 5 Aug
 - Explored different options of profilers to detect what objects are created. [VisualVM](https://visualvm.github.io) comes as part of JDK8, so it was fit for initial choice.
 - Execution file can be found from /Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home/bin/jvisualvm. After running the program on IntelliJ, the process (com.team7.EntryPoint) on the left pane. 

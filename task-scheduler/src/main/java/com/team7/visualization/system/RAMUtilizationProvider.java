@@ -12,8 +12,8 @@ public class RAMUtilizationProvider extends UtilizationProvider {
      * The default constructor of this class which calls the constructor of the parent class.
      * @param chart the chart on which the usage information will be shown.
      */
-    public RAMUtilizationProvider(LineChart<String, Number> chart) {
-        super(chart);
+    public RAMUtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider tp) {
+        super(chart, title, tp);
     }
 
     /**

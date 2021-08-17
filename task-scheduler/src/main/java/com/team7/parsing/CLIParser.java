@@ -3,16 +3,23 @@ package com.team7.parsing;
 import com.team7.exceptions.CommandLineException;
 import org.apache.commons.cli.*;
 
+/**
+ * This is the class which is used to parse the command line arguments that the user inputs into
+ * the application. Its primary task is to break the argument string into separate components,
+ * and generate a Config class which can be transported across many parts of the application.
+ */
 public class CLIParser {
 
     /**
      * This static method is used to construct a Config object from the parameters provided by
      * the user through the command line.
      *
-     * @param args the command line arguments to be passed in.
+     * @param args the command line argument string to be passed in.
      * @return Config object which embeds all the command line configuration.
      */
     public static Config parseCommandLineArguments(String[] args) throws CommandLineException {
+
+        // Initializing the return object.
         Config config = new Config();
 
         // Informing the CLI framework about possible optional parameters which users can enter.
@@ -21,9 +28,10 @@ public class CLIParser {
         options.addOption("v", "visualisation", false, "visualisation for the algorithm.");
         options.addOption("o", "output", true, "name for the output file.");
 
-        if (args.length <= 1) {
+        // Check if the user has input the required arguments.
+        if (args.length < 2) {
             printHelp(options);
-            throw new CommandLineException("Not enough parameters specified");
+            throw new CommandLineException("Not enough parameters specified.");
         }
 
         config.setInputName(args[0]);
@@ -57,7 +65,7 @@ public class CLIParser {
 
         } catch (ParseException exception) {
             printHelp(options);
-            throw new CommandLineException("Flag unrecognised");
+            throw new CommandLineException("An error has occured while parsing your command line argument, please try again.");
         }
 
         return config;
