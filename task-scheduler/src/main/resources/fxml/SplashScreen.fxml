@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.CategoryAxis?>
@@ -31,7 +32,7 @@
           <RowConstraints maxHeight="489.0" minHeight="10.0" percentHeight="46.0" prefHeight="223.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <BorderPane styleClass="header-container" GridPane.columnSpan="2">
+            <BorderPane GridPane.columnSpan="2">
                <left>
                   <Label nodeOrientation="RIGHT_TO_LEFT" styleClass="main-font-color" text="The Marauders: Task Scheduler Visualization" BorderPane.alignment="CENTER">
                      <font>
@@ -45,7 +46,12 @@
                <right>
                   <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" onAction="#handleViewToggleButton" styleClass="btn" text="Show Input Graph" />
+                        <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" onAction="#handleViewToggleButton" text="Show Input Graph">
+                           <styleClass>
+                              <String fx:value="btn" />
+                              <String fx:value="theme-font-color" />
+                              <String fx:value="theme-background-color" />
+                           </styleClass></Button>
                         <ImageView fx:id="themeToggleIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleToggleTheme" pickOnBounds="true" preserveRatio="true" styleClass="icon">
                            <image>
                               <Image url="@../images/moon.png" />
@@ -67,10 +73,15 @@
                      </children>
                   </HBox>
                </right>
+               <styleClass>
+                  <String fx:value="header-container" />
+                  <String fx:value="header-shadow" />
+                  <String fx:value="main-background-color" />
+               </styleClass>
             </BorderPane>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="35.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Label styleClass="main-font-color" text="Status:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
@@ -78,8 +89,12 @@
                            </font>
                         </Label>
                      </children>
+                     <styleClass>
+                        <String fx:value="status-info-container" />
+                        <String fx:value="main-background-color" />
+                     </styleClass>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Label styleClass="main-font-color" text="Elapsed time (s):" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
@@ -92,8 +107,12 @@
                            </font>
                         </Label>
                      </children>
+                     <styleClass>
+                        <String fx:value="status-info-container" />
+                        <String fx:value="main-background-color" />
+                     </styleClass>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Label styleClass="main-font-color" text="State Space Node Visited:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
@@ -106,8 +125,12 @@
                            </font>
                         </Label>
                      </children>
+                     <styleClass>
+                        <String fx:value="status-info-container" />
+                        <String fx:value="main-background-color" />
+                     </styleClass>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="status-info-container">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Label styleClass="main-font-color" text="No. of Pruned States:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
@@ -120,6 +143,10 @@
                            </font>
                         </Label>
                      </children>
+                     <styleClass>
+                        <String fx:value="status-info-container" />
+                        <String fx:value="main-background-color" />
+                     </styleClass>
                   </AnchorPane>
                </children>
                <padding>
@@ -166,6 +193,7 @@
       </GridPane>
    </children>
     <stylesheets>
+        <URL value="@/stylesheets/Layout.css" />
         <URL value="@/stylesheets/SplashLightMode.css" />
     </stylesheets>
 </AnchorPane>

@@ -44,6 +44,8 @@ public class SchedulerScreenController implements Initializable {
     private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
+    private final String LightCss = "/stylesheets/SplashLightMode.css";
+    private final String DarkCss = "/stylesheets/SplashDarkMode.css";
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
 
@@ -159,8 +161,8 @@ public class SchedulerScreenController implements Initializable {
             minimizeIcon.setImage(DARK_MIN_IMAGE);
             inputGraphContainer.setCenter(inputGraphDark);
 
-            sheets.clear();
-            sheets.add("/stylesheets/SplashDarkMode.css");
+            sheets.remove(LightCss);
+            sheets.add(DarkCss);
 
             isLightMode = !isLightMode;
         }
@@ -170,8 +172,8 @@ public class SchedulerScreenController implements Initializable {
             minimizeIcon.setImage(LIGHT_MIN_IMAGE);
             inputGraphContainer.setCenter(inputGraphLight);
 
-            sheets.clear();
-            sheets.add("/stylesheets/SplashLightMode.css");
+            sheets.remove(DarkCss);
+            sheets.add(LightCss);
 
             isLightMode = !isLightMode;
         }
