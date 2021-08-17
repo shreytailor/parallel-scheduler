@@ -94,4 +94,41 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
         return feasibleSchedule;
     }
 
+
+    /**
+     * IMPORTANT: access to treeset had to be synchronized, otherwise NPE
+     * @param s
+     */
+    public void expandSchedule(Schedule s) {
+        //Expanding the schedule s, and insert them into the scheduleQueue
+        for (Integer t : s.getBeginnableTasks()) {
+            boolean normalised = false;
+            for (int i = 0; i < processors; i++) {
+                int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
+                if (earliestStartTime == 0) {
+                    if (normalised || t < s.getNormalisationIndex()) {
+                        continue;
+                    }
+                    normalised = true;
+                }
+                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
+
+                //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+                if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
+                        !containsEquivalentSchedule(newSchedule, tasks[t]) &&
+                        !visitedSchedules.contains(newSchedule)) {
+                    scheduleQueue.add(newSchedule);
+                    if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
+                        s.setPartialExpansionIndex(t.byteValue());
+                        scheduleQueue.add(s);
+                        return;
+                    }
+                }
+            }
+        }
+        synchronized (Scheduler.class){
+            visitedSchedules.add(s);
+        }
+    }
+
 }
