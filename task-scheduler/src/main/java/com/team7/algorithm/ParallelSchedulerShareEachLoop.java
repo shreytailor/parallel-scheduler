@@ -64,16 +64,14 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                 workers[i] = new ExpansionWorker(scheduleQueue.poll());
             }
 
-            List<Future<Schedule>> results = null;
+            List<Future<Schedule>> results;
             try {
                 results = executor.invokeAll(Arrays.asList(workers));
                 Schedule bestSchedule = null;
                 for (Future<Schedule> result : results) {
                     Schedule schedule = result.get();
                     if(schedule != null){
-                        if (bestSchedule==null) {
-                            bestSchedule=schedule;
-                        } else if (schedule.getEstimatedFinishTime()<bestSchedule.getEstimatedFinishTime()){
+                        if (bestSchedule==null || schedule.getEstimatedFinishTime()<bestSchedule.getEstimatedFinishTime()) {
                             bestSchedule=schedule;
                         }
                     }
@@ -89,7 +87,6 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
             }
 
         }
-        executor.shutdown();
 
         return feasibleSchedule;
     }
