@@ -26,8 +26,10 @@ public class GraphInfoUtil {
                 info[1] = Integer.parseInt(s);
             }
             if(s.contains("TargetSystem")){
-                s = s.replaceAll("\\D+","");
-                info[2] = Integer.parseInt(s);
+                if(s.contains("Homogeneous")){
+                    s = s.replaceAll("\\D+","");
+                    info[2] = Integer.parseInt(s);
+                }
             }
         }
 
