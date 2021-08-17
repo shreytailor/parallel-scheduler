@@ -16,7 +16,6 @@ public class GraphInfoUtil {
         int[] info = new int[3];
 
         for (String s : split) {
-            System.out.println(s);
             if(s.contains("NumberOfTasks")){
                 s = s.replaceAll("\\D+","");
                 info[0] = Integer.parseInt(s);

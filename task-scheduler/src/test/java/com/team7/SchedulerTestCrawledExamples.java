@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,22 +53,21 @@ public class SchedulerTestCrawledExamples {
         // given
         try {
             Graph g = DOTParser.read(file.toString());
-
-            System.out.println("graphInfo = " + graphInfo);
             // when
             // ignore case where it's not homogeneous - that is, when target system number of processors is parsed to be 0
             if(graphInfo.numberOfTargetProcessors == 0){
                 fail("ignore this case");
             }
             Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
-            Schedule result = scheduler.findOptimalSchedule();
+            assertTimeout(Duration.ofSeconds(5), ()->{
+                Schedule result = scheduler.findOptimalSchedule();
+                assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
+                assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
+                assertEquals(graphInfo.totalScheduleLength,result.getEstimatedFinishTime());
+            });
             // then
 
-            assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
-            assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
-            assertEquals(graphInfo.totalScheduleLength,result.getEstimatedFinishTime());
 
-            System.out.println("schedule = " + result);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
