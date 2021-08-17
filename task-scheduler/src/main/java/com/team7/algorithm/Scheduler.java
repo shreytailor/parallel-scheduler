@@ -188,7 +188,7 @@ public class Scheduler {
      * @param processor
      * @return the earliest time that the task can be scheduled on the processor
      */
-    private int calculateEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
+    public int calculateEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
         int earliestStartTime = schedule.getProcessorFinishTime(processor);
         for (Edge e : task.getIngoingEdges()) {
             int finishTime = schedule.getTaskFinishTime(e.getTail());
@@ -210,7 +210,7 @@ public class Scheduler {
      * @param earliestStartTime
      * @return the new schedule
      */
-    private Schedule generateNewSchedule(Schedule s, Task t, int processor, int earliestStartTime) {
+    public Schedule generateNewSchedule(Schedule s, Task t, int processor, int earliestStartTime) {
         Schedule newSchedule = s.clone();
         newSchedule.addTask(t, processor, earliestStartTime);
 
@@ -231,7 +231,7 @@ public class Scheduler {
         return newSchedule;
     }
 
-    private boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
+    public boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
         int maxFinishTime = schedule.getTaskFinishTime(addedTask);
         int processor = schedule.getTaskProcessor(addedTask);
         List<Task> taskSet = new ArrayList<>();
