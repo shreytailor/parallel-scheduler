@@ -122,6 +122,8 @@ public class SchedulerScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupToolTips();
+
         TimeProvider timeProvider = new TimeProvider();
         timeProvider.registerLabel(timerLabel);
 
@@ -149,6 +151,12 @@ public class SchedulerScreenController implements Initializable {
         // For input graph
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
         inputGraphContainer.setVisible(false);
+    }
+
+    private void setupToolTips() {
+        Tooltip.install(inputGraphContainer, new Tooltip("Input Graph"));
+        Tooltip.install(themeToggleIcon, new Tooltip("Light/Dark mode"));
+        Tooltip.install(utilGraphContainer, new Tooltip("Utilization Graphs"));
     }
 
     @FXML
