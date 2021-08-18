@@ -27,7 +27,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -123,7 +122,19 @@ public class SchedulerScreenController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupToolTips();
+        setupSystemCharts();
+    }
 
+    private void setupToolTips() {
+        Tooltip.install(inputGraphContainer, new Tooltip("Input Graph"));
+        Tooltip.install(themeToggleIcon, new Tooltip("Light/Dark mode"));
+        Tooltip.install(utilGraphContainer, new Tooltip("Utilization Graphs"));
+    }
+
+    /**
+     * This method is used to set up the providers, required for live CPU/RAM usage visualization.
+     */
+    private void setupSystemCharts() {
         TimeProvider timeProvider = new TimeProvider();
         timeProvider.registerLabel(timerLabel);
 
@@ -151,12 +162,6 @@ public class SchedulerScreenController implements Initializable {
         // For input graph
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
         inputGraphContainer.setVisible(false);
-    }
-
-    private void setupToolTips() {
-        Tooltip.install(inputGraphContainer, new Tooltip("Input Graph"));
-        Tooltip.install(themeToggleIcon, new Tooltip("Light/Dark mode"));
-        Tooltip.install(utilGraphContainer, new Tooltip("Utilization Graphs"));
     }
 
     @FXML
