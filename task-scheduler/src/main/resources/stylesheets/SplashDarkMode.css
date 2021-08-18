@@ -1,7 +1,3 @@
-* {
-    -fx-font-family: Arial;
-}
-
 .root {
     -fx-background-color: #000000;
 }
@@ -10,54 +6,31 @@
     -fx-text-fill: white;
 }
 
-.header-container {
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0.5, 0.0, 0.0);
-    -fx-background-color: #1f1f1f;
-    -fx-padding: 0 30px 0 30px;
-}
-
-.graph-label {
-    -fx-font-size: 25px;
-    -fx-padding: 10px;
-}
-
-.screen-title {
-    -fx-border-insets: 10px;
-}
-
-.btn {
-    -fx-font-size: 16px;
-    -fx-background-color: #3D6EF4;
+.theme-font-color {
     -fx-text-fill: white;
-    -fx-background-radius: 10px;
-    -fx-padding: 8 50px;
 }
 
-.icon:hover {
-    -fx-opacity: 0.5;
+.theme-background-color {
+    -fx-background-color: #3D6EF4;
 }
 
-.btn:hover, .icon:hover {
-    -fx-cursor: hand;
+.main-background-color {
+    -fx-background-color: #1f1f1f;
 }
 
-
-.graph-container-padding {
-    -fx-padding: 15px 30px;
+.header-shadow {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0.5, 0.0, 0.0);
 }
 
 .status-info-container {
-    -fx-border-radius: 50px;
-    -fx-background-radius: 50px;
-    -fx-background-color: #1f1f1f;
-    -fx-padding: 0 30px;
+    -fx-effect: none;
 }
 
+.btn:hover {
+    -fx-background-color: #4262bb;
+}
 
 /*For color and background color of graphs except gantt chart*/
-.chart-plot-background {
-    -fx-background-color: transparent;
-}
 .default-color0.chart-series-line {
     -fx-stroke: #3D6EF4;
 }
@@ -70,6 +43,6 @@
 }
 
 .status-bar {
-    -fx-border-color: #3D6EF4;
+    -fx-border-color: black;
     -fx-background-color: #3D6EF4;
 }
