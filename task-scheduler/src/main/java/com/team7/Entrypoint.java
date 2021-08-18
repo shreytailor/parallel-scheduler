@@ -1,5 +1,6 @@
 package com.team7;
 
+import com.team7.algorithm.ParallelSchedulerCreate40;
 import com.team7.algorithm.ParallelSchedulerShareEachLoop;
 import com.team7.algorithm.Scheduler;
 import com.team7.exceptions.CommandLineException;
@@ -20,7 +21,7 @@ public class Entrypoint {
             Graph graph = DOTParser.read(config.getInputName());
 
             // Processing the input graph by using the scheduler, and storing the output.
-            Scheduler scheduler = new ParallelSchedulerShareEachLoop(graph, config.getNumOfProcessors());
+            Scheduler scheduler = new ParallelSchedulerCreate40(graph, config.getNumOfProcessors());
             long start = System.currentTimeMillis();
             Schedule schedule = scheduler.findOptimalSchedule();
             long finish = System.currentTimeMillis();

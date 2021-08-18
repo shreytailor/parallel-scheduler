@@ -6,6 +6,7 @@ import com.team7.model.Schedule;
 import com.team7.model.Task;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Scheduler {
     protected int processors;
@@ -17,8 +18,9 @@ public class Scheduler {
     protected List[] taskEquivalences;
     protected Schedule feasibleSchedule;
     protected int totalComputationTime = 0;
-    protected static Queue<Schedule> scheduleQueue;
+    protected Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
+
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -33,13 +35,7 @@ public class Scheduler {
         taskBottomLevelMap = Preprocessor.calculateTaskBottomLevels(tasks);
         taskStaticLevelMap = Preprocessor.calculateTaskStaticLevels(tasks);
 
-        scheduleQueue = new PriorityQueue<>((a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                return b.getNumberOfTasks() - a.getNumberOfTasks();
-            }
-            return n;
-        });
+        scheduleQueue = createEmptyPriorityScheduleQueue();
         visitedSchedules = new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
@@ -56,6 +52,16 @@ public class Scheduler {
                 return b.getNumberOfTasks() - a.getNumberOfTasks();
             }
             return a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+        });
+    }
+
+    public static PriorityQueue<Schedule> createEmptyPriorityScheduleQueue() {
+        return new PriorityQueue<>((a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
         });
     }
 
@@ -93,7 +99,9 @@ public class Scheduler {
     public Schedule findFeasibleSchedule() {
         Schedule schedule =
                 new Schedule(tasks.length, processors, taskRequirementsMap.clone());
-        Queue<Task> tasksToSchedule = new PriorityQueue<>((a, b) -> taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()]);
+        Queue<Task> tasksToSchedule = new PriorityQueue<>((a, b) -> {
+            return taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()];
+        });
         for (Integer i : schedule.getBeginnableTasks()) {
             tasksToSchedule.add(tasks[i]);
         }
@@ -327,5 +335,60 @@ public class Scheduler {
     
     public Task[] getTasks() {
         return tasks;
+    }
+
+    public Scheduler(int processors, Task[] tasks, int[] taskTopLevelMap, int[] taskBottomLevelMap, int[] taskStaticLevelMap, byte[] taskRequirementsMap, List[] taskEquivalences, Schedule feasibleSchedule, int totalComputationTime, Set<Schedule> visitedSchedules) {
+        this.processors = processors;
+        this.tasks = tasks;
+        this.taskTopLevelMap = taskTopLevelMap;
+        this.taskBottomLevelMap = taskBottomLevelMap;
+        this.taskStaticLevelMap = taskStaticLevelMap;
+        this.taskRequirementsMap = taskRequirementsMap;
+        this.taskEquivalences = taskEquivalences;
+        this.feasibleSchedule = feasibleSchedule;
+        this.totalComputationTime = totalComputationTime;
+        this.visitedSchedules = visitedSchedules;
+    }
+
+    public void setScheduleQueue(Queue<Schedule> scheduleQueue) {
+        this.scheduleQueue = scheduleQueue;
+    }
+
+    public static Scheduler cloneScheduler(Scheduler scheduler){
+        Task[] clonedTasks = new Task[scheduler.tasks.length];
+//        List[] clonedTaskEquivalences = new List[scheduler.taskEquivalences.length];
+
+        for (int i = 0; i < scheduler.tasks.length; i++) {
+            clonedTasks[i] = scheduler.tasks[i].clone();
+        }
+
+//        for (int i = 0; i < scheduler.taskEquivalences.length; i++){
+//            List<Task> tasks = scheduler.taskEquivalences[i];
+//            List<Task> tasksClonedList = tasks.stream().map(e->e.clone()).collect(Collectors.toList());
+////            clonedTaskEquivalences[i] = tasksClonedList;
+//        }
+
+        int[] clonedTaskTopLevelMap = scheduler.taskTopLevelMap.clone();
+        int[] clonedTaskBottomLevelMap = scheduler.taskBottomLevelMap.clone();
+        int[] clonedTaskStaticLevelMap = scheduler.taskStaticLevelMap.clone();
+        byte[] clonedTaskRequirementsMap = scheduler.taskRequirementsMap.clone();
+
+        Schedule clonedFeasibleSchedule = scheduler.feasibleSchedule.clone();
+        int clonedTotalComputationTime = scheduler.totalComputationTime;
+        Set<Schedule> clonedVisitedSchedules = scheduler.visitedSchedules.stream().map(e->e.clone()).collect(Collectors.toSet());
+
+        Scheduler clonedScheduler = new Scheduler(
+                scheduler.processors,
+                clonedTasks,
+                clonedTaskTopLevelMap,
+                clonedTaskBottomLevelMap,
+                clonedTaskStaticLevelMap,
+                clonedTaskRequirementsMap,
+                null,
+                clonedFeasibleSchedule,
+                clonedTotalComputationTime,
+                clonedVisitedSchedules
+        );
+        return clonedScheduler;
     }
 }
