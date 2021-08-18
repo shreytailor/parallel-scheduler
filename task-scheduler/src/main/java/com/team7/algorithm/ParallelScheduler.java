@@ -8,111 +8,96 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class ParallelScheduler extends Scheduler {
-    ExecutorService executor;
-    ExpansionWorker[] workers;
+    private ExecutorService executorService;
+    private IndependentWorker[] workers;
     private int numThreads;
-
+    private Schedule bestSchedule;
 
     public ParallelScheduler(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
-        scheduleQueue = new PriorityBlockingQueue<Schedule>(11, (a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                return b.getNumberOfTasks() - a.getNumberOfTasks();
-            }
-            return n;
-        });
+        executorService = Executors.newFixedThreadPool(numThreads);
+        workers = new IndependentWorker[numThreads];
+        for (int i = 0; i < numThreads; i++) {
+            workers[i] = new IndependentWorker();
+        }
         this.numThreads = numThreads;
-        executor = Executors.newFixedThreadPool(numThreads);
-        workers = new ExpansionWorker[numThreads];
     }
-
 
     public ParallelScheduler(Graph g, int numOfProcessors) {
-        super(g, numOfProcessors);
-        scheduleQueue = new PriorityBlockingQueue<Schedule>(11, (a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                return b.getNumberOfTasks() - a.getNumberOfTasks();
-            }
-            return n;
-        });
-        this.numThreads = 4;
-        executor = Executors.newFixedThreadPool(numThreads);
-        workers = new ExpansionWorker[numThreads];
+        this(g, numOfProcessors, 4);
     }
 
-    private class ExpansionWorker implements Callable<Schedule> {
-        private Schedule s;
-
-        public ExpansionWorker(Schedule s) {
-            this.s = s;
-        }
-
-        /**
-         * Computes a result, or throws an exception if unable to do so.
-         *
-         * @return computed result
-         */
-        @Override
-        public Schedule call() {
-            if (s == null || s.getNumberOfTasks() == tasks.length) {
-                return s;
-            }
-            expandSchedule(s);
-            return null;
-        }
-    }
-
-    public synchronized Schedule poll(){
-        return scheduleQueue.poll();
-    }
     /**
      * Generates an optimal schedule using an A* algorithm.
      *
      * @return an optimal schedule
      */
     public Schedule findOptimalSchedule() {
-        findFeasibleSchedule();
-        // (1) OPEN priority queue, sorted by f
+        bestSchedule = findFeasibleSchedule();
+
         generateInitialSchedules();
 
-        while (scheduleQueue.size() != 0) {
-            for (int i = 0; i < numThreads; i++) {
-                workers[i] = new ExpansionWorker(scheduleQueue.poll());
+        // if 4 threads, there will be more than 40 states created here
+        while (scheduleQueue.size() > 0 && scheduleQueue.size() < numThreads * 10) {
+            Schedule schedule = scheduleQueue.poll();
+            if (schedule.getNumberOfTasks() == tasks.length) {
+                return schedule;
             }
-
-            List<Future<Schedule>> results;
-            try {
-                results = executor.invokeAll(Arrays.asList(workers));
-                Schedule bestSchedule = null;
-                for (Future<Schedule> result : results) {
-                    Schedule schedule = result.get();
-                    if (schedule != null &&
-                            (bestSchedule == null || schedule.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime())) {
-                        bestSchedule = schedule;
-                    }
-                }
-                if (bestSchedule != null) {
-                    return bestSchedule;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
+            expandSchedule(schedule);
         }
-        return feasibleSchedule;
+
+        // for all thread worker except 1, distribute 10 tasks each
+        int index = 0;
+        while (scheduleQueue.size() > 0) {
+            workers[index % numThreads].addSchedule(scheduleQueue.poll());
+            index++;
+        }
+
+        try {
+            executorService.invokeAll(Arrays.asList(workers));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return bestSchedule;
     }
 
+    public void shutdown() {
+        executorService.shutdownNow();
+    }
 
-    /**
-     * IMPORTANT: access to treeset had to be synchronized, otherwise NPE
-     *
-     * @param s
-     */
-    public void expandSchedule(Schedule s) {
-        //Expanding the schedule s, and insert them into the scheduleQueue
+    private class IndependentWorker implements Callable<Schedule> {
+        private Queue<Schedule> schedules = createScheduleQueue();
+
+        public void addSchedule(Schedule s) {
+            schedules.add(s);
+        }
+
+        @Override
+        public Schedule call() {
+            // (1) OPEN priority queue, sorted by f
+            while (schedules.size() != 0) {
+                // (2) Remove from OPEN the search state s with the smallest f
+                Schedule s = schedules.poll();
+
+                synchronized (this) {
+                    if (s.getEstimatedFinishTime() >= bestSchedule.getEstimatedFinishTime()) {
+                        break;
+                    }
+                    // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
+                    // otherwise, go to the next step.
+                    if (s.getNumberOfTasks() == tasks.length && s.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime()) {
+                        bestSchedule = s;
+                    }
+                }
+                // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
+                expandSchedule(s, schedules);
+            }
+            return null;
+        }
+    }
+
+    private void expandSchedule(Schedule s, Queue<Schedule> schedules) {
         Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
             if (equivalent.contains(tasks[t])) {
@@ -131,26 +116,20 @@ public class ParallelScheduler extends Scheduler {
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
-
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
-                    scheduleQueue.add(newSchedule);
+                    schedules.add(newSchedule);
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
                         s.setPartialExpansionIndex(t.byteValue());
-                        scheduleQueue.add(s);
+                        schedules.add(s);
                         return;
                     }
                 }
             }
         }
-//        synchronized (Scheduler.class) {
         synchronized (this) {
             visitedSchedules.add(s);
         }
-    }
-
-    public void shutdown() {
-        executor.shutdownNow();
     }
 }
