@@ -196,21 +196,19 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     private void handleClose() {
         Platform.exit();
+        System.exit(0);
     }
 
     @FXML
     public void handleViewToggleButton() {
+        utilGraphContainer.setVisible(!isShowingUtilization);
+        inputGraphContainer.setVisible(isShowingUtilization);
+        isShowingUtilization = !isShowingUtilization;
+
         if (isShowingUtilization) {
-            utilGraphContainer.setVisible(false);
-            inputGraphContainer.setVisible(true);
             viewToggleButton.setText("Show Utilization");
-            isShowingUtilization = !isShowingUtilization;
-        }
-        else {
-            inputGraphContainer.setVisible(false);
-            utilGraphContainer.setVisible(true);
+        } else {
             viewToggleButton.setText("Show Input Graph");
-            isShowingUtilization = !isShowingUtilization;
         }
     }
 }

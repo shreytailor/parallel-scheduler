@@ -39,7 +39,7 @@ public class Entrypoint {
 
     private static void beginVisualisation(Task[] tasks, Schedule schedule, Config config) {
         new Thread(() -> {
-            VisualizationDriver.show(tasks ,schedule, config);
+            VisualizationDriver.show(tasks, schedule, config);
         }).start();
     }
 }
