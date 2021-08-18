@@ -63,13 +63,19 @@ public class Task {
         return Objects.hash(name, weight);
     }
 
+//    @Override
+//    public String toString() {
+//        return "Task{" +
+//                "name='" + name + '\'' +
+//                ", weight=" + weight +
+//                ", inEdges=" + inEdges +
+//                ", outEdges=" + outEdges +
+//                '}';
+//    }
     @Override
     public String toString() {
         return "Task{" +
-                "name='" + name + '\'' +
-                ", weight=" + weight +
-                ", inEdges=" + inEdges +
-                ", outEdges=" + outEdges +
+                "name=" + name +
                 '}';
     }
 }

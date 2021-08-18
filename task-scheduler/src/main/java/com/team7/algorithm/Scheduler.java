@@ -136,40 +136,23 @@ public class Scheduler {
      */
     public void expandSchedule(Schedule s) {
         Queue<Integer> tasksToAdd;
-        if (s.isTaskOrderFixed() || canFixTaskOrder(s)) {
-            s.fixTaskOrder();
-            List<Integer> taskOrder = new ArrayList<>(s.getBeginnableTasks());
-            taskOrder.sort((a, b) -> {
-                int DRTa = 0;
-                if (tasks[a].getIngoingEdges().size() == 1) {
-                    Edge ingoing = tasks[a].getIngoingEdges().get(0);
-                    DRTa = s.getTaskFinishTime(ingoing.getTail()) + ingoing.getWeight();
-                }
-                int DRTb = 0;
-                if (tasks[b].getIngoingEdges().size() == 1) {
-                    Edge ingoing = tasks[b].getIngoingEdges().get(0);
-                    DRTb = s.getTaskFinishTime(ingoing.getTail()) + ingoing.getWeight();
-                }
-                if (DRTa == DRTb) {
-                    int outCosta = 0;
-                    if (tasks[a].getOutgoingEdges().size() == 1) {
-                        outCosta = tasks[a].getOutgoingEdges().get(0).getWeight();
-                    }
-                    int outCostb = 0;
-                    if (tasks[b].getOutgoingEdges().size() == 1) {
-                        outCostb = tasks[b].getOutgoingEdges().get(0).getWeight();
-                    }
-                    return outCostb - outCosta;
-                }
-                return DRTa - DRTb;
-            });
-            tasksToAdd = new LinkedList<>();
-            if (taskOrder.size() > 0) {
-                tasksToAdd.add(taskOrder.get(0));
-            }
-        } else {
+//        if (s.isTaskOrderFixed() || canFixTaskOrder(s)) {
+//            s.fixTaskOrder();
+//            s.disableEquivalentSchedulePruning();
+//            Queue<Integer> beginnable = s.getBeginnableTasks();
+//            Task t = null;
+//            for (Integer i : beginnable) {
+//                if (fixedTaskOrderCompare(t, tasks[i], s) > 0) {
+//                    t = tasks[i];
+//                }
+//            }
+//            tasksToAdd = new LinkedList<>();
+//            if (t != null) {
+//                tasksToAdd.add((int) t.getUniqueID());
+//            }
+//        } else {
             tasksToAdd = s.getBeginnableTasks();
-        }
+//        }
         Set<Task> equivalent = new HashSet<>();
         for (Integer t : tasksToAdd) {
             if (equivalent.contains(tasks[t])) {
@@ -189,7 +172,7 @@ public class Scheduler {
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
-                        (newSchedule.isTaskOrderFixed() || !containsEquivalentSchedule(newSchedule, tasks[t])) &&
+                        !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
                     scheduleQueue.add(newSchedule);
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
@@ -393,4 +376,33 @@ public class Scheduler {
     public Task[] getTasks() {
         return tasks;
     }
+
+    public int fixedTaskOrderCompare(Task a, Task b, Schedule s) {
+        if (a == null) {
+            return 1;
+        }
+        int DRTa = 0;
+        if (a.getIngoingEdges().size() == 1) {
+            Edge ingoing = a.getIngoingEdges().get(0);
+            DRTa = s.getTaskFinishTime(ingoing.getTail()) + ingoing.getWeight();
+        }
+        int DRTb = 0;
+        if (b.getIngoingEdges().size() == 1) {
+            Edge ingoing = b.getIngoingEdges().get(0);
+            DRTb = s.getTaskFinishTime(ingoing.getTail()) + ingoing.getWeight();
+        }
+        if (DRTa == DRTb) {
+            int outCosta = 0;
+            if (a.getOutgoingEdges().size() == 1) {
+                outCosta = a.getOutgoingEdges().get(0).getWeight();
+            }
+            int outCostb = 0;
+            if (b.getOutgoingEdges().size() == 1) {
+                outCostb = b.getOutgoingEdges().get(0).getWeight();
+            }
+            return outCostb - outCosta;
+        }
+        return DRTa - DRTb;
+    }
+
 }

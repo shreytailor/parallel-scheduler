@@ -147,10 +147,16 @@ public class Preprocessor {
                     task1Out.sort(Comparator.comparingInt(a -> a.getHead().getUniqueID()));
                     task2Out.sort(Comparator.comparingInt(a -> a.getHead().getUniqueID()));
                     for (int k = 0; k < task1Out.size(); k++) {
-                        if (task1Out.get(k).getHead().getUniqueID() != task2Out.get(k).getHead().getUniqueID()) {
+                        Edge edge1 = task1Out.get(k);
+                        Edge edge2 = task2Out.get(k);
+                        if (edge1.getWeight() != edge2.getWeight() || edge1.getHead().getUniqueID() != edge2.getHead().getUniqueID()) {
                             equal = false;
                             break;
                         }
+                    }
+
+                    if (!equal) {
+                        break;
                     }
 
                     List<Edge> task1In = task1.getIngoingEdges();
@@ -158,7 +164,9 @@ public class Preprocessor {
                     task1In.sort(Comparator.comparingInt(a -> a.getTail().getUniqueID()));
                     task2In.sort(Comparator.comparingInt(a -> a.getTail().getUniqueID()));
                     for (int k = 0; k < task1In.size(); k++) {
-                        if (task1In.get(k).getTail().getUniqueID() != task2In.get(k).getTail().getUniqueID()) {
+                        Edge edge1 = task1In.get(k);
+                        Edge edge2 = task2In.get(k);
+                        if (edge1.getWeight() != edge2.getWeight() || edge1.getTail().getUniqueID() != edge2.getTail().getUniqueID()) {
                             equal = false;
                             break;
                         }
@@ -167,7 +175,6 @@ public class Preprocessor {
                     equal = false;
                 }
                 if (equal) {
-                    System.out.println(task1.getName() + " is equivalent to " + task2.getName());
                     equivalent.add(task2);
                     taskEquivalences[task2.getUniqueID()] = equivalent;
                 }
