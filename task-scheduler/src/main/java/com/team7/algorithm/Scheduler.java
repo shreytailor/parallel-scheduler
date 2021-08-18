@@ -6,7 +6,6 @@ import com.team7.model.Schedule;
 import com.team7.model.Task;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Scheduler {
     protected int processors;
@@ -34,9 +33,22 @@ public class Scheduler {
         taskBottomLevelMap = Preprocessor.calculateTaskBottomLevels(tasks);
         taskStaticLevelMap = Preprocessor.calculateTaskStaticLevels(tasks);
         taskEquivalencesMap = Preprocessor.calculateEquivalentTasks(tasks);
+        scheduleQueue = createScheduleQueue();
+        visitedSchedules = createVisitedScheduleSet();
+    }
 
-        scheduleQueue = createEmptyPriorityScheduleQueue();
-        visitedSchedules = new TreeSet<>((a, b) -> {
+    public static Queue<Schedule> createScheduleQueue() {
+        return new PriorityQueue<>((a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
+        });
+    }
+
+    protected Set<Schedule> createVisitedScheduleSet() {
+        return new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
                     for (Task t : tasks) {
@@ -52,16 +64,6 @@ public class Scheduler {
                 return b.getNumberOfTasks() - a.getNumberOfTasks();
             }
             return a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-        });
-    }
-
-    public static Queue<Schedule> createEmptyPriorityScheduleQueue() {
-        return new PriorityQueue<>((a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                return b.getNumberOfTasks() - a.getNumberOfTasks();
-            }
-            return n;
         });
     }
 

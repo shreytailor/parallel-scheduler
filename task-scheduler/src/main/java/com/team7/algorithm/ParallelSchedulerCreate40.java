@@ -2,17 +2,16 @@ package com.team7.algorithm;
 
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
+import com.team7.model.Task;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class ParallelSchedulerCreate40 extends Scheduler {
     private ExecutorService executorService;
     private IndependentWorker[] workers;
     private int numThreads;
+    private Schedule bestSchedule;
 
     public ParallelSchedulerCreate40(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
@@ -34,14 +33,14 @@ public class ParallelSchedulerCreate40 extends Scheduler {
      * @return an optimal schedule
      */
     public Schedule findOptimalSchedule() {
-        Schedule bestSchedule = findFeasibleSchedule();
+        bestSchedule = findFeasibleSchedule();
 
         generateInitialSchedules();
 
         // if 4 threads, there will be more than 40 states created here
         while (scheduleQueue.size() > 0 && scheduleQueue.size() < numThreads * 10) {
             Schedule schedule = scheduleQueue.poll();
-            if (schedule.getNumberOfTasks()==tasks.length) {
+            if (schedule.getNumberOfTasks() == tasks.length) {
                 return schedule;
             }
             expandSchedule(schedule);
@@ -55,21 +54,16 @@ public class ParallelSchedulerCreate40 extends Scheduler {
         }
 
         try {
-            List<Future<Schedule>> schedules = executorService.invokeAll(Arrays.asList(workers));
-            for (Future<Schedule> future : schedules) {
-                Schedule schedule = future.get();
-                if (schedule.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime()) {
-                    bestSchedule = schedule;
-                }
-            }
-        } catch (InterruptedException | ExecutionException e) {
+            executorService.invokeAll(Arrays.asList(workers));
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         return bestSchedule;
     }
 
     private class IndependentWorker implements Callable<Schedule> {
-        private Queue<Schedule> schedules = createEmptyPriorityScheduleQueue();
+        private Queue<Schedule> schedules = createScheduleQueue();
 
         public void addSchedule(Schedule s) {
             schedules.add(s);
@@ -82,22 +76,32 @@ public class ParallelSchedulerCreate40 extends Scheduler {
                 // (2) Remove from OPEN the search state s with the smallest f
                 Schedule s = schedules.poll();
 
-                // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
-                // otherwise, go to the next step.
-                if (s.getNumberOfTasks() == tasks.length) {
-                    return s;
+                synchronized (this) {
+                    if (s.getEstimatedFinishTime() >= bestSchedule.getEstimatedFinishTime()) {
+                        break;
+                    }
+                    // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
+                    // otherwise, go to the next step.
+                    if (s.getNumberOfTasks() == tasks.length) {
+                        if (s.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime()) {
+                            bestSchedule = s;
+                        }
+                    }
                 }
                 // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
                 expandSchedule(s, schedules);
             }
-
-            return feasibleSchedule;
+            return null;
         }
     }
 
     private void expandSchedule(Schedule s, Queue<Schedule> schedules) {
-        //Expanding the schedule s, and insert them into the scheduleQueue
+        Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
+            if (equivalent.contains(tasks[t])) {
+                continue;
+            }
+            equivalent.addAll(taskEquivalencesMap[t]);
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);

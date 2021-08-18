@@ -1,6 +1,7 @@
 package com.team7;
 
 import com.team7.algorithm.ParallelScheduler;
+import com.team7.algorithm.ParallelSchedulerCreate40;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -49,7 +50,7 @@ public class SchedulerTestCrawledExamples {
         return tests;
     }
 
-    @Test
+//    @Test
     void testOneFile(){
         String fileName = DOT_TEST_FILE_DIRECTORY+"/Join_Nodes_16_CCR_1.01_WeightType_Random#1_Homogeneous-4.dot";
         File file = new File(fileName);
@@ -67,7 +68,7 @@ public class SchedulerTestCrawledExamples {
             if(graphInfo.numberOfTargetProcessors == 0){
                 fail("ignore this case");
             }
-            Scheduler scheduler = new ParallelScheduler(g, graphInfo.numberOfTargetProcessors);
+            Scheduler scheduler = new ParallelSchedulerCreate40(g, graphInfo.numberOfTargetProcessors);
             assertTimeout(Duration.ofSeconds(5), ()->{
                 Schedule result = scheduler.findOptimalSchedule();
                 assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
