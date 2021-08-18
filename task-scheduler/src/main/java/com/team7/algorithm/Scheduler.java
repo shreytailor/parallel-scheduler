@@ -6,6 +6,7 @@ import com.team7.model.Schedule;
 import com.team7.model.Task;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Scheduler {
     protected int processors;
@@ -17,7 +18,7 @@ public class Scheduler {
     protected List[] taskEquivalencesMap;
     protected Schedule feasibleSchedule;
     protected int totalComputationTime = 0;
-    protected static Queue<Schedule> scheduleQueue;
+    protected Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
 
     public Scheduler(Graph g, int numOfProcessors) {
@@ -34,13 +35,7 @@ public class Scheduler {
         taskStaticLevelMap = Preprocessor.calculateTaskStaticLevels(tasks);
         taskEquivalencesMap = Preprocessor.calculateEquivalentTasks(tasks);
 
-        scheduleQueue = new PriorityQueue<>((a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                return b.getNumberOfTasks() - a.getNumberOfTasks();
-            }
-            return n;
-        });
+        scheduleQueue = createEmptyPriorityScheduleQueue();
         visitedSchedules = new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
@@ -57,6 +52,16 @@ public class Scheduler {
                 return b.getNumberOfTasks() - a.getNumberOfTasks();
             }
             return a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+        });
+    }
+
+    public static Queue<Schedule> createEmptyPriorityScheduleQueue() {
+        return new PriorityQueue<>((a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
         });
     }
 
@@ -309,7 +314,6 @@ public class Scheduler {
                                         }
                                         if (!scheduleLater) {
                                             equivalent = false;
-                                            ;
                                         }
                                     }
                                 }

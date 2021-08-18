@@ -49,7 +49,7 @@ public class NonFunctionalForkJoinPS extends Scheduler{
         }
     }
 
-    public static synchronized boolean isScheduleQueueEmpty(){
+    public synchronized boolean isScheduleQueueEmpty(){
         return scheduleQueue.isEmpty();
     }
 
@@ -57,7 +57,7 @@ public class NonFunctionalForkJoinPS extends Scheduler{
      *
      * @return schedule either null or a schedule
      */
-    public static synchronized Schedule pollSchedule(){
+    public synchronized Schedule pollSchedule(){
         if(isScheduleQueueEmpty()){
             return scheduleQueue.poll();
         }

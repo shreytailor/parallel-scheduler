@@ -64,6 +64,9 @@ public class ParallelScheduler extends Scheduler {
         }
     }
 
+    public synchronized Schedule poll(){
+        return scheduleQueue.poll();
+    }
     /**
      * Generates an optimal schedule using an A* algorithm.
      *

@@ -9,6 +9,7 @@ import com.team7.testutil.GraphInfoUtil;
 import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,8 +46,16 @@ public class SchedulerTestCrawledExamples {
             }
         }
 
-
         return tests;
+    }
+
+    @Test
+    void testOneFile(){
+        String fileName = DOT_TEST_FILE_DIRECTORY+"/Join_Nodes_16_CCR_1.01_WeightType_Random#1_Homogeneous-4.dot";
+        File file = new File(fileName);
+        GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
+
+        testAStarWithDotFile(file,graphInfo);
     }
 
     private void testAStarWithDotFile(File file, GraphInfoUtil.GraphInfo graphInfo) {
