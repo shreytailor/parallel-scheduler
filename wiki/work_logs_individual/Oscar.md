@@ -1,3 +1,17 @@
+### 18 August
+Implement equivalent task pruning https://www.sciencedirect.com/science/article/pii/S0305054813002542
+
+### 16 August
+Implement equivalent schedule pruning https://www.sciencedirect.com/science/article/pii/S0305054813002542
+
+### 13 August
+Implement a method of identifying equivalent tasks which will be used for a pruning technique later on.
+
+### 11 August
+Implement partial expansion https://link.springer.com/content/pdf/10.1007/s11227-010-0395-1.pdf
+
+Improve heuristic function using ideas from https://link.springer.com/content/pdf/10.1007/s11227-010-0395-1.pdf
+
 ### 4 August
 Fixed a bug which caused a lot of states to not be checked.
 
