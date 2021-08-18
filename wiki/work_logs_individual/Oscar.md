@@ -5,7 +5,7 @@ Implement equivalent task pruning https://www.sciencedirect.com/science/article/
 Implement equivalent schedule pruning https://www.sciencedirect.com/science/article/pii/S0305054813002542
 
 ### 13 August
-Implement a method of identifying equivalent tasks which will be used for a pruning technique later on.
+Implement a method of identifying equivalent tasks which will be used for a pruning technique later on https://link.springer.com/content/pdf/10.1007/s11227-010-0395-1.pdf.
 
 ### 11 August
 Implement partial expansion https://link.springer.com/content/pdf/10.1007/s11227-010-0395-1.pdf
