@@ -14,7 +14,7 @@ public class Scheduler {
     protected int[] taskBottomLevelMap;
     protected int[] taskStaticLevelMap;
     protected byte[] taskRequirementsMap;
-    protected List[] taskEquivalences;
+    protected List[] taskEquivalencesMap;
     protected Schedule feasibleSchedule;
     protected int totalComputationTime = 0;
     protected static Queue<Schedule> scheduleQueue;
@@ -32,7 +32,7 @@ public class Scheduler {
         taskTopLevelMap = Preprocessor.calculateTaskTopLevels(tasks);
         taskBottomLevelMap = Preprocessor.calculateTaskBottomLevels(tasks);
         taskStaticLevelMap = Preprocessor.calculateTaskStaticLevels(tasks);
-        taskEquivalences = Preprocessor.calculateEquivalentTasks(tasks);
+        taskEquivalencesMap = Preprocessor.calculateEquivalentTasks(tasks);
 
         scheduleQueue = new PriorityQueue<>((a, b) -> {
             int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
@@ -135,30 +135,12 @@ public class Scheduler {
      * @param s
      */
     public void expandSchedule(Schedule s) {
-        Queue<Integer> tasksToAdd;
-//        if (s.isTaskOrderFixed() || canFixTaskOrder(s)) {
-//            s.fixTaskOrder();
-//            s.disableEquivalentSchedulePruning();
-//            Queue<Integer> beginnable = s.getBeginnableTasks();
-//            Task t = null;
-//            for (Integer i : beginnable) {
-//                if (fixedTaskOrderCompare(t, tasks[i], s) > 0) {
-//                    t = tasks[i];
-//                }
-//            }
-//            tasksToAdd = new LinkedList<>();
-//            if (t != null) {
-//                tasksToAdd.add((int) t.getUniqueID());
-//            }
-//        } else {
-            tasksToAdd = s.getBeginnableTasks();
-//        }
         Set<Task> equivalent = new HashSet<>();
-        for (Integer t : tasksToAdd) {
+        for (Integer t : s.getBeginnableTasks()) {
             if (equivalent.contains(tasks[t])) {
                 continue;
             }
-            equivalent.addAll(taskEquivalences[t]);
+            equivalent.addAll(taskEquivalencesMap[t]);
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
@@ -345,6 +327,7 @@ public class Scheduler {
         return false;
     }
 
+    //Currently not in use
     public boolean canFixTaskOrder(Schedule schedule) {
         Queue<Integer> taskIDs = schedule.getBeginnableTasks();
         Task sharedChild = null;

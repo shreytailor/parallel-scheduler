@@ -2,41 +2,60 @@ package com.team7.algorithm;
 
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
+import com.team7.model.Task;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
-public class ParallelSchedulerShareEachLoop extends Scheduler{
+public class ParallelScheduler extends Scheduler {
+    ExecutorService executor;
+    ExpansionWorker[] workers;
     private int numThreads;
 
 
-    public ParallelSchedulerShareEachLoop(Graph g, int numOfProcessors, int numThreads) {
+    public ParallelScheduler(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
+        scheduleQueue = new PriorityBlockingQueue<Schedule>(11, (a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
+        });
         this.numThreads = numThreads;
+        executor = Executors.newFixedThreadPool(numThreads);
+        workers = new ExpansionWorker[numThreads];
     }
 
 
-    public ParallelSchedulerShareEachLoop(Graph g, int numOfProcessors) {
+    public ParallelScheduler(Graph g, int numOfProcessors) {
         super(g, numOfProcessors);
+        scheduleQueue = new PriorityBlockingQueue<Schedule>(11, (a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
+        });
         this.numThreads = 4;
+        executor = Executors.newFixedThreadPool(numThreads);
+        workers = new ExpansionWorker[numThreads];
     }
 
     private class ExpansionWorker implements Callable<Schedule> {
         private Schedule s;
 
-        public ExpansionWorker(Schedule s){
+        public ExpansionWorker(Schedule s) {
             this.s = s;
         }
+
         /**
          * Computes a result, or throws an exception if unable to do so.
          *
          * @return computed result
-         * @throws Exception if unable to compute a result
          */
         @Override
-        public Schedule call() throws Exception {
+        public Schedule call() {
             if (s == null || s.getNumberOfTasks() == tasks.length) {
                 return s;
             }
@@ -55,10 +74,6 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
         // (1) OPEN priority queue, sorted by f
         generateInitialSchedules();
 
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-        ExpansionWorker[] workers = new ExpansionWorker[numThreads];
-
-
         while (scheduleQueue.size() != 0) {
             for (int i = 0; i < numThreads; i++) {
                 workers[i] = new ExpansionWorker(scheduleQueue.poll());
@@ -70,35 +85,37 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                 Schedule bestSchedule = null;
                 for (Future<Schedule> result : results) {
                     Schedule schedule = result.get();
-                    if(schedule != null){
-                        if (bestSchedule==null || schedule.getEstimatedFinishTime()<bestSchedule.getEstimatedFinishTime()) {
-                            bestSchedule=schedule;
-                        }
+                    if (schedule != null &&
+                            (bestSchedule == null || schedule.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime())) {
+                        bestSchedule = schedule;
                     }
                 }
-                if (bestSchedule!=null) {
+                if (bestSchedule != null) {
                     return bestSchedule;
                 }
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-
         }
-
         return feasibleSchedule;
     }
 
 
     /**
      * IMPORTANT: access to treeset had to be synchronized, otherwise NPE
+     *
      * @param s
      */
     public void expandSchedule(Schedule s) {
         //Expanding the schedule s, and insert them into the scheduleQueue
+        Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
+            if (equivalent.contains(tasks[t])) {
+                continue;
+            }
+            equivalent.addAll(taskEquivalencesMap[t]);
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
@@ -111,6 +128,7 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
@@ -123,9 +141,13 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                 }
             }
         }
-        synchronized (Scheduler.class){
+//        synchronized (Scheduler.class) {
+        synchronized (this) {
             visitedSchedules.add(s);
         }
     }
 
+    public void shutdown() {
+        executor.shutdownNow();
+    }
 }

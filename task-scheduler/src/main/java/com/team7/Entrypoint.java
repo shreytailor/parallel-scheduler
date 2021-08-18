@@ -1,6 +1,6 @@
 package com.team7;
 
-import com.team7.algorithm.ParallelSchedulerShareEachLoop;
+import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.Scheduler;
 import com.team7.exceptions.CommandLineException;
 import com.team7.model.Graph;
@@ -25,11 +25,15 @@ public class Entrypoint {
             Schedule schedule = scheduler.findOptimalSchedule();
             long finish = System.currentTimeMillis();
             System.out.println(finish-start);
+            System.out.println(schedule.getEstimatedFinishTime());
             DOTParser.write(config.getOutputName(),schedule, graph);
 
             // Showing the visualization, if requested by the user.
             if (config.isVisualised()) {
                 beginVisualisation(scheduler.getTasks() ,schedule, config);
+            }
+            if (scheduler.getClass() == ParallelScheduler.class) {
+                ((ParallelScheduler) scheduler).shutdown();
             }
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());

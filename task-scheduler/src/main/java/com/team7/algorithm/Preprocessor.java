@@ -121,7 +121,6 @@ public class Preprocessor {
         return result;
     }
 
-    //Currently not in use
     public static List[] calculateEquivalentTasks(Task[] tasks) {
         List<Task>[] taskEquivalences = new List[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
