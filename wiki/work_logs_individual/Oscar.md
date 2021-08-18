@@ -15,14 +15,14 @@ Improve heuristic function using ideas from https://link.springer.com/content/pd
 ### 4 August
 Fixed a bug which caused a lot of states to not be checked.
 
-Reduced the memory usage of the scheduling algorithm by replacing HashMaps with byte and int arrays.
+Reduced the memory usage of the scheduling algorithm by replacing HashMaps with byte and int arrays. Now each task has an ID which is used to index into these arrays.
 
 ### 3 August
 Improve the heuristic of the scheduling algorithm. Strategies used include: 
 
-Adding node priorities (i.e. nodes with higher priorities are scheduled first, priority in this case is referring to the sum of the bottom and top levels of the node).
+Adding node priorities (i.e. nodes with higher priorities are scheduled first, priority in this case is referring to the sum of the bottom and top levels of the node).*No longer used*
 
-Initially generating a feasible schedule using a greedy approach, the makespan of this schedule is then used as an upper bound to prune schedules that cannot be optimal.
+Initially generating a feasible schedule using a greedy approach, the makespan of this schedule is then used as an upper bound to prune schedules that cannot be optimal. Tasks with the highest bottom level are scheduled first.
 
 The origin of these ideas are from the following paper: https://www.researchgate.net/publication/222302496_On_multiprocessor_task_scheduling_using_efficient_state_space_search_approaches
 
