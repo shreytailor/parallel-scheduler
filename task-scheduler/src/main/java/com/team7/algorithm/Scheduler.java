@@ -19,6 +19,7 @@ public class Scheduler {
     protected int totalComputationTime = 0;
     protected static Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
+    protected Schedule sharedState;
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -40,6 +41,7 @@ public class Scheduler {
             }
             return n;
         });
+
         visitedSchedules = new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
@@ -72,6 +74,7 @@ public class Scheduler {
         while (scheduleQueue.size() != 0) {
             // (2) Remove from OPEN the search state s with the smallest f
             Schedule s = scheduleQueue.poll();
+            sharedState = s;
 
             // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
             // otherwise, go to the next step.
@@ -121,6 +124,8 @@ public class Scheduler {
                 }
             }
         }
+
+        sharedState = schedule;
         feasibleSchedule = schedule;
         return feasibleSchedule;
     }
@@ -145,9 +150,11 @@ public class Scheduler {
                     }
                     normalised = true;
                 }
-                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
-                //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
+                sharedState = newSchedule;
+
+                // Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
@@ -327,5 +334,9 @@ public class Scheduler {
     
     public Task[] getTasks() {
         return tasks;
+    }
+
+    public Schedule getSharedState() {
+        return sharedState;
     }
 }

@@ -47,7 +47,7 @@ public abstract class UtilizationProvider {
             if (currentData.size() == 20) currentData.remove(0);
         };
 
-        // Finally register the event listener.
+        // Finally, register the event listener.
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), chartUpdater));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();

@@ -46,23 +46,27 @@ public class GanttProvider {
             processorSeries.add(new XYChart.Series());
         }
 
-        // Getting the important parts of the schedule.
-        byte[] taskMap = _schedule.getTaskProcessorMap();
-        int[] taskStartTime = _schedule.getTaskStartTimeMap();
+        try {
+            // Getting the important parts of the schedule.
+            byte[] taskMap = _schedule.getTaskProcessorMap();
+            int[] taskStartTime = _schedule.getTaskStartTimeMap();
 
-        for (int counter = 0; counter < _tasks.length; counter++) {
-            Task currentTask = _tasks[counter];
-            short uniqueId = currentTask.getUniqueID();
-            String processor = String.valueOf(taskMap[uniqueId]);
-            int startTime = taskStartTime[uniqueId];
-            int length = currentTask.getWeight();
+            for (int counter = 0; counter < _tasks.length; counter++) {
+                Task currentTask = _tasks[counter];
+                short uniqueId = currentTask.getUniqueID();
+                String processor = String.valueOf(taskMap[uniqueId]);
+                int startTime = taskStartTime[uniqueId];
+                int length = currentTask.getWeight();
 
-            XYChart.Series series = processorSeries.get(Integer.valueOf(taskMap[uniqueId]));
-            XYChart.Data<Number, String> data = new XYChart.Data(
-                    startTime, processor,
-                    new GanttComponent.ExtraData(length, "status-bar", currentTask.getName()));
+                XYChart.Series series = processorSeries.get(Integer.valueOf(taskMap[uniqueId]));
+                XYChart.Data<Number, String> data = new XYChart.Data(
+                        startTime, processor,
+                        new GanttComponent.ExtraData(length, "status-bar", currentTask.getName()));
 
-            series.getData().add(data);
+                series.getData().add(data);
+            }
+        } catch (NullPointerException exception) {
+            return chart;
         }
 
         // Adding each series to the final graph.

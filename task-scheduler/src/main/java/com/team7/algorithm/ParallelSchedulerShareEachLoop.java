@@ -2,8 +2,6 @@ package com.team7.algorithm;
 
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
@@ -11,12 +9,10 @@ import java.util.concurrent.*;
 public class ParallelSchedulerShareEachLoop extends Scheduler{
     private int numThreads;
 
-
     public ParallelSchedulerShareEachLoop(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
         this.numThreads = numThreads;
     }
-
 
     public ParallelSchedulerShareEachLoop(Graph g, int numOfProcessors) {
         super(g, numOfProcessors);
@@ -52,12 +48,12 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
      */
     public Schedule findOptimalSchedule() {
         findFeasibleSchedule();
+
         // (1) OPEN priority queue, sorted by f
         generateInitialSchedules();
 
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         ExpansionWorker[] workers = new ExpansionWorker[numThreads];
-
 
         while (scheduleQueue.size() != 0) {
             for (int i = 0; i < numThreads; i++) {
@@ -76,24 +72,23 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                         } else if (schedule.getEstimatedFinishTime()<bestSchedule.getEstimatedFinishTime()){
                             bestSchedule=schedule;
                         }
+
+                        sharedState = schedule;
                     }
                 }
+
                 if (bestSchedule!=null) {
                     return bestSchedule;
                 }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException exception) {
+                exception.printStackTrace();
             }
-
         }
-        executor.shutdown();
 
+        executor.shutdown();
         return feasibleSchedule;
     }
-
 
     /**
      * IMPORTANT: access to treeset had to be synchronized, otherwise NPE
@@ -126,6 +121,7 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                 }
             }
         }
+
         synchronized (Scheduler.class){
             visitedSchedules.add(s);
         }
