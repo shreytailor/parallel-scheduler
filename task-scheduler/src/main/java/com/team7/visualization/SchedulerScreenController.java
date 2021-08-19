@@ -104,7 +104,7 @@ public class SchedulerScreenController implements Initializable {
             darkMutableGraph.nodeAttrs().add(Color.WHITE);
             darkMutableGraph.nodeAttrs().add(Color.WHITE.font());
 
-
+            //render an image into buffer
             lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).render(Format.SVG).toImage();
             darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).render(Format.SVG).toImage();
 
@@ -233,30 +233,9 @@ public class SchedulerScreenController implements Initializable {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
 
         if (isLightMode) {
-            zoomInIcon.setImage(DARK_IN_IMAGE);
-            zoomOutIcon.setImage(DARK_OUT_IMAGE);
-            themeToggleIcon.setImage(SUN_IMAGE);
-            closeIcon.setImage(DARK_CLOSE_IMAGE);
-            minimizeIcon.setImage(DARK_MIN_IMAGE);
-            inputGraphContainer.setCenter(inputGraphDark);
-
-            sheets.remove(LightCss);
-            sheets.add(DarkCss);
-
-            isLightMode = !isLightMode;
+            updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE, inputGraphDark, LightCss, DarkCss);
         } else {
-            zoomInIcon.setImage(LIGHT_IN_IMAGE);
-            zoomOutIcon.setImage(LIGHT_OUT_IMAGE);
-
-            themeToggleIcon.setImage(MOON_IMAGE);
-            closeIcon.setImage(LIGHT_CLOSE_IMAGE);
-            minimizeIcon.setImage(LIGHT_MIN_IMAGE);
-            inputGraphContainer.setCenter(inputGraphLight);
-
-            sheets.remove(DarkCss);
-            sheets.add(LightCss);
-
-            isLightMode = !isLightMode;
+            updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE, inputGraphLight, DarkCss, LightCss);
         }
     }
 
@@ -339,6 +318,35 @@ public class SchedulerScreenController implements Initializable {
             inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
             inputGraphContainer.setCenter(inputGraphDark);
         }
+    }
+
+    /***
+     * A helper method that updates the components and stylesheet after changing theme
+     * @param sheets
+     * @param in_image
+     * @param out_image
+     * @param planet_image
+     * @param close_image
+     * @param min_image
+     * @param inputGraph
+     * @param removingCss
+     * @param addingCss
+     */
+    private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image, Image close_image, Image min_image, ImageView inputGraph, String removingCss, String addingCss) {
+        zoomInIcon.setImage(in_image);
+        zoomOutIcon.setImage(out_image);
+        themeToggleIcon.setImage(planet_image);
+        closeIcon.setImage(close_image);
+        minimizeIcon.setImage(min_image);
+        inputGraphContainer.setCenter(inputGraph);
+
+        sheets.remove(removingCss);
+        sheets.add(addingCss);
+
+        isLightMode = !isLightMode;
+
+        // Updating the input graph, otherwise size will differ in two different themes
+        updateInputGraph(isLightMode,inputGraphHeight, inputGraphWidth);
     }
 
 
