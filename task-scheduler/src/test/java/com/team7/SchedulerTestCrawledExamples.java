@@ -8,6 +8,7 @@ import com.team7.parsing.DOTParser;
 import com.team7.testutil.GraphInfoUtil;
 import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
@@ -33,7 +34,7 @@ public class SchedulerTestCrawledExamples {
             GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
 
             boolean numProcessorsTwoOrFour = graphInfo.numberOfTargetProcessors == 2 || graphInfo.numberOfTargetProcessors == 4;
-            boolean numNodesLessThanTwenty = graphInfo.numberOfTasks<20;
+            boolean numNodesLessThanTwenty = graphInfo.numberOfTasks<16;
 
             if(numProcessorsTwoOrFour && numNodesLessThanTwenty){
                 tests.add(
@@ -41,16 +42,15 @@ public class SchedulerTestCrawledExamples {
                                 file.getName(),
                                 () -> testAStarWithDotFile(file, graphInfo)
                         ));
-
             }
         }
 
         return tests;
     }
 
-//    @Test
+    //@Test
     void testOneFile(){
-        String fileName = DOT_TEST_FILE_DIRECTORY+"/Join_Nodes_16_CCR_1.01_WeightType_Random#1_Homogeneous-4.dot";
+        String fileName = DOT_TEST_FILE_DIRECTORY+"/Join_Nodes_10_CCR_10.02_WeightType_Random#1_Homogeneous-2.dot";
         File file = new File(fileName);
         GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
 
@@ -66,8 +66,8 @@ public class SchedulerTestCrawledExamples {
             if(graphInfo.numberOfTargetProcessors == 0){
                 fail("ignore this case");
             }
-            Scheduler scheduler = new ParallelScheduler(g, graphInfo.numberOfTargetProcessors);
-            assertTimeout(Duration.ofSeconds(5), ()->{
+            Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
+            assertTimeout(Duration.ofSeconds(30), ()->{
                 Schedule result = scheduler.findOptimalSchedule();
                 assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
                 assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
@@ -75,14 +75,9 @@ public class SchedulerTestCrawledExamples {
             });
             // then
 
-
         } catch (IOException e) {
             e.printStackTrace();
             fail();
         }
     }
-
-
-
-
 }

@@ -59,7 +59,7 @@ public class Preprocessor {
      *
      * @param tasks
      */
-    public static int[] calculateTaskTopLevels(Task[] tasks) {
+    public static int[] calculateTaskTopLevelsWithoutEdgeCost(Task[] tasks) {
         int[] taskTopLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
@@ -71,7 +71,7 @@ public class Preprocessor {
                     Task t = taskQueue.poll();
                     for (Edge e : t.getOutgoingEdges()) {
                         int neighbour = e.getHead().getUniqueID();
-                        taskTopLevelMap[neighbour] = Math.max(taskTopLevelMap[neighbour], taskTopLevelMap[t.getUniqueID()] + t.getWeight() + e.getWeight());
+                        taskTopLevelMap[neighbour] = Math.max(taskTopLevelMap[neighbour], taskTopLevelMap[t.getUniqueID()] + t.getWeight());
                         taskQueue.add(tasks[neighbour]);
                     }
                 }

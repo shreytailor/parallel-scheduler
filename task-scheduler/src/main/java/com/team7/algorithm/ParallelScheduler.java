@@ -37,7 +37,6 @@ public class ParallelScheduler extends Scheduler {
 
         generateInitialSchedules();
 
-        // if 4 threads, there will be more than 40 states created here
         while (scheduleQueue.size() > 0 && scheduleQueue.size() < numThreads * 10) {
             Schedule schedule = scheduleQueue.poll();
             if (schedule.getNumberOfTasks() == tasks.length) {
@@ -46,7 +45,7 @@ public class ParallelScheduler extends Scheduler {
             expandSchedule(schedule);
         }
 
-        // for all thread worker except 1, distribute 10 tasks each
+        // distribute the tasks
         int index = 0;
         while (scheduleQueue.size() > 0) {
             workers[index % numThreads].addSchedule(scheduleQueue.poll());
@@ -77,20 +76,17 @@ public class ParallelScheduler extends Scheduler {
         public Schedule call() {
             // (1) OPEN priority queue, sorted by f
             while (schedules.size() != 0) {
-                // (2) Remove from OPEN the search state s with the smallest f
                 Schedule s = schedules.poll();
 
                 synchronized (this) {
                     if (s.getEstimatedFinishTime() >= bestSchedule.getEstimatedFinishTime()) {
                         break;
                     }
-                    // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
-                    // otherwise, go to the next step.
                     if (s.getNumberOfTasks() == tasks.length && s.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime()) {
                         bestSchedule = s;
                     }
                 }
-                // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
+
                 expandSchedule(s, schedules);
             }
             return null;
@@ -104,15 +100,8 @@ public class ParallelScheduler extends Scheduler {
                 continue;
             }
             equivalent.addAll(taskEquivalencesMap[t]);
-            boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
-                if (earliestStartTime == 0) {
-                    if (normalised || t < s.getNormalisationIndex()) {
-                        continue;
-                    }
-                    normalised = true;
-                }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.

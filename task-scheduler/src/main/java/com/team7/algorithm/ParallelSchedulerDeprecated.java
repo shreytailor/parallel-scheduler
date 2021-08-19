@@ -12,10 +12,9 @@ public class ParallelSchedulerDeprecated extends Scheduler {
     ExpansionWorker[] workers;
     private int numThreads;
 
-
     public ParallelSchedulerDeprecated(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
-        scheduleQueue = new PriorityBlockingQueue<Schedule>(11, (a, b) -> {
+        scheduleQueue = new PriorityBlockingQueue<>(11, (a, b) -> {
             int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
             if (n == 0) {
                 return b.getNumberOfTasks() - a.getNumberOfTasks();
