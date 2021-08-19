@@ -90,7 +90,7 @@ public class SchedulerScreenController implements Initializable {
     private double heightAdjustmentRatio; //ratio value that used to resize the input graph
     private int heightAdjustmentValue;
 
-    public SchedulerScreenController(Task[] tasks, Schedule schedule, Config config) {
+    public SchedulerScreenController(Task[] tasks, Config config) {
 
         _config = config;
         _tasks = tasks;
@@ -274,17 +274,17 @@ public class SchedulerScreenController implements Initializable {
 
     @FXML
     public void handleViewToggleButton() {
-        utilGraphContainer.setVisible(!isShowingUtilization);
-        inputGraphContainer.setVisible(isShowingUtilization);
-        isShowingUtilization = !isShowingUtilization;
-
         if (isShowingUtilization) {
+            utilGraphContainer.setVisible(false);
+            inputGraphContainer.setVisible(true);
             viewToggleButton.setText("Show Utilization");
             isShowingUtilization = !isShowingUtilization;
-        } else {
+        }
+        else {
             inputGraphContainer.setVisible(false);
             utilGraphContainer.setVisible(true);
             viewToggleButton.setText("Show Input Graph");
+            isShowingUtilization = !isShowingUtilization;
         }
     }
 
