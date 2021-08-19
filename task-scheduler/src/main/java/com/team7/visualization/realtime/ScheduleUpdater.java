@@ -47,17 +47,14 @@ public class ScheduleUpdater {
 
     public void start() {
         EventHandler<ActionEvent> scheduleUpdater = event -> {
-            System.out.println("Trying to update...");
-
             if (_observableList.size() > 0) {
                 _observableList.clear();
             }
 
             _observableList.add(_scheduler.getSharedState());
-            System.out.println(_observableList.get(0));
         };
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), scheduleUpdater));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), scheduleUpdater));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }

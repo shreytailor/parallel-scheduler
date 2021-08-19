@@ -171,9 +171,10 @@ public class SchedulerScreenController implements Initializable {
         _schedules = ScheduleUpdater.getInstance().getObservableList();
         ScheduleUpdater.getInstance().start();
 
+        ganttProvider = new GanttProvider(_tasks, _schedules.get(0), _config);
+        stateGraphContainer.setCenter(ganttProvider.getSchedule());
         EventHandler<ActionEvent> remakeGraph = event -> {
-            ganttProvider = new GanttProvider(_tasks, _schedules.get(0), _config);
-            stateGraphContainer.setCenter(ganttProvider.getSchedule());
+            ganttProvider.updateSchedule(_schedules.get(0));
         };
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), remakeGraph));

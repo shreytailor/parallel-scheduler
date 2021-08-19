@@ -107,6 +107,7 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                     normalised = true;
                 }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
+                sharedState = newSchedule;
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
