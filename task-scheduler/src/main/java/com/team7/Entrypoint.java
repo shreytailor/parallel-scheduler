@@ -11,6 +11,7 @@ import com.team7.parsing.CLIParser;
 import com.team7.parsing.DOTParser;
 import com.team7.visualization.VisualizationDriver;
 import com.team7.visualization.realtime.ScheduleUpdater;
+import javafx.application.Platform;
 
 import java.io.FileNotFoundException;
 
@@ -33,7 +34,10 @@ public class Entrypoint {
             long start = System.currentTimeMillis();
             Schedule schedule = scheduler.findOptimalSchedule();
             long finish = System.currentTimeMillis();
+
+            stopVisualisationTime();
             System.out.println(finish-start);
+
             DOTParser.write(config.getOutputName(),schedule, graph);
 
         } catch (CommandLineException | FileNotFoundException exception) {
@@ -46,5 +50,14 @@ public class Entrypoint {
         new Thread(() -> {
             VisualizationDriver.show(tasks, config);
         }).start();
+    }
+
+    private static void stopVisualisationTime() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                VisualizationDriver.finish();
+            }
+        });
     }
 }

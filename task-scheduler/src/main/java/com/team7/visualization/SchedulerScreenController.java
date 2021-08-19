@@ -127,6 +127,8 @@ public class SchedulerScreenController implements Initializable {
     private CPUUtilizationProvider cpuUtilizationProvider;
     private RAMUtilizationProvider ramUtilizationProvider;
     private GanttProvider ganttProvider;
+    private Timeline _chartUpdaterTimeline;
+    private TimeProvider _timeProvider;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -147,10 +149,10 @@ public class SchedulerScreenController implements Initializable {
      * This method is used to set up the providers, required for live CPU/RAM usage visualization.
      */
     private void setupSystemCharts() {
-        TimeProvider timeProvider = new TimeProvider();
-        timeProvider.registerLabel(timerLabel);
+        _timeProvider = new TimeProvider();
+        _timeProvider.registerLabel(timerLabel);
 
-        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", timeProvider);
+        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", _timeProvider);
         cpuUtilizationProvider.startTracking();
 
         // Applying custom properties to the CPU chart.
@@ -159,7 +161,7 @@ public class SchedulerScreenController implements Initializable {
         cpuYAxis.setLabel("Usage (%)");
         cpuYAxis.setUpperBound(cpuUtilizationProvider.getUpperBound());
 
-        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization", timeProvider);
+        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization", _timeProvider);
         ramUtilizationProvider.startTracking();
 
         // Applying custom properties to the RAM chart.
@@ -177,9 +179,9 @@ public class SchedulerScreenController implements Initializable {
             ganttProvider.updateSchedule(_schedules.get(0));
         };
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), remakeGraph));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        _chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), remakeGraph));
+        _chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
+        _chartUpdaterTimeline.play();
 
         // For input graph
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
@@ -236,6 +238,14 @@ public class SchedulerScreenController implements Initializable {
         } else {
             viewToggleButton.setText("Show Input Graph");
         }
+    }
+
+    public void stop() {
+
+        ScheduleUpdater.getInstance().stop();
+        _chartUpdaterTimeline.stop();
+        ganttProvider.updateSchedule(_schedules.get(0));
+        _timeProvider.stopTimerLabel();
     }
 }
 

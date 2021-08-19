@@ -13,6 +13,7 @@ import javafx.stage.StageStyle;
 public class VisualizationDriver extends Application {
     private static Config _config;
     private static Task[] _tasks;
+    private static SchedulerScreenController _controller;
 
     public static void show(Task[] tasks, Config config) {
         _config = config;
@@ -23,7 +24,10 @@ public class VisualizationDriver extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SplashScreen.fxml"));
-        loader.setController(new SchedulerScreenController(_tasks, _config));
+
+        _controller = new SchedulerScreenController(_tasks, _config);
+        loader.setController(_controller);
+
         Parent root = loader.load();
         Scene scene = new Scene(root);
 
@@ -33,5 +37,9 @@ public class VisualizationDriver extends Application {
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
+    }
+
+    public static void finish() {
+        _controller.stop();
     }
 }

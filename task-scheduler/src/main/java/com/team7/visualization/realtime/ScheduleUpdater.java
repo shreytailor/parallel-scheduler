@@ -15,6 +15,7 @@ public class ScheduleUpdater {
     private static ScheduleUpdater _scheduleUpdater;
     private Scheduler _scheduler;
     private ObservableList<Schedule> _observableList;
+    private Timeline _scheduleUpdaterTimeline;
 
     private ScheduleUpdater() {
         _observableList = FXCollections.observableArrayList();
@@ -54,8 +55,14 @@ public class ScheduleUpdater {
             _observableList.add(_scheduler.getSharedState());
         };
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), scheduleUpdater));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        _scheduleUpdaterTimeline = new Timeline(new KeyFrame(Duration.millis(500), scheduleUpdater));
+        _scheduleUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
+        _scheduleUpdaterTimeline.play();
+    }
+
+    public void stop() {
+        _observableList.clear();
+        _observableList.add(_scheduler.getSharedState());
+        _scheduleUpdaterTimeline.stop();
     }
 }
