@@ -27,9 +27,9 @@ public class ParallelSchedulerDeprecated extends Scheduler {
     }
 
 
-    public ParallelSchedulerDeprecated(Graph g, int numOfProcessors) {
-        this(g,numOfProcessors,4);
-    }
+//    public ParallelSchedulerDeprecated(Graph g, int numOfProcessors) {
+//        this(g,numOfProcessors,4);
+//    }
 
     private class ExpansionWorker implements Callable<Schedule> {
         private Schedule s;

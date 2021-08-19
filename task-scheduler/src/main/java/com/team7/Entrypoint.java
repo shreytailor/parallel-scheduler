@@ -11,6 +11,7 @@ import com.team7.parsing.Config;
 import com.team7.parsing.CLIParser;
 import com.team7.parsing.DOTParser;
 import com.team7.visualization.VisualizationDriver;
+
 import java.io.FileNotFoundException;
 
 public class Entrypoint {
@@ -21,7 +22,7 @@ public class Entrypoint {
             Graph graph = DOTParser.read(config.getInputName());
 
             // Processing the input graph by using the scheduler, and storing the output.
-            Scheduler scheduler = new Scheduler(graph, config.getNumOfProcessors());
+            Scheduler scheduler = new ParallelScheduler(graph, config.getNumOfProcessors(), config.getNumOfCores());
             long start = System.currentTimeMillis();
             Schedule schedule = scheduler.findOptimalSchedule();
             long finish = System.currentTimeMillis();

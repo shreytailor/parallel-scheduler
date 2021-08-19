@@ -1,5 +1,6 @@
 package com.team7;
 
+import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.ParallelSchedulerDeprecated;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
@@ -46,7 +47,7 @@ public class SchedulerTestLectureExamples {
             Graph g = DOTParser.read(file.toString());
             // when
 
-            Scheduler scheduler = new ParallelSchedulerDeprecated(g, NUM_PROCESSORS);
+            Scheduler scheduler = new ParallelScheduler(g, NUM_PROCESSORS,4);
             Schedule result = scheduler.findOptimalSchedule();
 
             // then

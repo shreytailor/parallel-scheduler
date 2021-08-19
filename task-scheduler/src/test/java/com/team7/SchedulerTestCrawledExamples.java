@@ -66,8 +66,9 @@ public class SchedulerTestCrawledExamples {
             if(graphInfo.numberOfTargetProcessors == 0){
                 fail("ignore this case");
             }
-            Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
-            assertTimeout(Duration.ofSeconds(30), ()->{
+
+            Scheduler scheduler = new ParallelScheduler(g, graphInfo.numberOfTargetProcessors, 4);
+            assertTimeout(Duration.ofSeconds(5), ()->{
                 Schedule result = scheduler.findOptimalSchedule();
                 assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
                 assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
