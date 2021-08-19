@@ -47,12 +47,20 @@ public class SchedulerScreenController implements Initializable {
 
     private final Image SUN_IMAGE = new Image("/images/sun.png");
     private final Image MOON_IMAGE = new Image("/images/moon.png");
+
     private final Image DARK_MIN_IMAGE = new Image("/images/minimise-dark.png");
     private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
+    private final Image DARK_OUT_IMAGE = new Image("/images/zoom-out-dark.png");
+    private final Image DARK_IN_IMAGE = new Image("/images/zoom-in-dark.png");
+
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
+    private final Image LIGHT_OUT_IMAGE = new Image("/images/zoom-out-light.png");
+    private final Image LIGHT_IN_IMAGE = new Image("/images/zoom-in-light.png");
+
     private final String LightCss = "/stylesheets/SplashLightMode.css";
     private final String DarkCss = "/stylesheets/SplashDarkMode.css";
+
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
 
@@ -77,11 +85,13 @@ public class SchedulerScreenController implements Initializable {
     private final int INPUT_GRAPH_MIN_WIDTH = 50;
     private int inputGraphHeight;
     private int inputGraphWidth;
+
     private int unitAdjustmentValue = 20;
     private double heightAdjustmentRatio; //ratio value that used to resize the input graph
     private int heightAdjustmentValue;
 
-    public SchedulerScreenController(Task[] tasks, Config config) {
+    public SchedulerScreenController(Task[] tasks, Schedule schedule, Config config) {
+
         _config = config;
         _tasks = tasks;
 
@@ -129,6 +139,12 @@ public class SchedulerScreenController implements Initializable {
 
     @FXML
     private Label timerLabel;
+
+    @FXML
+    public ImageView zoomInIcon;
+
+    @FXML
+    public ImageView zoomOutIcon;
 
     @FXML
     public Button viewToggleButton;
@@ -215,8 +231,10 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
-        
+
         if (isLightMode) {
+            zoomInIcon.setImage(DARK_IN_IMAGE);
+            zoomOutIcon.setImage(DARK_OUT_IMAGE);
             themeToggleIcon.setImage(SUN_IMAGE);
             closeIcon.setImage(DARK_CLOSE_IMAGE);
             minimizeIcon.setImage(DARK_MIN_IMAGE);
@@ -227,6 +245,9 @@ public class SchedulerScreenController implements Initializable {
 
             isLightMode = !isLightMode;
         } else {
+            zoomInIcon.setImage(LIGHT_IN_IMAGE);
+            zoomOutIcon.setImage(LIGHT_OUT_IMAGE);
+
             themeToggleIcon.setImage(MOON_IMAGE);
             closeIcon.setImage(LIGHT_CLOSE_IMAGE);
             minimizeIcon.setImage(LIGHT_MIN_IMAGE);
@@ -259,7 +280,10 @@ public class SchedulerScreenController implements Initializable {
 
         if (isShowingUtilization) {
             viewToggleButton.setText("Show Utilization");
+            isShowingUtilization = !isShowingUtilization;
         } else {
+            inputGraphContainer.setVisible(false);
+            utilGraphContainer.setVisible(true);
             viewToggleButton.setText("Show Input Graph");
         }
     }
@@ -316,5 +340,7 @@ public class SchedulerScreenController implements Initializable {
             inputGraphContainer.setCenter(inputGraphDark);
         }
     }
+
+
 }
 
