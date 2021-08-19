@@ -23,10 +23,6 @@ public class ParallelScheduler extends Scheduler {
         this.numThreads = numThreads;
     }
 
-    public ParallelScheduler(Graph g, int numOfProcessors) {
-        this(g, numOfProcessors, 4);
-    }
-
     /**
      * Generates an optimal schedule using an A* algorithm.
      *
