@@ -12,6 +12,8 @@ public class Schedule {
     private int idleTime;
     private byte partialExpansionIndex = -1;
     private byte normalisationIndex;
+    private boolean fixTaskOrder = false;
+    private boolean disableEquivalentSchedulePruning = false;
 
     public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap) {
         taskProcessorMap = new byte[numTasks];
@@ -24,7 +26,11 @@ public class Schedule {
         normalisationIndex = -1;
     }
 
-    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap, byte[] taskRequirementsMap, int[] processorFinishTimes, int estimatedFinishTime, byte tasksCompleted, int idleTime, byte normalisationIndex) {
+    public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap,
+                    byte[] taskRequirementsMap, int[] processorFinishTimes,
+                    int estimatedFinishTime, byte tasksCompleted,
+                    int idleTime, byte normalisationIndex,
+                    boolean fixTaskOrder, boolean disableEquivalentSchedulePruning) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
@@ -33,11 +39,13 @@ public class Schedule {
         this.tasksCompleted = tasksCompleted;
         this.idleTime = idleTime;
         this.normalisationIndex = normalisationIndex;
+        this.fixTaskOrder = fixTaskOrder;
+        this.disableEquivalentSchedulePruning = disableEquivalentSchedulePruning;
     }
 
     public void addTask(Task n, int processor, int startTime) {
         if (startTime == 0) {
-            normalisationIndex = (byte) n.getUniqueID();
+            normalisationIndex = n.getUniqueID();
         }
         taskProcessorMap[n.getUniqueID()] = (byte) processor;
         taskStartTimeMap[n.getUniqueID()] = startTime;
@@ -47,6 +55,9 @@ public class Schedule {
         //Checking whether there are any new tasks that we can begin
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap[out.getHead().getUniqueID()]--;
+            if (taskRequirementsMap[out.getHead().getUniqueID()]==0) {
+                fixTaskOrder=false;
+            }
         }
 
         processorFinishTimes[processor] = startTime + n.getWeight();
@@ -115,9 +126,29 @@ public class Schedule {
         return normalisationIndex;
     }
 
+    public void fixTaskOrder() {
+        fixTaskOrder=true;
+    }
+
+    public boolean isTaskOrderFixed() {
+        return fixTaskOrder;
+    }
+
+    public void disableEquivalentSchedulePruning() {
+        disableEquivalentSchedulePruning=true;
+    }
+
+    public boolean isEquivalentSchedulePruningDisabled() {
+        return disableEquivalentSchedulePruning;
+    }
+
     @Override
     public Schedule clone() {
-        return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(), taskRequirementsMap.clone(), processorFinishTimes.clone(), estimatedFinishTime, tasksCompleted, idleTime, normalisationIndex);
+        return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(),
+                taskRequirementsMap.clone(), processorFinishTimes.clone(),
+                estimatedFinishTime, tasksCompleted,
+                idleTime, normalisationIndex,
+                fixTaskOrder, disableEquivalentSchedulePruning);
     }
 
     @Override

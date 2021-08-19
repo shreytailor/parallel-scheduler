@@ -1,6 +1,7 @@
 package com.team7;
 
-import com.team7.algorithm.ParallelSchedulerShareEachLoop;
+
+import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.Scheduler;
 import com.team7.exceptions.CommandLineException;
 import com.team7.model.Graph;

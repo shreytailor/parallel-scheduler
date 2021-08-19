@@ -59,6 +59,12 @@ public class Task {
     }
 
     @Override
+    public Task clone(){
+        return new Task(name, weight);
+    }
+
+
+    @Override
     public int hashCode() {
         return Objects.hash(name, weight);
     }
