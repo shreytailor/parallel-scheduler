@@ -19,6 +19,7 @@ public class Scheduler {
     protected int totalComputationTime = 0;
     protected static Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
+    protected Schedule sharedState;
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -40,6 +41,7 @@ public class Scheduler {
             }
             return n;
         });
+
         visitedSchedules = new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
@@ -121,6 +123,7 @@ public class Scheduler {
                 }
             }
         }
+
         feasibleSchedule = schedule;
         return feasibleSchedule;
     }
@@ -145,9 +148,12 @@ public class Scheduler {
                     }
                     normalised = true;
                 }
-                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
-                //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
+                sharedState = newSchedule;
+                System.out.println("Copied");
+
+                // Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
@@ -327,5 +333,9 @@ public class Scheduler {
     
     public Task[] getTasks() {
         return tasks;
+    }
+
+    public Schedule getSharedState() {
+        return sharedState;
     }
 }

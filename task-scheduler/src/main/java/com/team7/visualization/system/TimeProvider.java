@@ -7,8 +7,12 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TimeProvider {
     private static long time;
+    private List<Timeline> labelTimelines;
 
     public TimeProvider() {
         time = 0;
@@ -20,6 +24,8 @@ public class TimeProvider {
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+
+        labelTimelines = new ArrayList<>();
     }
 
     public long getCurrentSec() {
@@ -39,5 +45,13 @@ public class TimeProvider {
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+
+        labelTimelines.add(timeline);
+    }
+
+    public  void stopTimerLabel() {
+        for (Timeline t : labelTimelines) {
+            t.stop();
+        }
     }
 }
