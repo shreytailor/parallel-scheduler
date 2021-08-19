@@ -64,25 +64,49 @@ public class SchedulerScreenController implements Initializable {
     private ImageView inputGraphDark;
     private final BorderPane inputGraphContainer = new BorderPane();
 
+    // Input Graph
+    private BufferedImage lightBufferedImage;
+    private BufferedImage darkBufferedImage;
+
+    private MutableGraph lightMutableGraph;
+    private MutableGraph darkMutableGraph;
+
+    private final int INPUT_GRAPH_MAX_HEIGHT = 650;
+    private final int INPUT_GRAPH_MAX_WIDTH = 500;
+    private final int INPUT_GRAPH_MIN_HEIGHT = 50;
+    private final int INPUT_GRAPH_MIN_WIDTH = 50;
+    private int inputGraphHeight;
+    private int inputGraphWidth;
+    private int unitAdjustmentValue = 20;
+    private double heightAdjustmentRatio; //ratio value that used to resize the input graph
+    private int heightAdjustmentValue;
+
     public SchedulerScreenController(Task[] tasks, Config config) {
         _config = config;
         _tasks = tasks;
 
         try (InputStream dot = new FileInputStream(_config.getInputName())) {
             // parse the dot file and generate an image
-            MutableGraph lg = new Parser().read(dot);
-            lg.graphAttrs().add(Color.TRANSPARENT.background());
-            MutableGraph dg = lg.copy();
-            dg.linkAttrs().add(Color.WHITE);
-            dg.nodeAttrs().add(Color.WHITE);
-            dg.nodeAttrs().add(Color.WHITE.font());
+            lightMutableGraph = new Parser().read(dot);
+            lightMutableGraph.graphAttrs().add(Color.TRANSPARENT.background());
+            darkMutableGraph = lightMutableGraph.copy();
+            darkMutableGraph.linkAttrs().add(Color.WHITE);
+            darkMutableGraph.nodeAttrs().add(Color.WHITE);
+            darkMutableGraph.nodeAttrs().add(Color.WHITE.font());
 
-            BufferedImage imBufferLight = Graphviz.fromGraph(lg).height(650).width(500).render(Format.SVG).toImage();
-            BufferedImage imBufferDark = Graphviz.fromGraph(dg).height(650).width(500).render(Format.SVG).toImage();
+
+            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).render(Format.SVG).toImage();
+            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).render(Format.SVG).toImage();
+
+            // finds a suitable adjustment height value for every zoom in/zoom out click
+            inputGraphHeight = lightBufferedImage.getHeight();
+            inputGraphWidth = lightBufferedImage.getWidth();
+            heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
+            heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
 
             // convert the image to javafx component
-            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(imBufferLight, null));
-            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(imBufferDark, null));
+            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
+            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
             inputGraphContainer.setCenter(inputGraphLight);
 
         } catch (FileNotFoundException e) {
@@ -246,6 +270,51 @@ public class SchedulerScreenController implements Initializable {
         _chartUpdaterTimeline.stop();
         ganttProvider.updateSchedule(_schedules.get(0));
         _timeProvider.stopTimerLabel();
+    }
+    @FXML
+    public void handleZoomOutIcon() {
+
+        // When the image size is smaller than the minimum width, return to save overhead
+        if (inputGraphHeight <= INPUT_GRAPH_MIN_HEIGHT || inputGraphWidth <= INPUT_GRAPH_MIN_WIDTH) {
+            return;
+        }
+
+        inputGraphHeight -= heightAdjustmentValue;
+        inputGraphWidth -= unitAdjustmentValue;
+
+        updateInputGraph(isLightMode,inputGraphHeight, inputGraphWidth);
+    }
+
+    @FXML
+    public void handleZoomInIcon() {
+
+        // When the image size is exceeding the minimum height, return to save overhead
+        if (inputGraphHeight >= INPUT_GRAPH_MAX_HEIGHT || inputGraphWidth >= INPUT_GRAPH_MAX_WIDTH) {
+            return;
+        }
+
+        inputGraphHeight += heightAdjustmentValue;
+        inputGraphWidth += unitAdjustmentValue;
+
+        updateInputGraph(isLightMode,inputGraphHeight, inputGraphWidth);
+    }
+
+    /***
+     * A helper method that updates the input graph after resizing
+     * @param isLightMode
+     * @param inputGraphHeight
+     * @param inputGraphWidth
+     */
+    private void updateInputGraph(boolean isLightMode, int inputGraphHeight, int inputGraphWidth){
+        if (isLightMode) {
+            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).height(inputGraphHeight).width(inputGraphWidth).render(Format.SVG).toImage();
+            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
+            inputGraphContainer.setCenter(inputGraphLight);
+        } else {
+            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).height(inputGraphHeight).width(inputGraphWidth).render(Format.SVG).toImage();
+            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
+            inputGraphContainer.setCenter(inputGraphDark);
+        }
     }
 }
 
