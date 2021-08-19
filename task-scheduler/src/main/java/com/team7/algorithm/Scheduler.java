@@ -21,6 +21,22 @@ public class Scheduler {
     protected Set<Schedule> visitedSchedules;
     protected Schedule sharedState;
 
+    /**
+     * Open state just means it's a state that is to be expanded
+     * @return number of open states
+     */
+    public int getInfoOpenStates() {
+        return scheduleQueue.size();
+    }
+
+    /**
+     * Closed state means it has been expanded and won't be looked at again
+     * @return number of closed states
+     */
+    public int getInfoClosedStates() {
+        return visitedSchedules.size();
+    }
+
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
         tasks = Preprocessor.getTopologicalOrder(g.getNodes());
