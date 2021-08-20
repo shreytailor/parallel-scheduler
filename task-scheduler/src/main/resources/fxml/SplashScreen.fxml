@@ -92,6 +92,16 @@
                               <Font size="20.0" />
                            </font>
                         </Label>
+                        <ImageView fx:id="statusIconLoading" fitHeight="29.0" fitWidth="29.0" layoutX="567.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" styleClass="status-icon-loading" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
+                           <image>
+                              <Image url="@../images/loading-light.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="statusIconTick" fitHeight="29.0" fitWidth="29.0" layoutX="577.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                           <image>
+                              <Image url="@../images/tick-light.png" />
+                           </image>
+                        </ImageView>
                      </children>
                      <styleClass>
                         <String fx:value="status-info-container" />

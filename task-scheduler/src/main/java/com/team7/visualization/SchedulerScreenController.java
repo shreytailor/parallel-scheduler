@@ -51,8 +51,12 @@ public class SchedulerScreenController implements Initializable {
     private final Image MOON_IMAGE = new Image("/images/moon.png");
     private final Image DARK_MIN_IMAGE = new Image("/images/minimise-dark.png");
     private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
+    private final Image DARK_LOAD_IMAGE = new Image("/images/loading-dark.png");
+    private final Image DARK_TICK_IMAGE = new Image("/images/tick-dark.png");
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
+    private final Image LIGHT_LOAD_IMAGE = new Image("/images/loading-light.png");
+    private final Image LIGHT_TICK_IMAGE = new Image("/images/tick-light.png");
     private final String LightCss = "/stylesheets/SplashLightMode.css";
     private final String DarkCss = "/stylesheets/SplashDarkMode.css";
     private boolean isLightMode = true;
@@ -111,16 +115,22 @@ public class SchedulerScreenController implements Initializable {
     private Label timerLabel;
 
     @FXML
-    public Button viewToggleButton;
+    private Button viewToggleButton;
 
     @FXML
-    public ImageView themeToggleIcon;
+    private ImageView themeToggleIcon;
 
     @FXML
-    public ImageView minimizeIcon;
+    private ImageView minimizeIcon;
 
     @FXML
-    public ImageView closeIcon;
+    private ImageView closeIcon;
+
+    @FXML
+    private ImageView statusIconLoading;
+
+    @FXML
+    private ImageView statusIconTick;
 
     @FXML
     public LineChart<String, Number> cpuUsageChart;
@@ -207,6 +217,8 @@ public class SchedulerScreenController implements Initializable {
             themeToggleIcon.setImage(SUN_IMAGE);
             closeIcon.setImage(DARK_CLOSE_IMAGE);
             minimizeIcon.setImage(DARK_MIN_IMAGE);
+            statusIconLoading.setImage(DARK_LOAD_IMAGE);
+            statusIconTick.setImage(DARK_TICK_IMAGE);
             inputGraphContainer.setCenter(inputGraphDark);
 
             sheets.remove(LightCss);
@@ -217,6 +229,8 @@ public class SchedulerScreenController implements Initializable {
             themeToggleIcon.setImage(MOON_IMAGE);
             closeIcon.setImage(LIGHT_CLOSE_IMAGE);
             minimizeIcon.setImage(LIGHT_MIN_IMAGE);
+            statusIconLoading.setImage(LIGHT_LOAD_IMAGE);
+            statusIconTick.setImage(LIGHT_TICK_IMAGE);
             inputGraphContainer.setCenter(inputGraphLight);
 
             sheets.remove(DarkCss);
