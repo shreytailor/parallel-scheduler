@@ -197,9 +197,6 @@ public class SchedulerScreenController implements Initializable {
         ganttProvider = new GanttProvider2(_tasks, _observedSchedule, _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
-        labelOpenedStates.setText("Op");
-        labelClosedStates.setText("Cl");
-
         EventHandler<ActionEvent> rerenderStatistics = event -> {
             ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
             ganttProvider.updateSchedule(scheduleUpdater.getObservedSchedule());
@@ -214,6 +211,7 @@ public class SchedulerScreenController implements Initializable {
         // For input graph
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
         inputGraphContainer.setVisible(false);
+        _timeProvider.registerTimeline(_chartUpdaterTimeline);
     }
 
     @FXML
