@@ -47,18 +47,28 @@ import java.util.ResourceBundle;
 
 public class SchedulerScreenController implements Initializable {
 
+    // Image Resources
     private final Image SUN_IMAGE = new Image("/images/sun.png");
     private final Image MOON_IMAGE = new Image("/images/moon.png");
+
     private final Image DARK_MIN_IMAGE = new Image("/images/minimise-dark.png");
     private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
     private final Image DARK_LOAD_IMAGE = new Image("/images/loading-dark.png");
     private final Image DARK_TICK_IMAGE = new Image("/images/tick-dark.png");
+    private final Image DARK_OUT_IMAGE = new Image("/images/zoom-out-dark.png");
+    private final Image DARK_IN_IMAGE = new Image("/images/zoom-in-dark.png");
+
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
     private final Image LIGHT_LOAD_IMAGE = new Image("/images/loading-light.png");
     private final Image LIGHT_TICK_IMAGE = new Image("/images/tick-light.png");
+    private final Image LIGHT_OUT_IMAGE = new Image("/images/zoom-out-light.png");
+    private final Image LIGHT_IN_IMAGE = new Image("/images/zoom-in-light.png");
+
+    // Style Sheets
     private final String LightCss = getClass().getResource("/stylesheets/SplashLightMode.css").toExternalForm();
     private final String DarkCss = getClass().getResource("/stylesheets/SplashDarkMode.css").toExternalForm();
+
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
 
@@ -71,6 +81,21 @@ public class SchedulerScreenController implements Initializable {
     private Scheduler scheduler;
     private Schedule _observedSchedule;
 
+    // Input Graph variables
+    private BufferedImage lightBufferedImage;
+    private BufferedImage darkBufferedImage;
+    private MutableGraph lightMutableGraph;
+    private MutableGraph darkMutableGraph;
+    private final int INPUT_GRAPH_MAX_HEIGHT = 650;
+    private final int INPUT_GRAPH_MAX_WIDTH = 500;
+    private final int INPUT_GRAPH_MIN_HEIGHT = 50;
+    private final int INPUT_GRAPH_MIN_WIDTH = 50;
+    private int inputGraphHeight;
+    private int inputGraphWidth;
+    private int unitAdjustmentValue = 20;
+    private double heightAdjustmentRatio; //ratio value that used to resize the input graph
+    private int heightAdjustmentValue;
+
     public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
         _config = config;
         _tasks = tasks;
@@ -78,19 +103,26 @@ public class SchedulerScreenController implements Initializable {
 
         try (InputStream dot = new FileInputStream(_config.getInputName())) {
             // parse the dot file and generate an image
-            MutableGraph lg = new Parser().read(dot);
-            lg.graphAttrs().add(Color.TRANSPARENT.background());
-            MutableGraph dg = lg.copy();
-            dg.linkAttrs().add(Color.WHITE);
-            dg.nodeAttrs().add(Color.WHITE);
-            dg.nodeAttrs().add(Color.WHITE.font());
+            lightMutableGraph = new Parser().read(dot);
+            lightMutableGraph.graphAttrs().add(Color.TRANSPARENT.background());
+            darkMutableGraph = lightMutableGraph.copy();
+            darkMutableGraph.linkAttrs().add(Color.WHITE);
+            darkMutableGraph.nodeAttrs().add(Color.WHITE);
+            darkMutableGraph.nodeAttrs().add(Color.WHITE.font());
 
-            BufferedImage imBufferLight = Graphviz.fromGraph(lg).height(650).width(500).render(Format.SVG).toImage();
-            BufferedImage imBufferDark = Graphviz.fromGraph(dg).height(650).width(500).render(Format.SVG).toImage();
+            //render an image into buffer
+            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).render(Format.SVG).toImage();
+            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).render(Format.SVG).toImage();
+
+            // finds a suitable adjustment height value for every zoom in/zoom out click
+            inputGraphHeight = lightBufferedImage.getHeight();
+            inputGraphWidth = lightBufferedImage.getWidth();
+            heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
+            heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
 
             // convert the image to javafx component
-            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(imBufferLight, null));
-            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(imBufferDark, null));
+            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
+            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
             inputGraphContainer.setCenter(inputGraphLight);
 
         } catch (FileNotFoundException e) {
@@ -125,6 +157,13 @@ public class SchedulerScreenController implements Initializable {
 
     @FXML
     private ImageView closeIcon;
+
+    @FXML
+    public ImageView zoomInIcon;
+
+    @FXML
+    public ImageView zoomOutIcon;
+
 
     @FXML
     private ImageView statusIconLoading;
@@ -218,29 +257,9 @@ public class SchedulerScreenController implements Initializable {
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
         if (isLightMode) {
-            themeToggleIcon.setImage(SUN_IMAGE);
-            closeIcon.setImage(DARK_CLOSE_IMAGE);
-            minimizeIcon.setImage(DARK_MIN_IMAGE);
-            statusIconLoading.setImage(DARK_LOAD_IMAGE);
-            statusIconTick.setImage(DARK_TICK_IMAGE);
-            inputGraphContainer.setCenter(inputGraphDark);
-
-            sheets.remove(LightCss);
-            sheets.add(DarkCss);
-
-            isLightMode = !isLightMode;
+            updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE, inputGraphDark, LightCss, DarkCss);
         } else {
-            themeToggleIcon.setImage(MOON_IMAGE);
-            closeIcon.setImage(LIGHT_CLOSE_IMAGE);
-            minimizeIcon.setImage(LIGHT_MIN_IMAGE);
-            statusIconLoading.setImage(LIGHT_LOAD_IMAGE);
-            statusIconTick.setImage(LIGHT_TICK_IMAGE);
-            inputGraphContainer.setCenter(inputGraphLight);
-
-            sheets.remove(DarkCss);
-            sheets.add(LightCss);
-
-            isLightMode = !isLightMode;
+            updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE, inputGraphLight, DarkCss, LightCss);
         }
     }
 
@@ -269,11 +288,86 @@ public class SchedulerScreenController implements Initializable {
         }
     }
 
+    @FXML
+    public void handleZoomOutIcon() {
+
+        // When the image size is smaller than the minimum width, return to save overhead
+        if (inputGraphHeight <= INPUT_GRAPH_MIN_HEIGHT || inputGraphWidth <= INPUT_GRAPH_MIN_WIDTH) {
+            return;
+        }
+
+        inputGraphHeight -= heightAdjustmentValue;
+        inputGraphWidth -= unitAdjustmentValue;
+
+        updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
+    }
+
+    @FXML
+    public void handleZoomInIcon() {
+
+        // When the image size is exceeding the minimum height, return to save overhead
+        if (inputGraphHeight >= INPUT_GRAPH_MAX_HEIGHT || inputGraphWidth >= INPUT_GRAPH_MAX_WIDTH) {
+            return;
+        }
+
+        inputGraphHeight += heightAdjustmentValue;
+        inputGraphWidth += unitAdjustmentValue;
+
+        updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
+    }
+
     public void stop() {
 
         ScheduleUpdater.getInstance().stop();
 //        _chartUpdaterTimeline.stop();
         ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
         _timeProvider.stopTimerLabel();
+    }
+
+    /***
+     * A helper method that updates the input graph after resizing
+     * @param isLightMode
+     * @param inputGraphHeight
+     * @param inputGraphWidth
+     */
+    private void updateInputGraph(boolean isLightMode, int inputGraphHeight, int inputGraphWidth) {
+        if (isLightMode) {
+            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).height(inputGraphHeight).width(inputGraphWidth).render(Format.SVG).toImage();
+            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
+            inputGraphContainer.setCenter(inputGraphLight);
+        } else {
+            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).height(inputGraphHeight).width(inputGraphWidth).render(Format.SVG).toImage();
+            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
+            inputGraphContainer.setCenter(inputGraphDark);
+        }
+    }
+
+    /***
+     * A helper method that updates the components and stylesheet after changing theme
+     * @param sheets
+     * @param in_image
+     * @param out_image
+     * @param planet_image
+     * @param close_image
+     * @param min_image
+     * @param inputGraph
+     * @param removingCss
+     * @param addingCss
+     */
+    private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image, Image close_image, Image min_image, ImageView inputGraph, String removingCss, String addingCss) {
+        zoomInIcon.setImage(in_image);
+        zoomOutIcon.setImage(out_image);
+        themeToggleIcon.setImage(planet_image);
+        closeIcon.setImage(close_image);
+        minimizeIcon.setImage(min_image);
+        inputGraphContainer.setCenter(inputGraph);
+
+        sheets.remove(removingCss);
+        sheets.add(addingCss);
+
+        isLightMode = !isLightMode;
+
+        // Updating the input graph, otherwise size will differ in two different themes
+        updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }
 }
