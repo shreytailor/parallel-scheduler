@@ -33,7 +33,7 @@ public class SchedulerTestCrawledExamples {
         for (File file : directory.listFiles()) {
             GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
 
-            boolean numProcessorsTwoOrFour = graphInfo.numberOfTargetProcessors == 2 || graphInfo.numberOfTargetProcessors == 4;
+            boolean numProcessorsTwoOrFour = graphInfo.numberOfTargetProcessors == 2 || graphInfo.numberOfTargetProcessors == 4|| graphInfo.numberOfTargetProcessors == 6;
             boolean numNodesLessThanTwenty = graphInfo.numberOfTasks<16;
 
             if(numProcessorsTwoOrFour && numNodesLessThanTwenty){
@@ -67,7 +67,7 @@ public class SchedulerTestCrawledExamples {
                 fail("ignore this case");
             }
             Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
-            assertTimeout(Duration.ofSeconds(30), ()->{
+            assertTimeout(Duration.ofSeconds(120), ()->{
                 Schedule result = scheduler.findOptimalSchedule();
                 assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
                 assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));

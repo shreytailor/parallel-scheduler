@@ -37,7 +37,7 @@ public class Scheduler {
         visitedSchedules = createVisitedScheduleSet();
     }
 
-    public static Queue<Schedule> createScheduleQueue() {
+    public Queue<Schedule> createScheduleQueue() {
         return new PriorityQueue<>((a, b) -> {
             int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
             if (n == 0) {
@@ -149,8 +149,22 @@ public class Scheduler {
             }
             equivalent.addAll(taskEquivalencesMap[t]);
 
+//            boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
+                if (earliestStartTime == 0 && t<s.getNormalisationIndex()) {
+                    continue;
+                }
+//                if (earliestStartTime == 0) {
+//                    if (t<s.getNormalisationIndex()) {
+//                        normalised = false;
+//                        continue;
+//                    } else if (normalised) {
+//                        continue;
+//                    } else {
+//                        normalised = true;
+//                    }
+//                }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
