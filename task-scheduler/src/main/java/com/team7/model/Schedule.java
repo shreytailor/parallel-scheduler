@@ -147,51 +147,7 @@ public class Schedule {
         if (this.getEstimatedFinishTime() != other.getEstimatedFinishTime() || this.getNumberOfTasks() != other.getNumberOfTasks()) {
             return false;
         }
-
-        Map<Byte, List> processorTasks = new HashMap<>();
-        for (int i=0;i<processorFirstTask.length;i++) {
-            if (processorFirstTask[i] != -1) {
-                List<Byte> l = new ArrayList<>();
-                l.add(processorFirstTask[i]);
-                for (byte j=0;j<taskProcessorMap.length;j++) {
-                    if (taskProcessorMap[j] == i) {
-                        l.add(j);
-                    }
-                }
-                l.sort(Comparator.comparingInt(a -> taskStartTimeMap[a]));
-                processorTasks.put(processorFirstTask[i], l);
-            }
-        }
-
-        Map<Byte, List> otherProcessorTasks = new HashMap<>();
-        for (int i=0;i<other.processorFirstTask.length;i++) {
-            if (other.processorFirstTask[i] != -1) {
-                List<Byte> l = new ArrayList<>();
-                l.add(other.processorFirstTask[i]);
-                for (byte j=0;j<other.taskProcessorMap.length;j++) {
-                    if (other.taskProcessorMap[j] == i) {
-                        l.add(j);
-                    }
-                }
-                l.sort(Comparator.comparingInt(a -> other.taskStartTimeMap[a]));
-                otherProcessorTasks.put(other.processorFirstTask[i], l);
-            }
-        }
-
-        for (Byte key : processorTasks.keySet()) {
-            List<Byte> l1 = processorTasks.get(key);
-            List<Byte> l2 = otherProcessorTasks.get(key);
-            if (!l1.equals(l2)) {
-                return false;
-            }
-            for (Byte b : l1) {
-                if (taskStartTimeMap[b] != other.taskStartTimeMap[b]) {
-                    return false;
-                }
-            }
-        }
-        return true;
-//        return Arrays.equals(taskProcessorMap,other.taskProcessorMap) && Arrays.equals(taskStartTimeMap ,other.taskStartTimeMap);
+        return Arrays.equals(taskProcessorMap,other.taskProcessorMap) && Arrays.equals(taskStartTimeMap ,other.taskStartTimeMap);
     }
 
     @Override

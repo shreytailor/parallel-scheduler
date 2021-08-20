@@ -98,6 +98,9 @@ public class ParallelScheduler extends Scheduler {
             equivalent.addAll(taskEquivalencesMap[t]);
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
+                if (earliestStartTime == 0 && t<s.getNormalisationIndex()) {
+                    continue;
+                }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
