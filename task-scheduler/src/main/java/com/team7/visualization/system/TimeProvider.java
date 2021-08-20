@@ -74,8 +74,7 @@ public class TimeProvider {
      * This method is used to stop the timer of the application. It pretty much stops the timelines
      * throughout the visualization, so that everything comes to a halt.
      */
-    public void stopTimerLabel() {
-
+    public void stopTimers() {
         // Go through all the timelines in the list, and stop them.
         for (Timeline timeline : _timelines) {
             timeline.stop();

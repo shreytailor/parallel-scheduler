@@ -266,9 +266,11 @@ public class SchedulerScreenController implements Initializable {
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
         if (isLightMode) {
-            updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE, inputGraphDark, LightCss, DarkCss);
+            updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE,
+                    DARK_LOAD_IMAGE, DARK_TICK_IMAGE, inputGraphDark, LightCss, DarkCss);
         } else {
-            updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE, inputGraphLight, DarkCss, LightCss);
+            updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE,
+                    LIGHT_LOAD_IMAGE, LIGHT_TICK_IMAGE, inputGraphLight, DarkCss, LightCss);
         }
     }
 
@@ -369,7 +371,7 @@ public class SchedulerScreenController implements Initializable {
 
     /***
      * A helper method that updates the components and stylesheet after changing theme
-     * @param sheets an ObsersvableList of all the stylesheets.
+     * @param sheets an ObservableList of all the stylesheets.
      * @param in_image Image for zooming-in symbol.
      * @param out_image Image for zooming-out symbol.
      * @param planet_image Image for toggling the colour scheme.
@@ -387,6 +389,8 @@ public class SchedulerScreenController implements Initializable {
         themeToggleIcon.setImage(planet_image);
         closeIcon.setImage(close_image);
         minimizeIcon.setImage(min_image);
+        statusIconLoading.setImage(load_image);
+        statusIconTick.setImage(tick_image);
         inputGraphContainer.setCenter(inputGraph);
 
         // Adding and removing the stylesheets from the ObservableList.
@@ -398,5 +402,16 @@ public class SchedulerScreenController implements Initializable {
 
         // Updating the input graph, otherwise size will differ in two different themes
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
+    }
+
+    /**
+     * This method is used for the final update of the visualization.
+     */
+    public void finalUpdate(Scheduler s) {
+        ganttProvider.updateSchedule(s.getSharedState());
+        labelClosedStates.setText(String.valueOf(s.getInfoClosedStates()));
+        labelOpenedStates.setText(String.valueOf(s.getInfoOpenStates()));
+        statusIconLoading.setVisible(false);
+        statusIconTick.setVisible(true);
     }
 }

@@ -6,6 +6,7 @@ import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -60,10 +61,9 @@ public class VisualizationDriver extends Application {
         }).start();
     }
 
-    /**
-     * This method is used to stop the controller of the application.
-     */
-    public static void finish() {
-        _controller.stop();
+    public static void updateScreen() {
+        Platform.runLater(() -> {
+            _controller.finalUpdate(_scheduler);
+        });
     }
 }
