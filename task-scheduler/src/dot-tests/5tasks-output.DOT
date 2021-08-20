@@ -1,7 +1,7 @@
 digraph test {
 	a	 [Weight=1,Start=0,Processor=1];
-	b	 [Weight=1,Start=3,Processor=1];
-	c	 [Weight=2,Start=1,Processor=1];
+	b	 [Weight=1,Start=1,Processor=1];
+	c	 [Weight=2,Start=2,Processor=1];
 	d	 [Weight=5,Start=4,Processor=1];
 	e	 [Weight=10,Start=9,Processor=1];
 	a -> b	 [Weight=3];

@@ -12,21 +12,22 @@ import java.util.List;
 
 public class TimeProvider {
     private static long time;
-    private List<Timeline> labelTimelines;
+    private Timeline _clockTimeline;
+    private List<Timeline> _timelines;
     private static TimeProvider provider;
 
     private TimeProvider() {
         time = 0;
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
+        _timelines = new ArrayList<>();
+
+        _clockTimeline = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 time += 100;
             }
         }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-
-        labelTimelines = new ArrayList<>();
+        _clockTimeline.setCycleCount(Timeline.INDEFINITE);
+        _clockTimeline.play();
     }
 
     public static TimeProvider getInstance() {
@@ -37,11 +38,11 @@ public class TimeProvider {
     }
 
     public long getCurrentSec() {
-        return time/1000;
+        return time / 1000;
     }
 
     public long getCurrentMilli() {
-        return time%1000;
+        return time % 1000;
     }
 
     public void registerLabel(Label timerLabel) {
@@ -53,13 +54,16 @@ public class TimeProvider {
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
-
-        labelTimelines.add(timeline);
+        _timelines.add(timeline);
     }
 
     public void stopTimerLabel() {
-        for (Timeline t : labelTimelines) {
-            t.stop();
+        for (Timeline timeline : _timelines) {
+            timeline.stop();
         }
+    }
+
+    public void registerTimeline(Timeline timeline) {
+        _timelines.add(timeline);
     }
 }

@@ -133,6 +133,12 @@ public class SchedulerScreenController implements Initializable {
     private ImageView statusIconTick;
 
     @FXML
+    private Label labelOpenedStates;
+
+    @FXML
+    private Label labelClosedStates;
+
+    @FXML
     public LineChart<String, Number> cpuUsageChart;
 
     @FXML
@@ -191,17 +197,17 @@ public class SchedulerScreenController implements Initializable {
         ganttProvider = new GanttProvider2(_tasks, _observedSchedule, _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
-//        scheduler.getTrigger().addListener((observable, oldVal, newVal) -> {
-//            Schedule s = scheduler.getCurrentBest();
-//            ganttProvider.updateSchedule(s);
-//        });
+        labelOpenedStates.setText("Op");
+        labelClosedStates.setText("Cl");
 
-        EventHandler<ActionEvent> remakeGraph = event -> {
-            ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
+        EventHandler<ActionEvent> rerenderStatistics = event -> {
+            ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
+            ganttProvider.updateSchedule(scheduleUpdater.getObservedSchedule());
+            labelOpenedStates.setText(String.valueOf(scheduleUpdater.getOpenedStates()));
+            labelClosedStates.setText(String.valueOf(scheduleUpdater.getClosedStates()));
         };
 
-
-        _chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), remakeGraph));
+        _chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), rerenderStatistics));
         _chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
         _chartUpdaterTimeline.play();
 

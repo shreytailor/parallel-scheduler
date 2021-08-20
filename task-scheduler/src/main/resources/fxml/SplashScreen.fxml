@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
@@ -151,7 +143,7 @@
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label fx:id="labelOpenedStates" layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -169,7 +161,7 @@
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label fx:id="labelClosedStates" layoutX="10.0" layoutY="10.0" styleClass="main-font-color" text="0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
                               <Font size="20.0" />
                            </font>

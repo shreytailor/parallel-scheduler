@@ -46,8 +46,6 @@ public class VisualizationDriver extends Application {
             Schedule schedule = scheduler.findOptimalSchedule();
             Entrypoint.writeScheduleOutputToFile(schedule);
         }).start();
-
-
     }
 
     public static void finish() {
