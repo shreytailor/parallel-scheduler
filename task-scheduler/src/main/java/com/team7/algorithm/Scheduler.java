@@ -25,7 +25,6 @@ public class Scheduler {
 
     /**
      * Open state just means it's a state that is to be expanded
-     * @return number of open states
      */
     public int getInfoOpenStates() {
         return scheduleQueue.size();

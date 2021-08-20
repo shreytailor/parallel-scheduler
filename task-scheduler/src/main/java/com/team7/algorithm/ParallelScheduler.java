@@ -27,6 +27,15 @@ public class ParallelScheduler extends Scheduler {
         this(g, numOfProcessors, 4);
     }
 
+    @Override
+    public int getInfoOpenStates(){
+        int numberOfOpenStates = 0;
+        for (IndependentWorker worker : workers) {
+            numberOfOpenStates += worker.getOpenStatesSize();
+        }
+        return numberOfOpenStates;
+    }
+
     /**
      * Generates an optimal schedule using an A* algorithm.
      *
@@ -71,6 +80,10 @@ public class ParallelScheduler extends Scheduler {
 
         public void addSchedule(Schedule s) {
             schedules.add(s);
+        }
+
+        public int getOpenStatesSize(){
+            return schedules.size();
         }
 
         @Override
