@@ -1,5 +1,16 @@
 # Shrey's Work Log
 
+## 18/08/2021
+- Added onto the implementation of the existing `ScheduleUpdater` class to make it more efficient to show the visualization, and refactored some of the code that deals with linking the algorithm, middleware, and visualization together.
+
+---
+
+## 17/08/2021
+- Implemented some functionality of the `ScheduleUpdater` class, which acts as a middleware between the algorithm implementation and the Graphical User Interface.
+- This class tries to poll the data from the `Scheduler` class, and pass that onto the visualization every `x` milliseconds, which then triggers the graph update.
+
+---
+
 ## 10/08/2021
 - Currently, the visualization is only useful to check the final schedule once the algorithm has completed its execution. However, for the next iteration of the application, the GUI would be required to show the schedule as the algorithm runs (so we can see the *best schedule yet*.)
 - Before starting the implementation, it was important to research on how this part of the application would be architectured so I used the following resources to learn more about JavaFX. 

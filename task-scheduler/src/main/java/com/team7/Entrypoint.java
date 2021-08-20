@@ -27,7 +27,7 @@ public class Entrypoint {
             graph = DOTParser.read(config.getInputName());
 
             // Processing the input graph by using the scheduler, and storing the texoutput.
-            Scheduler scheduler = new Scheduler(graph, config.getNumOfProcessors());
+            Scheduler scheduler = new ParallelScheduler(graph, config.getNumOfProcessors(), config.getNumOfThreads());
             ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
             scheduleUpdater.setScheduler(scheduler);
 
@@ -41,6 +41,9 @@ public class Entrypoint {
                 long finish = System.currentTimeMillis();
                 System.out.println(finish-start);
                 Entrypoint.writeScheduleOutputToFile(schedule);
+            }
+            if (scheduler.getClass() == ParallelScheduler.class) {
+                ((ParallelScheduler) scheduler).shutdown();
             }
 
         } catch (CommandLineException | FileNotFoundException exception) {

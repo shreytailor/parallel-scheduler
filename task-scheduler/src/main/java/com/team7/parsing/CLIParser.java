@@ -47,7 +47,7 @@ public class CLIParser {
             // Error handling for the processors, in the case where user doesn't specify a number.
             String numOfCores = commandLine.getOptionValue("processors");
             if (numOfCores != null) {
-                config.setNumOfCores(Integer.parseInt(numOfCores));
+                config.setNumOfThreads(Integer.parseInt(numOfCores));
             }
 
             String outputName = commandLine.getOptionValue("output");
