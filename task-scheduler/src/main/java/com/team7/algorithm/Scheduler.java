@@ -1,5 +1,6 @@
 package com.team7.algorithm;
 
+import com.team7.Entrypoint;
 import com.team7.model.Edge;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -103,14 +104,14 @@ public class Scheduler {
             // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
             // otherwise, go to the next step.
             if (s.getNumberOfTasks() == tasks.length) {
-                TimeProvider.getInstance().stopTimerLabel();
+                Entrypoint.stopTimerLabel();
                 return s;
             }
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
             expandSchedule(s);
 
         }
-        TimeProvider.getInstance().stopTimerLabel();
+        Entrypoint.stopTimerLabel();
         return feasibleSchedule;
     }
 

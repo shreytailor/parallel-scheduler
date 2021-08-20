@@ -1,5 +1,6 @@
 package com.team7.algorithm;
 
+import com.team7.Entrypoint;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
@@ -50,6 +51,7 @@ public class ParallelScheduler extends Scheduler {
         while (scheduleQueue.size() > 0 && scheduleQueue.size() < numThreads * 10) {
             Schedule schedule = scheduleQueue.poll();
             if (schedule.getNumberOfTasks() == tasks.length) {
+                Entrypoint.stopTimerLabel();
                 return schedule;
             }
             expandSchedule(schedule);
@@ -67,7 +69,7 @@ public class ParallelScheduler extends Scheduler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+        Entrypoint.stopTimerLabel();
         return bestSchedule;
     }
 
@@ -100,6 +102,7 @@ public class ParallelScheduler extends Scheduler {
                     // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
                     // otherwise, go to the next step.
                     if (s.getNumberOfTasks() == tasks.length && s.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime()) {
+                        Entrypoint.stopTimerLabel();
                         bestSchedule = s;
                     }
                 }
