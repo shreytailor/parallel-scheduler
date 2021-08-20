@@ -7,28 +7,31 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
-import org.omg.DynamicAny._DynFixedStub;
 
+/**
+ * This class is a middleware between the Scheduler (actual algorithm), and the Graphical User
+ * Interface. It is used to get the data from the algorithm and supply it to the visualization as
+ * the execution occurs.
+ */
 public class ScheduleUpdater {
-    private static ScheduleUpdater _scheduleUpdater;
-    private Scheduler _scheduler;
-    private Schedule _observedSchedule;
     private int _openedStates;
     private int _closedStates;
+    private Scheduler _scheduler;
+    private Schedule _observedSchedule;
     private Timeline _scheduleUpdaterTimeline;
+    private static ScheduleUpdater _scheduleUpdater;
 
-    public void setScheduler(Scheduler scheduler) {
-        _scheduler = scheduler;
+    /**
+     * This lone constructor is called by the getInstance() method to create the Singleton instance.
+     */
+    private ScheduleUpdater() {
+
     }
 
-    public Scheduler getScheduler() {
-        return _scheduler;
-    }
-
-    public Schedule getObservedSchedule() {
-        return _observedSchedule;
-    }
-
+    /**
+     * This class is a Singleton, so this method is used to get the singleton instance.
+     * @return ScheduleUpdater the singleton instance of this class.
+     */
     public static ScheduleUpdater getInstance () {
         if (_scheduleUpdater == null) {
             _scheduleUpdater = new ScheduleUpdater();
@@ -37,6 +40,9 @@ public class ScheduleUpdater {
         return _scheduleUpdater;
     }
 
+    /**
+     * This method starts to retrieve the information from the scheduler.
+     */
     public void start() {
         EventHandler<ActionEvent> scheduleUpdater = event -> {
             _observedSchedule = _scheduler.getSharedState();
@@ -49,26 +55,44 @@ public class ScheduleUpdater {
         _scheduleUpdaterTimeline.play();
     }
 
+    /**
+     * This method starts the process of retrieving the information from the scheduler.
+     */
     public void stop() {
         _observedSchedule = _scheduler.getSharedState();
         _scheduleUpdaterTimeline.stop();
     }
 
+    /**
+     * This method is used to set the scheduler, from which this class retrieves its information.
+     * @param scheduler the scheduler on which the algorithm is running.
+     */
+    public void setScheduler(Scheduler scheduler) {
+        _scheduler = scheduler;
+    }
+
+    /**
+     * Getter method for the amount of opened states.
+     * @return Integer for the number of opened states.
+     */
     public int getOpenedStates() {
-        System.out.println("Opened:" + _openedStates);
         return _openedStates;
     }
 
+    /**
+     * Getter method for the amount of closed states.
+     * @return Integer for the number of closed states.
+     */
     public int getClosedStates() {
         System.out.println("Closed:" + _closedStates);
         return _closedStates;
     }
 
-    public void setOpenedStates(int openedStates) {
-        _openedStates = openedStates;
-    }
-
-    public void setClosedStates(int closedStates) {
-        _closedStates = closedStates;
+    /**
+     * This method is used to get the current latest schedule from the scheduler.
+     * @return Schedule this is the latest schedule from the scheduler.
+     */
+    public Schedule getObservedSchedule() {
+        return _observedSchedule;
     }
 }
