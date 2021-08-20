@@ -45,6 +45,8 @@ public class ScheduleUpdater {
      */
     public void start() {
         EventHandler<ActionEvent> scheduleUpdater = event -> {
+
+            // Fetch the latest statistics / information from the scheduler.
             _observedSchedule = _scheduler.getSharedState();
             _openedStates = _scheduler.getInfoOpenStates();
             _closedStates = _scheduler.getInfoClosedStates();
@@ -84,7 +86,6 @@ public class ScheduleUpdater {
      * @return Integer for the number of closed states.
      */
     public int getClosedStates() {
-        System.out.println("Closed:" + _closedStates);
         return _closedStates;
     }
 
