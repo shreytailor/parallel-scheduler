@@ -56,10 +56,12 @@ public class Entrypoint {
     public static void writeScheduleOutputToFile(Schedule schedule){
         DOTParser.write(config.getOutputName(),schedule, graph);
     }
+
     public static void stopTimerLabel(){
         if (config != null) {
             if (config.isVisualised()) {
-                TimeProvider.getInstance().stopTimerLabel();
+                TimeProvider.getInstance().stopTimers();
+                VisualizationDriver.updateScreen();
             }
         }else{
             if (!IS_TEST_MODE) {
@@ -72,15 +74,6 @@ public class Entrypoint {
         new Thread(() -> {
             VisualizationDriver.show(tasks, config, scheduler);
         }).start();
-    }
-
-    private static void stopVisualisationTime() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                VisualizationDriver.finish();
-            }
-        });
     }
 
 }

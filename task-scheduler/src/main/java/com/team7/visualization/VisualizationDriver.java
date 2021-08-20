@@ -6,6 +6,7 @@ import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -48,7 +49,9 @@ public class VisualizationDriver extends Application {
         }).start();
     }
 
-    public static void finish() {
-        _controller.stop();
+    public static void updateScreen() {
+        Platform.runLater(() -> {
+            _controller.finalUpdate(scheduler);
+        });
     }
 }

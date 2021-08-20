@@ -269,11 +269,9 @@ public class SchedulerScreenController implements Initializable {
         }
     }
 
-    public void stop() {
-
-        ScheduleUpdater.getInstance().stop();
-//        _chartUpdaterTimeline.stop();
-        ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
-        _timeProvider.stopTimerLabel();
+    public void finalUpdate(Scheduler s) {
+        ganttProvider.updateSchedule(s.getSharedState());
+        labelClosedStates.setText(String.valueOf(s.getInfoClosedStates()));
+        labelOpenedStates.setText(String.valueOf(s.getInfoOpenStates()));
     }
 }

@@ -57,7 +57,7 @@ public class TimeProvider {
         _timelines.add(timeline);
     }
 
-    public void stopTimerLabel() {
+    public void stopTimers() {
         for (Timeline timeline : _timelines) {
             timeline.stop();
         }
