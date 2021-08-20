@@ -4,7 +4,6 @@ import com.team7.algorithm.Scheduler;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
-import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.ganttchart.GanttProvider2;
 import com.team7.visualization.realtime.ScheduleUpdater;
 import com.team7.visualization.system.CPUUtilizationProvider;
@@ -18,7 +17,6 @@ import guru.nidi.graphviz.parse.Parser;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -36,7 +34,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,12 +42,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * This is the JavaFX controller class for the main screen of the Visualization.
+ */
 public class SchedulerScreenController implements Initializable {
 
     // Image Resources
     private final Image SUN_IMAGE = new Image("/images/sun.png");
     private final Image MOON_IMAGE = new Image("/images/moon.png");
 
+    // Image Resources - Dark Mode
     private final Image DARK_MIN_IMAGE = new Image("/images/minimise-dark.png");
     private final Image DARK_CLOSE_IMAGE = new Image("/images/close-dark.png");
     private final Image DARK_LOAD_IMAGE = new Image("/images/loading-dark.png");
@@ -58,6 +59,7 @@ public class SchedulerScreenController implements Initializable {
     private final Image DARK_OUT_IMAGE = new Image("/images/zoom-out-dark.png");
     private final Image DARK_IN_IMAGE = new Image("/images/zoom-in-dark.png");
 
+    // Image Resources - Light Mode
     private final Image LIGHT_MIN_IMAGE = new Image("/images/minimise-light.png");
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
     private final Image LIGHT_LOAD_IMAGE = new Image("/images/loading-light.png");
@@ -71,10 +73,8 @@ public class SchedulerScreenController implements Initializable {
 
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
-
     private final Config _config;
     private final Task[] _tasks;
-
     private ImageView inputGraphLight;
     private ImageView inputGraphDark;
     private final BorderPane inputGraphContainer = new BorderPane();
@@ -93,46 +93,7 @@ public class SchedulerScreenController implements Initializable {
     private int inputGraphHeight;
     private int inputGraphWidth;
     private int unitAdjustmentValue = 20;
-    private double heightAdjustmentRatio; //ratio value that used to resize the input graph
     private int heightAdjustmentValue;
-
-    public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
-        _config = config;
-        _tasks = tasks;
-        scheduler = s;
-
-        try (InputStream dot = new FileInputStream(_config.getInputName())) {
-            // parse the dot file and generate an image
-            lightMutableGraph = new Parser().read(dot);
-            lightMutableGraph.graphAttrs().add(Color.TRANSPARENT.background());
-            darkMutableGraph = lightMutableGraph.copy();
-            darkMutableGraph.linkAttrs().add(Color.WHITE);
-            darkMutableGraph.nodeAttrs().add(Color.WHITE);
-            darkMutableGraph.nodeAttrs().add(Color.WHITE.font());
-
-            //render an image into buffer
-            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).render(Format.SVG).toImage();
-            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).render(Format.SVG).toImage();
-
-            // finds a suitable adjustment height value for every zoom in/zoom out click
-            inputGraphHeight = lightBufferedImage.getHeight();
-            inputGraphWidth = lightBufferedImage.getWidth();
-            heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
-            heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
-
-            // convert the image to javafx component
-            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
-            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
-            inputGraphContainer.setCenter(inputGraphLight);
-
-        } catch (FileNotFoundException e) {
-            viewToggleButton.setDisable(true);
-            viewToggleButton.setTooltip(new Tooltip("Input file not found"));
-        } catch (IOException e) {
-            viewToggleButton.setDisable(true);
-            viewToggleButton.setTooltip(new Tooltip("Some problems occurred in the input file"));
-        }
-    }
 
     @FXML
     private GridPane utilGraphContainer;
@@ -164,7 +125,6 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     public ImageView zoomOutIcon;
 
-
     @FXML
     private ImageView statusIconLoading;
 
@@ -183,11 +143,58 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     public LineChart<String, Number> ramUsageChart;
 
+    // Objects used for the live visualization.
     private CPUUtilizationProvider cpuUtilizationProvider;
     private RAMUtilizationProvider ramUtilizationProvider;
     private GanttProvider2 ganttProvider;
     private Timeline _chartUpdaterTimeline;
     private TimeProvider _timeProvider;
+
+    // Ratio value used to resize the input graph.
+    private double heightAdjustmentRatio;
+
+    public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
+        _config = config;
+        _tasks = tasks;
+        scheduler = s;
+
+        try (InputStream dot = new FileInputStream(_config.getInputName())) {
+
+            // Parse the dot file and generate an image
+            lightMutableGraph = new Parser().read(dot);
+            lightMutableGraph.graphAttrs().add(Color.TRANSPARENT.background());
+            darkMutableGraph = lightMutableGraph.copy();
+            darkMutableGraph.linkAttrs().add(Color.WHITE);
+            darkMutableGraph.nodeAttrs().add(Color.WHITE);
+            darkMutableGraph.nodeAttrs().add(Color.WHITE.font());
+
+            // Render an image into buffer
+            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).render(Format.SVG).toImage();
+            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).render(Format.SVG).toImage();
+
+            // Finds a suitable adjustment height value for every zoom in/zoom out click
+            inputGraphHeight = lightBufferedImage.getHeight();
+            inputGraphWidth = lightBufferedImage.getWidth();
+            heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
+            heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
+
+            // Convert the image to javafx component
+            inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
+            inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
+            inputGraphContainer.setCenter(inputGraphLight);
+
+        } catch (FileNotFoundException e) {
+
+            // If the find is not found.
+            viewToggleButton.setDisable(true);
+            viewToggleButton.setTooltip(new Tooltip("Input file not found"));
+        } catch (IOException e) {
+
+            // Problems in the input file.
+            viewToggleButton.setDisable(true);
+            viewToggleButton.setTooltip(new Tooltip("Some problems occurred in the input file"));
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -229,15 +236,14 @@ public class SchedulerScreenController implements Initializable {
         ramYAxis.setLabel("Usage (%)");
         ramYAxis.setUpperBound(ramUtilizationProvider.getUpperBound());
 
-        _observedSchedule = ScheduleUpdater.getInstance().getObservedSchedule();
-//        _schedules = ScheduleUpdater.getInstance().getObservableList();
-        ScheduleUpdater.getInstance().start();
-
+        // Beginning the live visualization by getting the ScheduleUpdater singleton instance.
+        ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
+        _observedSchedule = scheduleUpdater.getObservedSchedule();
+        scheduleUpdater.start();
         ganttProvider = new GanttProvider2(_tasks, _observedSchedule, _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
         EventHandler<ActionEvent> rerenderStatistics = event -> {
-            ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
             ganttProvider.updateSchedule(scheduleUpdater.getObservedSchedule());
             labelOpenedStates.setText(String.valueOf(scheduleUpdater.getOpenedStates()));
             labelClosedStates.setText(String.valueOf(scheduleUpdater.getClosedStates()));
@@ -247,12 +253,15 @@ public class SchedulerScreenController implements Initializable {
         _chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
         _chartUpdaterTimeline.play();
 
-        // For input graph
+        // Adding the container of the input graph to the screen.
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
         inputGraphContainer.setVisible(false);
         _timeProvider.registerTimeline(_chartUpdaterTimeline);
     }
 
+    /**
+     * This handler method is used for the logic to toggle between the light and dark mode.
+     */
     @FXML
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
@@ -263,18 +272,27 @@ public class SchedulerScreenController implements Initializable {
         }
     }
 
+    /**
+     * This handler method is used to define the logic for minimizing the application.
+     */
     @FXML
     private void handleMinimize() {
         Stage stage = (Stage) minimizeIcon.getScene().getWindow();
         stage.setIconified(true);
     }
 
+    /**
+     * This handler method is used to define the logic of closing the application.
+     */
     @FXML
     private void handleClose() {
         Platform.exit();
         System.exit(0);
     }
 
+    /**
+     * This handler method is used to define the logic of toggling between system and input charts.
+     */
     @FXML
     public void handleViewToggleButton() {
         utilGraphContainer.setVisible(!isShowingUtilization);
@@ -288,6 +306,9 @@ public class SchedulerScreenController implements Initializable {
         }
     }
 
+    /**
+     * This handler method is used to define the logic of zooming out of the input graph.
+     */
     @FXML
     public void handleZoomOutIcon() {
 
@@ -302,6 +323,9 @@ public class SchedulerScreenController implements Initializable {
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }
 
+    /**
+     * This handler method is used to define the logic of zooming into the input graph.
+     */
     @FXML
     public void handleZoomInIcon() {
 
@@ -316,45 +340,48 @@ public class SchedulerScreenController implements Initializable {
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }
 
+    /**
+     * This method is used to halt all the live movements of the screen.
+     */
     public void stop() {
-
         ScheduleUpdater.getInstance().stop();
-//        _chartUpdaterTimeline.stop();
         ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
         _timeProvider.stopTimerLabel();
     }
 
     /***
      * A helper method that updates the input graph after resizing
-     * @param isLightMode
-     * @param inputGraphHeight
-     * @param inputGraphWidth
+     * @param isLightMode boolean for whether the light mode is turned on.
+     * @param inputGraphHeight the height of the input graph.
+     * @param inputGraphWidth the width of the input graph.
      */
     private void updateInputGraph(boolean isLightMode, int inputGraphHeight, int inputGraphWidth) {
         if (isLightMode) {
             lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).height(inputGraphHeight).width(inputGraphWidth).render(Format.SVG).toImage();
             inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
-            inputGraphContainer.setCenter(inputGraphLight);
         } else {
             darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).height(inputGraphHeight).width(inputGraphWidth).render(Format.SVG).toImage();
             inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
-            inputGraphContainer.setCenter(inputGraphDark);
         }
+
+        inputGraphContainer.setCenter(isLightMode ? inputGraphLight : inputGraphDark);
     }
 
     /***
      * A helper method that updates the components and stylesheet after changing theme
-     * @param sheets
-     * @param in_image
-     * @param out_image
-     * @param planet_image
-     * @param close_image
-     * @param min_image
-     * @param inputGraph
-     * @param removingCss
-     * @param addingCss
+     * @param sheets an ObsersvableList of all the stylesheets.
+     * @param in_image Image for zooming-in symbol.
+     * @param out_image Image for zooming-out symbol.
+     * @param planet_image Image for toggling the colour scheme.
+     * @param close_image Image for closing the window.
+     * @param min_image Image for minimizing the window.
+     * @param inputGraph ImageView for the input graph.
+     * @param removingCss String for the stylesheets being removed.
+     * @param addingCss String for the stylesheets being added,
      */
     private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image, Image close_image, Image min_image, ImageView inputGraph, String removingCss, String addingCss) {
+
+        // Setting all the images from the parameters.
         zoomInIcon.setImage(in_image);
         zoomOutIcon.setImage(out_image);
         themeToggleIcon.setImage(planet_image);
@@ -362,9 +389,11 @@ public class SchedulerScreenController implements Initializable {
         minimizeIcon.setImage(min_image);
         inputGraphContainer.setCenter(inputGraph);
 
+        // Adding and removing the stylesheets from the ObservableList.
         sheets.remove(removingCss);
         sheets.add(addingCss);
 
+        // Toggling the mode.
         isLightMode = !isLightMode;
 
         // Updating the input graph, otherwise size will differ in two different themes
