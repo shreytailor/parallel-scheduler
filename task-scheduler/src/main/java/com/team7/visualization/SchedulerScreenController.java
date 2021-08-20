@@ -57,19 +57,19 @@ public class SchedulerScreenController implements Initializable {
     private final Image LIGHT_CLOSE_IMAGE = new Image("/images/close-light.png");
     private final Image LIGHT_LOAD_IMAGE = new Image("/images/loading-light.png");
     private final Image LIGHT_TICK_IMAGE = new Image("/images/tick-light.png");
-    private final String LightCss = "/stylesheets/SplashLightMode.css";
-    private final String DarkCss = "/stylesheets/SplashDarkMode.css";
+    private final String LightCss = getClass().getResource("/stylesheets/SplashLightMode.css").toExternalForm();
+    private final String DarkCss = getClass().getResource("/stylesheets/SplashDarkMode.css").toExternalForm();
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
 
     private final Config _config;
     private final Task[] _tasks;
-    private ObservableList<Schedule> _schedules;
 
     private ImageView inputGraphLight;
     private ImageView inputGraphDark;
     private final BorderPane inputGraphContainer = new BorderPane();
     private Scheduler scheduler;
+    private Schedule _observedSchedule;
 
     public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
         _config = config;
@@ -184,10 +184,11 @@ public class SchedulerScreenController implements Initializable {
         ramYAxis.setLabel("Usage (%)");
         ramYAxis.setUpperBound(ramUtilizationProvider.getUpperBound());
 
-        _schedules = ScheduleUpdater.getInstance().getObservableList();
+        _observedSchedule = ScheduleUpdater.getInstance().getObservedSchedule();
+//        _schedules = ScheduleUpdater.getInstance().getObservableList();
         ScheduleUpdater.getInstance().start();
 
-        ganttProvider = new GanttProvider2(_tasks, _schedules.get(0), _config);
+        ganttProvider = new GanttProvider2(_tasks, _observedSchedule, _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
 //        scheduler.getTrigger().addListener((observable, oldVal, newVal) -> {
@@ -196,7 +197,7 @@ public class SchedulerScreenController implements Initializable {
 //        });
 
         EventHandler<ActionEvent> remakeGraph = event -> {
-            ganttProvider.updateSchedule(_schedules.get(0));
+            ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
         };
 
 
@@ -212,7 +213,6 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
-
         if (isLightMode) {
             themeToggleIcon.setImage(SUN_IMAGE);
             closeIcon.setImage(DARK_CLOSE_IMAGE);
@@ -269,7 +269,7 @@ public class SchedulerScreenController implements Initializable {
 
         ScheduleUpdater.getInstance().stop();
 //        _chartUpdaterTimeline.stop();
-        ganttProvider.updateSchedule(_schedules.get(0));
+        ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
         _timeProvider.stopTimerLabel();
     }
 }
