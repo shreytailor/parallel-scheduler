@@ -16,6 +16,10 @@ public class ParallelScheduler extends Scheduler {
 
     public ParallelScheduler(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
+
+        if(numThreads == 0){
+            throw new RuntimeException("number of threads not specified");
+        }
         executorService = Executors.newFixedThreadPool(numThreads);
         workers = new IndependentWorker[numThreads];
         for (int i = 0; i < numThreads; i++) {
@@ -118,7 +122,9 @@ public class ParallelScheduler extends Scheduler {
                     continue;
                 }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
-
+                if (newSchedule.getNumberOfTasks() > sharedState.getNumberOfTasks()) {
+                    sharedState = newSchedule;
+                }
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&

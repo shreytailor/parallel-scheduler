@@ -43,9 +43,9 @@ public class Entrypoint {
                 System.out.println(finish-start);
                 Entrypoint.writeScheduleOutputToFile(schedule);
             }
-            if (scheduler.getClass() == ParallelScheduler.class) {
-                ((ParallelScheduler) scheduler).shutdown();
-            }
+//            if (scheduler.getClass() == ParallelScheduler.class) {
+//                ((ParallelScheduler) scheduler).shutdown();
+//            }
 
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
