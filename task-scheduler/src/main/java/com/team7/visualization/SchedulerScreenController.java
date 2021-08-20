@@ -1,9 +1,11 @@
 package com.team7.visualization;
 
+import com.team7.algorithm.Scheduler;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
 import com.team7.visualization.ganttchart.GanttProvider;
+import com.team7.visualization.ganttchart.GanttProvider2;
 import com.team7.visualization.realtime.ScheduleUpdater;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
@@ -63,10 +65,12 @@ public class SchedulerScreenController implements Initializable {
     private ImageView inputGraphLight;
     private ImageView inputGraphDark;
     private final BorderPane inputGraphContainer = new BorderPane();
+    private Scheduler scheduler;
 
-    public SchedulerScreenController(Task[] tasks, Config config) {
+    public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
         _config = config;
         _tasks = tasks;
+        scheduler = s;
 
         try (InputStream dot = new FileInputStream(_config.getInputName())) {
             // parse the dot file and generate an image
@@ -126,7 +130,7 @@ public class SchedulerScreenController implements Initializable {
 
     private CPUUtilizationProvider cpuUtilizationProvider;
     private RAMUtilizationProvider ramUtilizationProvider;
-    private GanttProvider ganttProvider;
+    private GanttProvider2 ganttProvider;
     private Timeline _chartUpdaterTimeline;
     private TimeProvider _timeProvider;
 
@@ -149,7 +153,7 @@ public class SchedulerScreenController implements Initializable {
      * This method is used to set up the providers, required for live CPU/RAM usage visualization.
      */
     private void setupSystemCharts() {
-        _timeProvider = new TimeProvider();
+        _timeProvider = TimeProvider.getInstance();
         _timeProvider.registerLabel(timerLabel);
 
         cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", _timeProvider);
@@ -173,11 +177,18 @@ public class SchedulerScreenController implements Initializable {
         _schedules = ScheduleUpdater.getInstance().getObservableList();
         ScheduleUpdater.getInstance().start();
 
-        ganttProvider = new GanttProvider(_tasks, _schedules.get(0), _config);
+        ganttProvider = new GanttProvider2(_tasks, _schedules.get(0), _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
+
+//        scheduler.getTrigger().addListener((observable, oldVal, newVal) -> {
+//            Schedule s = scheduler.getCurrentBest();
+//            ganttProvider.updateSchedule(s);
+//        });
+
         EventHandler<ActionEvent> remakeGraph = event -> {
             ganttProvider.updateSchedule(_schedules.get(0));
         };
+
 
         _chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), remakeGraph));
         _chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -243,7 +254,7 @@ public class SchedulerScreenController implements Initializable {
     public void stop() {
 
         ScheduleUpdater.getInstance().stop();
-        _chartUpdaterTimeline.stop();
+//        _chartUpdaterTimeline.stop();
         ganttProvider.updateSchedule(_schedules.get(0));
         _timeProvider.stopTimerLabel();
     }

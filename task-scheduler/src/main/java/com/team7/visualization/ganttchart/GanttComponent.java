@@ -128,7 +128,10 @@ public class GanttComponent<X,Y> extends XYChart<X,Y> {
                         label.setFont(new Font(16));
                         label.setStyle("-fx-text-fill: #ffffff");
                         label.setPadding(new Insets(ellipse.getHeight() / 1.3, 0, 0, ellipse.getWidth() / 1.1));
-                        region.getChildren().add(label);
+                        BorderPane bp = new BorderPane(label);
+                        bp.setPrefWidth(250);
+                        bp.setMinWidth(250);
+                        region.getChildren().add(bp);
 
                         block.setLayoutX(x);
                         block.setLayoutY(y);

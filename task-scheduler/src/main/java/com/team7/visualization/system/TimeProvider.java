@@ -13,8 +13,9 @@ import java.util.List;
 public class TimeProvider {
     private static long time;
     private List<Timeline> labelTimelines;
+    private static TimeProvider provider;
 
-    public TimeProvider() {
+    private TimeProvider() {
         time = 0;
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
             @Override
@@ -26,6 +27,13 @@ public class TimeProvider {
         timeline.play();
 
         labelTimelines = new ArrayList<>();
+    }
+
+    public static TimeProvider getInstance() {
+        if (provider == null) {
+            provider = new TimeProvider();
+        }
+        return provider;
     }
 
     public long getCurrentSec() {
@@ -49,7 +57,7 @@ public class TimeProvider {
         labelTimelines.add(timeline);
     }
 
-    public  void stopTimerLabel() {
+    public void stopTimerLabel() {
         for (Timeline t : labelTimelines) {
             t.stop();
         }

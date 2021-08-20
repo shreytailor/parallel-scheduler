@@ -4,6 +4,8 @@ import com.team7.model.Edge;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
+import com.team7.visualization.system.TimeProvider;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import java.util.*;
 
@@ -90,6 +92,7 @@ public class Scheduler {
      * @return an optimal schedule
      */
     public Schedule findOptimalSchedule() {
+
         findFeasibleSchedule();
 
         // (1) OPEN priority queue, sorted by f
@@ -101,12 +104,14 @@ public class Scheduler {
             // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
             // otherwise, go to the next step.
             if (s.getNumberOfTasks() == tasks.length) {
+                TimeProvider.getInstance().stopTimerLabel();
                 return s;
             }
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
             expandSchedule(s);
-        }
 
+        }
+        TimeProvider.getInstance().stopTimerLabel();
         return feasibleSchedule;
     }
 
@@ -178,7 +183,6 @@ public class Scheduler {
 
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
                 sharedState = newSchedule;
-                System.out.println("Copied");
 
                 // Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
@@ -415,4 +419,7 @@ public class Scheduler {
         return DRTa - DRTb;
     }
 
+    public Schedule getSharedState() {
+        return sharedState;
+    }
 }

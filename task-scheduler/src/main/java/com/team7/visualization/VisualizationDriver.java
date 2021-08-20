@@ -1,5 +1,6 @@
 package com.team7.visualization;
 
+import com.team7.algorithm.Scheduler;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
@@ -14,10 +15,12 @@ public class VisualizationDriver extends Application {
     private static Config _config;
     private static Task[] _tasks;
     private static SchedulerScreenController _controller;
+    private static Scheduler scheduler;
 
-    public static void show(Task[] tasks, Config config) {
+    public static void show(Task[] tasks, Config config, Scheduler s) {
         _config = config;
         _tasks = tasks;
+        scheduler = s;
         launch();
     }
 
@@ -25,7 +28,7 @@ public class VisualizationDriver extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SplashScreen.fxml"));
 
-        _controller = new SchedulerScreenController(_tasks, _config);
+        _controller = new SchedulerScreenController(_tasks, _config, scheduler);
         loader.setController(_controller);
 
         Parent root = loader.load();
@@ -37,6 +40,12 @@ public class VisualizationDriver extends Application {
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
+
+        new Thread(() -> {
+            Schedule schedule = scheduler.findOptimalSchedule();
+        }).start();
+
+
     }
 
     public static void finish() {

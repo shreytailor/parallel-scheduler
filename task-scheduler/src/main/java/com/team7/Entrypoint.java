@@ -23,33 +23,36 @@ public class Entrypoint {
             Config config  = CLIParser.parseCommandLineArguments(args);
             Graph graph = DOTParser.read(config.getInputName());
 
-            // Processing the input graph by using the scheduler, and storing the output.
-            Scheduler scheduler = new ParallelSchedulerShareEachLoop(graph, config.getNumOfProcessors());
+            // Processing the input graph by using the scheduler, and storing the texoutput.
+            Scheduler scheduler = new Scheduler(graph, config.getNumOfProcessors());
             ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
             scheduleUpdater.setScheduler(scheduler);
 
             if (config.isVisualised()) {
-                beginVisualisation(scheduler.getTasks(), config);
+                beginVisualisation(scheduler.getTasks(), config, scheduler);
             }
 
-            long start = System.currentTimeMillis();
-            Schedule schedule = scheduler.findOptimalSchedule();
-            long finish = System.currentTimeMillis();
+//            long start = System.currentTimeMillis();
+//            System.out.println("Start");
+//            Schedule schedule = scheduler.findOptimalSchedule();
+//            System.out.println("Finished");
+//            long finish = System.currentTimeMillis();
 
-            stopVisualisationTime();
-            System.out.println(finish-start);
-
-            DOTParser.write(config.getOutputName(),schedule, graph);
-
+//            if (config.isVisualised()) {
+//                stopVisualisationTime();
+//            }
+//            System.out.println(finish-start);
+//
+//            DOTParser.write(config.getOutputName(),schedule, graph);
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);
         }
     }
 
-    private static void beginVisualisation(Task[] tasks, Config config) {
+    private static void beginVisualisation(Task[] tasks, Config config, Scheduler scheduler) {
         new Thread(() -> {
-            VisualizationDriver.show(tasks, config);
+            VisualizationDriver.show(tasks, config, scheduler);
         }).start();
     }
 
