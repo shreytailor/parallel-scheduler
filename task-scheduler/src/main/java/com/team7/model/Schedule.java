@@ -1,7 +1,5 @@
 package com.team7.model;
 
-import sun.awt.image.ImageWatched;
-
 import java.util.*;
 
 public class Schedule {

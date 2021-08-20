@@ -25,7 +25,7 @@ public class SchedulerTestLectureExamples {
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() {
         List<DynamicTest> tests = new ArrayList<>();
-
+        Entrypoint.IS_TEST_MODE = true;
         File directory = new File(DOT_TEST_FILE_DIRECTORY);
         for (File file : directory.listFiles()) {
             if (shouldBeSkipped(file)) {

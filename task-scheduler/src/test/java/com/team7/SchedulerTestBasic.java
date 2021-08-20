@@ -21,6 +21,7 @@ public class SchedulerTestBasic {
      */
     @Test
     void AStar_singleProcessor3TasksNoDependency() {
+        Entrypoint.IS_TEST_MODE = true;
 //        Given
         Task task1 = new Task("a", 3);
         Task task2 = new Task("b", 4);
@@ -43,6 +44,7 @@ public class SchedulerTestBasic {
      */
     @Test
     void AStar_singleProcessor3Tasks() {
+        Entrypoint.IS_TEST_MODE = true;
 //        Given
         Task task1 = new Task("a", 3);
         Task task2 = new Task("b", 4);

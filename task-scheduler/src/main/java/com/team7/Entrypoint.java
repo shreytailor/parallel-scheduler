@@ -18,6 +18,7 @@ import javafx.application.Platform;
 import java.io.FileNotFoundException;
 
 public class Entrypoint {
+    public static boolean IS_TEST_MODE = false;
     public static Config config;
     public static Graph graph;
     public static void main(String[] args) {
@@ -61,7 +62,9 @@ public class Entrypoint {
                 TimeProvider.getInstance().stopTimerLabel();
             }
         }else{
-            throw new RuntimeException("Config should have been initialised");
+            if (!IS_TEST_MODE) {
+                throw new RuntimeException("Config should have been initialised");
+            }
         }
     }
 

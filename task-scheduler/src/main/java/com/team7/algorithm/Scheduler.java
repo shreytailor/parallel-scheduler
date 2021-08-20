@@ -22,7 +22,7 @@ public class Scheduler {
     protected int totalComputationTime = 0;
     protected Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
-
+    protected Schedule sharedState;
     /**
      * Open state just means it's a state that is to be expanded
      */

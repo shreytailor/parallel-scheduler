@@ -26,7 +26,7 @@ public class SchedulerTestCrawledExamples {
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() {
         List<DynamicTest> tests = new ArrayList<>();
-
+        Entrypoint.IS_TEST_MODE = true;
 
         //only test ones that allocates to 2, 4 processors, and has less than 20 nodes
         File directory = new File(DOT_TEST_FILE_DIRECTORY);
