@@ -48,15 +48,6 @@ public class SchedulerTestCrawledExamples {
         return tests;
     }
 
-    //@Test
-    void testOneFile(){
-        String fileName = DOT_TEST_FILE_DIRECTORY+"/Join_Nodes_10_CCR_10.02_WeightType_Random#1_Homogeneous-2.dot";
-        File file = new File(fileName);
-        GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
-
-        testAStarWithDotFile(file,graphInfo);
-    }
-
     private void testAStarWithDotFile(File file, GraphInfoUtil.GraphInfo graphInfo) {
         // given
         try {

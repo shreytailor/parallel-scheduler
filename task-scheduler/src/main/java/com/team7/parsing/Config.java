@@ -9,9 +9,9 @@ public class Config {
     private int numOfProcessors;
 
     /*
-        This is the number of cores which are used for running the scheduling algorithm.
+        This is the number of thread which are used for running the parallel scheduling algorithm.
      */
-    private int numOfCores;
+    private int numOfThreads;
 
     private boolean isVisualised;
     private String outputName;
@@ -24,9 +24,9 @@ public class Config {
         this(1,1, false,"","");
     }
 
-    public Config(int numOfProcessors, int numOfCores,  boolean isVisualised, String outputName, String inputName) {
+    public Config(int numOfProcessors, int numOfThreads, boolean isVisualised, String outputName, String inputName) {
         this.numOfProcessors = numOfProcessors;
-        this.numOfCores = numOfCores;
+        this.numOfThreads = numOfThreads;
         this.isVisualised = isVisualised;
         this.outputName = outputName;
         this.inputName = inputName;
@@ -38,7 +38,7 @@ public class Config {
         if (o == null || getClass() != o.getClass()) return false;
         Config config = (Config) o;
         return numOfProcessors == config.numOfProcessors &&
-                numOfCores == config.numOfCores &&
+                numOfThreads == config.numOfThreads &&
                 isVisualised == config.isVisualised &&
                 Objects.equals(outputName, config.outputName) &&
                 Objects.equals(inputName, config.inputName);
@@ -46,15 +46,15 @@ public class Config {
 
     @Override
     public int hashCode() {
-        return Objects.hash(numOfProcessors, numOfCores, isVisualised, outputName, inputName);
+        return Objects.hash(numOfProcessors, numOfThreads, isVisualised, outputName, inputName);
     }
 
-    public int getNumOfCores() {
-        return numOfCores;
+    public int getNumOfThreads() {
+        return numOfThreads;
     }
 
-    public void setNumOfCores(int numOfCores) {
-        this.numOfCores = numOfCores;
+    public void setNumOfThreads(int numOfThreads) {
+        this.numOfThreads = numOfThreads;
     }
 
     public int getNumOfProcessors() {
@@ -92,7 +92,7 @@ public class Config {
     public String toString() {
         return "Config {" +
                 "numOfProcessors=" + numOfProcessors +
-                ", numOfCores=" + numOfCores +
+                ", numOfCores=" + numOfThreads +
                 ", isVisualized=" + isVisualised +
                 ", outputName=" + outputName +
                 ", inputName=" + inputName;

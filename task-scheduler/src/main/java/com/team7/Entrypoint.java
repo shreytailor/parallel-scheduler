@@ -22,7 +22,7 @@ public class Entrypoint {
             Graph graph = DOTParser.read(config.getInputName());
 
             // Processing the input graph by using the scheduler, and storing the output.
-            Scheduler scheduler = new ParallelScheduler(graph, config.getNumOfProcessors(), config.getNumOfCores());
+            Scheduler scheduler = new ParallelScheduler(graph, config.getNumOfProcessors(), config.getNumOfThreads());
             long start = System.currentTimeMillis();
             Schedule schedule = scheduler.findOptimalSchedule();
             long finish = System.currentTimeMillis();

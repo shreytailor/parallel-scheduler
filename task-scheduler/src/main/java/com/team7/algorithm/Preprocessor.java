@@ -6,13 +6,41 @@ import com.team7.model.Task;
 import java.util.*;
 
 public class Preprocessor {
+
+    public static Task[] getTopologicalOrder(List<Task> tasks) {
+        Task[] result = new Task[tasks.size()];
+        Map<Task,Integer> taskRequirementsMap = new HashMap<>();
+        Queue<Task> beginnable = new LinkedList<>();
+        for (Task t : tasks) {
+            taskRequirementsMap.put(t,t.getIngoingEdges().size());
+            if (t.getIngoingEdges().size() == 0) {
+                beginnable.add(t);
+            }
+        }
+        int index=0;
+        while (beginnable.size() > 0) {
+            Task t = beginnable.poll();
+            result[index] = t;
+            index++;
+            for (Edge e : t.getOutgoingEdges()) {
+                taskRequirementsMap.compute(e.getHead(), (k,v)-> {
+                    v--;
+                    if (v==0) {
+                        beginnable.add(k);
+                    }
+                    return v;
+                });
+            }
+        }
+        return result;
+    }
     /**
      * Static Level: Static level of a node is its bottom level without counting edge costs.
      * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node.
      *
      * @param tasks
      */
-    public static int[] calculateTaskStaticLevels(Task[] tasks) {
+    public static int[] calculateTaskBottomLevelsWithoutEdgeCosts(Task[] tasks) {
         int[] taskStaticLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
@@ -59,7 +87,7 @@ public class Preprocessor {
      *
      * @param tasks
      */
-    public static int[] calculateTaskTopLevelsWithoutEdgeCost(Task[] tasks) {
+    public static int[] calculateTaskTopLevelsWithoutEdgeCosts(Task[] tasks) {
         int[] taskTopLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
@@ -93,33 +121,6 @@ public class Preprocessor {
         return taskRequirementsMap;
     }
 
-    public static Task[] getTopologicalOrder(List<Task> tasks) {
-        Task[] result = new Task[tasks.size()];
-        Map<Task,Integer> taskRequirementsMap = new HashMap<>();
-        Queue<Task> beginnable = new LinkedList<>();
-        for (Task t : tasks) {
-            taskRequirementsMap.put(t,t.getIngoingEdges().size());
-            if (t.getIngoingEdges().size() == 0) {
-                beginnable.add(t);
-            }
-        }
-        int index=0;
-        while (beginnable.size() > 0) {
-            Task t = beginnable.poll();
-            result[index] = t;
-            index++;
-            for (Edge e : t.getOutgoingEdges()) {
-                taskRequirementsMap.compute(e.getHead(), (k,v)-> {
-                    v--;
-                    if (v==0) {
-                        beginnable.add(k);
-                    }
-                    return v;
-                });
-            }
-        }
-        return result;
-    }
 
     public static List[] calculateEquivalentTasks(Task[] tasks) {
         List<Task>[] taskEquivalences = new List[tasks.length];
