@@ -1,6 +1,7 @@
 package com.team7;
 
-import com.team7.algorithm.ParallelSchedulerShareEachLoop;
+import com.team7.algorithm.ParallelScheduler;
+import com.team7.algorithm.ParallelSchedulerDeprecated;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulerTestLectureExamples {
     public static final String DOT_TEST_FILE_DIRECTORY = "src/lecture-dot-tests";
-    public static final int NUM_PROCESSORS = 2;
+    public static final int NUM_PROCESSORS = 4;
 
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() {
@@ -46,7 +47,7 @@ public class SchedulerTestLectureExamples {
             Graph g = DOTParser.read(file.toString());
             // when
 
-            Scheduler scheduler = new ParallelSchedulerShareEachLoop(g, NUM_PROCESSORS);
+            Scheduler scheduler = new ParallelScheduler(g, NUM_PROCESSORS,4);
             Schedule result = scheduler.findOptimalSchedule();
 
             // then

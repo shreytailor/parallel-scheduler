@@ -2,37 +2,49 @@ package com.team7.algorithm;
 
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
-import java.util.Arrays;
-import java.util.List;
+import com.team7.model.Task;
+
+import java.util.*;
 import java.util.concurrent.*;
 
-public class ParallelSchedulerShareEachLoop extends Scheduler{
+public class ParallelSchedulerDeprecated extends Scheduler {
+    ExecutorService executor;
+    ExpansionWorker[] workers;
     private int numThreads;
 
-    public ParallelSchedulerShareEachLoop(Graph g, int numOfProcessors, int numThreads) {
+    public ParallelSchedulerDeprecated(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
+        scheduleQueue = new PriorityBlockingQueue<>(11, (a, b) -> {
+            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
+            if (n == 0) {
+                return b.getNumberOfTasks() - a.getNumberOfTasks();
+            }
+            return n;
+        });
         this.numThreads = numThreads;
+        executor = Executors.newFixedThreadPool(numThreads);
+        workers = new ExpansionWorker[numThreads];
     }
 
-    public ParallelSchedulerShareEachLoop(Graph g, int numOfProcessors) {
-        super(g, numOfProcessors);
-        this.numThreads = 4;
-    }
+
+//    public ParallelSchedulerDeprecated(Graph g, int numOfProcessors) {
+//        this(g,numOfProcessors,4);
+//    }
 
     private class ExpansionWorker implements Callable<Schedule> {
         private Schedule s;
 
-        public ExpansionWorker(Schedule s){
+        public ExpansionWorker(Schedule s) {
             this.s = s;
         }
+
         /**
          * Computes a result, or throws an exception if unable to do so.
          *
          * @return computed result
-         * @throws Exception if unable to compute a result
          */
         @Override
-        public Schedule call() throws Exception {
+        public Schedule call() {
             if (s == null || s.getNumberOfTasks() == tasks.length) {
                 return s;
             }
@@ -41,6 +53,9 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
         }
     }
 
+    public synchronized Schedule poll(){
+        return scheduleQueue.poll();
+    }
     /**
      * Generates an optimal schedule using an A* algorithm.
      *
@@ -48,55 +63,51 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
      */
     public Schedule findOptimalSchedule() {
         findFeasibleSchedule();
-
         // (1) OPEN priority queue, sorted by f
         generateInitialSchedules();
-
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-        ExpansionWorker[] workers = new ExpansionWorker[numThreads];
 
         while (scheduleQueue.size() != 0) {
             for (int i = 0; i < numThreads; i++) {
                 workers[i] = new ExpansionWorker(scheduleQueue.poll());
             }
 
-            List<Future<Schedule>> results = null;
+            List<Future<Schedule>> results;
             try {
                 results = executor.invokeAll(Arrays.asList(workers));
                 Schedule bestSchedule = null;
                 for (Future<Schedule> result : results) {
                     Schedule schedule = result.get();
-                    if(schedule != null){
-                        if (bestSchedule==null) {
-                            bestSchedule=schedule;
-                        } else if (schedule.getEstimatedFinishTime()<bestSchedule.getEstimatedFinishTime()){
-                            bestSchedule=schedule;
-                        }
-
-                        sharedState = schedule;
+                    if (schedule != null &&
+                            (bestSchedule == null || schedule.getEstimatedFinishTime() < bestSchedule.getEstimatedFinishTime())) {
+                        bestSchedule = schedule;
                     }
                 }
-
-                if (bestSchedule!=null) {
+                if (bestSchedule != null) {
                     return bestSchedule;
                 }
-
-            } catch (InterruptedException | ExecutionException exception) {
-                exception.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         }
-
-        executor.shutdown();
         return feasibleSchedule;
     }
 
+
     /**
      * IMPORTANT: access to treeset had to be synchronized, otherwise NPE
+     *
      * @param s
      */
     public void expandSchedule(Schedule s) {
         //Expanding the schedule s, and insert them into the scheduleQueue
+        Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
+            if (equivalent.contains(tasks[t])) {
+                continue;
+            }
+            equivalent.addAll(taskEquivalencesMap[t]);
             boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
@@ -107,9 +118,9 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                     normalised = true;
                 }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
-                sharedState = newSchedule;
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
@@ -122,10 +133,13 @@ public class ParallelSchedulerShareEachLoop extends Scheduler{
                 }
             }
         }
-
-        synchronized (Scheduler.class){
+//        synchronized (Scheduler.class) {
+        synchronized (this) {
             visitedSchedules.add(s);
         }
     }
 
+    public void shutdown() {
+        executor.shutdownNow();
+    }
 }

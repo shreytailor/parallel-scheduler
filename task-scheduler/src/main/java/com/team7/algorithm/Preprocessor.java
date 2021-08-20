@@ -6,13 +6,41 @@ import com.team7.model.Task;
 import java.util.*;
 
 public class Preprocessor {
+
+    public static Task[] getTopologicalOrder(List<Task> tasks) {
+        Task[] result = new Task[tasks.size()];
+        Map<Task,Integer> taskRequirementsMap = new HashMap<>();
+        Queue<Task> beginnable = new LinkedList<>();
+        for (Task t : tasks) {
+            taskRequirementsMap.put(t,t.getIngoingEdges().size());
+            if (t.getIngoingEdges().size() == 0) {
+                beginnable.add(t);
+            }
+        }
+        int index=0;
+        while (beginnable.size() > 0) {
+            Task t = beginnable.poll();
+            result[index] = t;
+            index++;
+            for (Edge e : t.getOutgoingEdges()) {
+                taskRequirementsMap.compute(e.getHead(), (k,v)-> {
+                    v--;
+                    if (v==0) {
+                        beginnable.add(k);
+                    }
+                    return v;
+                });
+            }
+        }
+        return result;
+    }
     /**
      * Static Level: Static level of a node is its bottom level without counting edge costs.
      * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node.
      *
      * @param tasks
      */
-    public static int[] calculateTaskStaticLevels(Task[] tasks) {
+    public static int[] calculateTaskBottomLevelsWithoutEdgeCosts(Task[] tasks) {
         int[] taskStaticLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
@@ -59,7 +87,7 @@ public class Preprocessor {
      *
      * @param tasks
      */
-    public static int[] calculateTaskTopLevels(Task[] tasks) {
+    public static int[] calculateTaskTopLevelsWithoutEdgeCosts(Task[] tasks) {
         int[] taskTopLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
             Task task = tasks[i];
@@ -71,7 +99,7 @@ public class Preprocessor {
                     Task t = taskQueue.poll();
                     for (Edge e : t.getOutgoingEdges()) {
                         int neighbour = e.getHead().getUniqueID();
-                        taskTopLevelMap[neighbour] = Math.max(taskTopLevelMap[neighbour], taskTopLevelMap[t.getUniqueID()] + t.getWeight() + e.getWeight());
+                        taskTopLevelMap[neighbour] = Math.max(taskTopLevelMap[neighbour], taskTopLevelMap[t.getUniqueID()] + t.getWeight());
                         taskQueue.add(tasks[neighbour]);
                     }
                 }
@@ -93,48 +121,23 @@ public class Preprocessor {
         return taskRequirementsMap;
     }
 
-    public static Task[] getTopologicalOrder(List<Task> tasks) {
-        Task[] result = new Task[tasks.size()];
-        Map<Task,Integer> taskRequirementsMap = new HashMap<>();
-        Queue<Task> beginnable = new LinkedList<>();
-        for (Task t : tasks) {
-            taskRequirementsMap.put(t,t.getIngoingEdges().size());
-            if (t.getIngoingEdges().size() == 0) {
-                beginnable.add(t);
-            }
-        }
-        int index=0;
-        while (beginnable.size() > 0) {
-            Task t = beginnable.poll();
-            result[index] = t;
-            index++;
-            for (Edge e : t.getOutgoingEdges()) {
-                taskRequirementsMap.compute(e.getHead(), (k,v)-> {
-                    v--;
-                    if (v==0) {
-                        beginnable.add(k);
-                    }
-                    return v;
-                });
-            }
-        }
-        return result;
-    }
 
-    //Currently not in use
     public static List[] calculateEquivalentTasks(Task[] tasks) {
         List<Task>[] taskEquivalences = new List[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
-            List<Task> equivalent = new LinkedList<>();
             Task task1 = tasks[i];
+            if (taskEquivalences[task1.getUniqueID()] != null) {
+                continue;
+            }
+            List<Task> equivalent = new LinkedList<>();
             equivalent.add(task1);
             taskEquivalences[task1.getUniqueID()] = equivalent;
 
             for (int j = i + 1; j < tasks.length; j++) {
-                if (taskEquivalences[j] != null) {
+                Task task2 = tasks[j];
+                if (taskEquivalences[task2.getUniqueID()] != null) {
                     continue;
                 }
-                Task task2 = tasks[j];
                 boolean equal = true;
                 if (task1.getWeight() == task2.getWeight() &&
                         task1.getOutgoingEdges().size() == task2.getOutgoingEdges().size() &&
@@ -144,10 +147,16 @@ public class Preprocessor {
                     task1Out.sort(Comparator.comparingInt(a -> a.getHead().getUniqueID()));
                     task2Out.sort(Comparator.comparingInt(a -> a.getHead().getUniqueID()));
                     for (int k = 0; k < task1Out.size(); k++) {
-                        if (task1Out.get(k).getHead().getUniqueID() != task2Out.get(k).getHead().getUniqueID()) {
+                        Edge edge1 = task1Out.get(k);
+                        Edge edge2 = task2Out.get(k);
+                        if (edge1.getWeight() != edge2.getWeight() || edge1.getHead().getUniqueID() != edge2.getHead().getUniqueID()) {
                             equal = false;
                             break;
                         }
+                    }
+
+                    if (!equal) {
+                        break;
                     }
 
                     List<Edge> task1In = task1.getIngoingEdges();
@@ -155,7 +164,9 @@ public class Preprocessor {
                     task1In.sort(Comparator.comparingInt(a -> a.getTail().getUniqueID()));
                     task2In.sort(Comparator.comparingInt(a -> a.getTail().getUniqueID()));
                     for (int k = 0; k < task1In.size(); k++) {
-                        if (task1In.get(k).getTail().getUniqueID() != task2In.get(k).getTail().getUniqueID()) {
+                        Edge edge1 = task1In.get(k);
+                        Edge edge2 = task2In.get(k);
+                        if (edge1.getWeight() != edge2.getWeight() || edge1.getTail().getUniqueID() != edge2.getTail().getUniqueID()) {
                             equal = false;
                             break;
                         }
@@ -164,7 +175,6 @@ public class Preprocessor {
                     equal = false;
                 }
                 if (equal) {
-                    System.out.println(task1.getName() + " is equivalent to " + task2.getName());
                     equivalent.add(task2);
                     taskEquivalences[task2.getUniqueID()] = equivalent;
                 }

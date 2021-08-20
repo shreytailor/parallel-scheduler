@@ -1,6 +1,7 @@
 package com.team7;
 
-import com.team7.algorithm.ParallelSchedulerShareEachLoop;
+
+import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.Scheduler;
 import com.team7.exceptions.CommandLineException;
 import com.team7.model.Graph;
@@ -23,13 +24,10 @@ public class Entrypoint {
             Graph graph = DOTParser.read(config.getInputName());
 
             // Processing the input graph by using the scheduler, and storing the output.
-            Scheduler scheduler = new ParallelSchedulerShareEachLoop(graph, config.getNumOfProcessors());
+
+            Scheduler scheduler = new ParallelScheduler(graph, config.getNumOfProcessors(), config.getNumOfThreads());
             ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
             scheduleUpdater.setScheduler(scheduler);
-
-            if (config.isVisualised()) {
-                beginVisualisation(scheduler.getTasks(), config);
-            }
 
             long start = System.currentTimeMillis();
             Schedule schedule = scheduler.findOptimalSchedule();
@@ -37,9 +35,15 @@ public class Entrypoint {
 
             stopVisualisationTime();
             System.out.println(finish-start);
-
             DOTParser.write(config.getOutputName(),schedule, graph);
 
+            // Showing the visualization, if requested by the user.
+            if (config.isVisualised()) {
+                beginVisualisation(scheduler.getTasks() ,schedule, config);
+            }
+            if (scheduler.getClass() == ParallelScheduler.class) {
+                ((ParallelScheduler) scheduler).shutdown();
+            }
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
             System.exit(1);

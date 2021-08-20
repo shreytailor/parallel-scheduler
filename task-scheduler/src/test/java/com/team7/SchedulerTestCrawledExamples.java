@@ -1,6 +1,6 @@
 package com.team7;
 
-import com.team7.algorithm.ParallelSchedulerShareEachLoop;
+import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -8,6 +8,7 @@ import com.team7.parsing.DOTParser;
 import com.team7.testutil.GraphInfoUtil;
 import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
@@ -32,8 +33,8 @@ public class SchedulerTestCrawledExamples {
         for (File file : directory.listFiles()) {
             GraphInfoUtil.GraphInfo graphInfo = GraphInfoUtil.getGraphInfo(file.toString());
 
-            boolean numProcessorsTwoOrFour = graphInfo.numberOfTargetProcessors == 2 || graphInfo.numberOfTargetProcessors == 4;
-            boolean numNodesLessThanTwenty = graphInfo.numberOfTasks<20;
+            boolean numProcessorsTwoOrFour = graphInfo.numberOfTargetProcessors == 2 || graphInfo.numberOfTargetProcessors == 4|| graphInfo.numberOfTargetProcessors == 6;
+            boolean numNodesLessThanTwenty = graphInfo.numberOfTasks<16;
 
             if(numProcessorsTwoOrFour && numNodesLessThanTwenty){
                 tests.add(
@@ -41,10 +42,8 @@ public class SchedulerTestCrawledExamples {
                                 file.getName(),
                                 () -> testAStarWithDotFile(file, graphInfo)
                         ));
-
             }
         }
-
 
         return tests;
     }
@@ -58,8 +57,9 @@ public class SchedulerTestCrawledExamples {
             if(graphInfo.numberOfTargetProcessors == 0){
                 fail("ignore this case");
             }
+
             Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
-            assertTimeout(Duration.ofSeconds(5), ()->{
+            assertTimeout(Duration.ofSeconds(120), ()->{
                 Schedule result = scheduler.findOptimalSchedule();
                 assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));
                 assertTrue(TaskSchedulingConstraintsChecker.isPrecedenceConstraintMet(result, g.getEdges()));
@@ -67,14 +67,9 @@ public class SchedulerTestCrawledExamples {
             });
             // then
 
-
         } catch (IOException e) {
             e.printStackTrace();
             fail();
         }
     }
-
-
-
-
 }
