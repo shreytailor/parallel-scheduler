@@ -104,6 +104,7 @@ public class Scheduler {
             // otherwise, go to the next step.
             if (s.getNumberOfTasks() == tasks.length) {
                 Entrypoint.stopTimerLabel();
+                sharedState = s;
                 return s;
             }
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
@@ -111,6 +112,7 @@ public class Scheduler {
 
         }
         Entrypoint.stopTimerLabel();
+        sharedState = feasibleSchedule;
         return feasibleSchedule;
     }
 
@@ -119,7 +121,7 @@ public class Scheduler {
      *
      * @return a valid schedule
      */
-    public Schedule findFeasibleSchedule() {
+    protected Schedule findFeasibleSchedule() {
         Schedule schedule =
                 new Schedule(tasks.length, processors, taskRequirementsMap.clone());
         Queue<Task> tasksToSchedule = new PriorityQueue<>((a, b) -> taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()]);
@@ -162,7 +164,7 @@ public class Scheduler {
      *
      * @param s
      */
-    public void expandSchedule(Schedule s) {
+    protected void expandSchedule(Schedule s) {
         Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
             if (equivalent.contains(tasks[t])) {
