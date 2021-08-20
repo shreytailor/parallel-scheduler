@@ -69,6 +69,7 @@ public class ParallelScheduler extends Scheduler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        
         Entrypoint.stopTimerLabel();
         sharedState = bestSchedule;
         return bestSchedule;

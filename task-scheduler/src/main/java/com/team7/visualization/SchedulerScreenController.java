@@ -342,15 +342,6 @@ public class SchedulerScreenController implements Initializable {
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }
 
-    /**
-     * This method is used to halt all the live movements of the screen.
-     */
-    public void stop() {
-        ScheduleUpdater.getInstance().stop();
-        ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
-        _timeProvider.stopTimerLabel();
-    }
-
     /***
      * A helper method that updates the input graph after resizing
      * @param isLightMode boolean for whether the light mode is turned on.
@@ -381,7 +372,7 @@ public class SchedulerScreenController implements Initializable {
      * @param removingCss String for the stylesheets being removed.
      * @param addingCss String for the stylesheets being added,
      */
-    private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image, Image close_image, Image min_image, ImageView inputGraph, String removingCss, String addingCss) {
+    private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image, Image close_image, Image min_image, Image load_image, Image tick_image, ImageView inputGraph, String removingCss, String addingCss) {
 
         // Setting all the images from the parameters.
         zoomInIcon.setImage(in_image);
