@@ -1,5 +1,6 @@
 package com.team7.visualization;
 
+import com.team7.Entrypoint;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
@@ -43,6 +44,7 @@ public class VisualizationDriver extends Application {
 
         new Thread(() -> {
             Schedule schedule = scheduler.findOptimalSchedule();
+            Entrypoint.writeScheduleOutputToFile(schedule);
         }).start();
 
 

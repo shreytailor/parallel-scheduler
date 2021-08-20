@@ -212,7 +212,7 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
-        
+
         if (isLightMode) {
             themeToggleIcon.setImage(SUN_IMAGE);
             closeIcon.setImage(DARK_CLOSE_IMAGE);
@@ -273,4 +273,3 @@ public class SchedulerScreenController implements Initializable {
         _timeProvider.stopTimerLabel();
     }
 }
-

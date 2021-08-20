@@ -1,5 +1,6 @@
 package com.team7.algorithm;
 
+import com.team7.Entrypoint;
 import com.team7.model.Edge;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -12,9 +13,9 @@ import java.util.*;
 public class Scheduler {
     protected int processors;
     protected Task[] tasks;
-    protected int[] taskTopLevelMap;
+    protected int[] taskTopLevelWithoutEdgeCostsMap;
     protected int[] taskBottomLevelMap;
-    protected int[] taskStaticLevelMap;
+    protected int[] taskBottomLevelsWithoutEdgeCostsMap;
     protected byte[] taskRequirementsMap;
     protected List[] taskEquivalencesMap;
     protected Schedule feasibleSchedule;
@@ -22,7 +23,6 @@ public class Scheduler {
     protected Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
     protected Schedule sharedState;
-
     /**
      * Open state just means it's a state that is to be expanded
      */
@@ -47,15 +47,15 @@ public class Scheduler {
             totalComputationTime += t.getWeight();
         }
         taskRequirementsMap = Preprocessor.calculateRequirements(tasks);
-        taskTopLevelMap = Preprocessor.calculateTaskTopLevels(tasks);
+        taskTopLevelWithoutEdgeCostsMap = Preprocessor.calculateTaskTopLevelsWithoutEdgeCosts(tasks);
         taskBottomLevelMap = Preprocessor.calculateTaskBottomLevels(tasks);
-        taskStaticLevelMap = Preprocessor.calculateTaskStaticLevels(tasks);
+        taskBottomLevelsWithoutEdgeCostsMap = Preprocessor.calculateTaskBottomLevelsWithoutEdgeCosts(tasks);
         taskEquivalencesMap = Preprocessor.calculateEquivalentTasks(tasks);
         scheduleQueue = createScheduleQueue();
         visitedSchedules = createVisitedScheduleSet();
     }
 
-    public static Queue<Schedule> createScheduleQueue() {
+    public Queue<Schedule> createScheduleQueue() {
         return new PriorityQueue<>((a, b) -> {
             int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
             if (n == 0) {
@@ -103,14 +103,14 @@ public class Scheduler {
             // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
             // otherwise, go to the next step.
             if (s.getNumberOfTasks() == tasks.length) {
-                TimeProvider.getInstance().stopTimerLabel();
+                Entrypoint.stopTimerLabel();
                 return s;
             }
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
             expandSchedule(s);
 
         }
-        TimeProvider.getInstance().stopTimerLabel();
+        Entrypoint.stopTimerLabel();
         return feasibleSchedule;
     }
 
@@ -142,7 +142,7 @@ public class Scheduler {
             }
 
             schedule.addTask(t, earliestStartProcessor, earliestStartTime);
-            schedule.setEstimatedFinishTime(Math.max(schedule.getEstimatedFinishTime(), earliestStartTime + taskStaticLevelMap[t.getUniqueID()]));
+            schedule.setEstimatedFinishTime(Math.max(schedule.getEstimatedFinishTime(), earliestStartTime + taskBottomLevelsWithoutEdgeCostsMap[t.getUniqueID()]));
 
             for (Edge e : t.getOutgoingEdges()) {
                 if (schedule.isBeginnable(e.getHead())) {
@@ -150,7 +150,6 @@ public class Scheduler {
                 }
             }
         }
-
         feasibleSchedule = schedule;
         return feasibleSchedule;
     }
@@ -170,20 +169,16 @@ public class Scheduler {
                 continue;
             }
             equivalent.addAll(taskEquivalencesMap[t]);
-            boolean normalised = false;
+
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
-                if (earliestStartTime == 0) {
-                    if (normalised || t < s.getNormalisationIndex()) {
-                        continue;
-                    }
-                    normalised = true;
+                if (earliestStartTime == 0 && t<s.getNormalisationIndex()) {
+                    continue;
                 }
-
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
                 sharedState = newSchedule;
 
-                // Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+                //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
@@ -210,7 +205,7 @@ public class Scheduler {
             if (taskRequirementsMap[i] == 0) {
                 Schedule s = new Schedule(tasks.length, processors, taskRequirementsMap.clone());
                 s.addTask(tasks[i], 0, 0);
-                s.setEstimatedFinishTime(taskStaticLevelMap[i]);
+                s.setEstimatedFinishTime(taskBottomLevelsWithoutEdgeCostsMap[i]);
                 scheduleQueue.add(s);
             }
         }
@@ -240,12 +235,12 @@ public class Scheduler {
     private int calculateEarliestTimeToSchedule(int[] taskStartTimes, byte[] taskProcessorMap, Task t1, int processor, int t1StartTime) {
         int earliestStartTime = t1StartTime;
         for (Edge e : t1.getIngoingEdges()) {
-            Task tail = e.getTail();
-            int finishTime = taskStartTimes[tail.getUniqueID()] + tail.getWeight();
-            if (taskProcessorMap[tail.getUniqueID()] == processor) {
-                earliestStartTime = Math.max(t1StartTime, finishTime);
+            Task parent = e.getTail();
+            int finishTime = taskStartTimes[parent.getUniqueID()] + parent.getWeight();
+            if (taskProcessorMap[parent.getUniqueID()] == processor) {
+                earliestStartTime = Math.max(earliestStartTime, finishTime);
             } else {
-                earliestStartTime = Math.max(t1StartTime, finishTime + e.getWeight());
+                earliestStartTime = Math.max(earliestStartTime, finishTime + e.getWeight());
             }
         }
         return earliestStartTime;
@@ -265,7 +260,7 @@ public class Scheduler {
         newSchedule.addTask(t, processor, earliestStartTime);
 
         int lowerBound = Math.max((newSchedule.getIdleTime() + totalComputationTime) / processors, //The schedule length is then bounded by the sum of total idle time and the total weight (execution time) of all nodes divided by the number of processors,
-                Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime + taskStaticLevelMap[t.getUniqueID()]));  //Computation bottom level of task t
+                Math.max(newSchedule.getEstimatedFinishTime(), earliestStartTime + taskBottomLevelsWithoutEdgeCostsMap[t.getUniqueID()]));  //Computation bottom level of task t
         for (Integer beginnable : newSchedule.getBeginnableTasks()) {
             Task task = tasks[beginnable];
             int nextEarliestStartTime = Integer.MAX_VALUE;
@@ -275,7 +270,7 @@ public class Scheduler {
                     nextEarliestStartTime = start;
                 }
             }
-            lowerBound = Math.max(lowerBound, nextEarliestStartTime + taskStaticLevelMap[beginnable]);
+            lowerBound = Math.max(lowerBound, nextEarliestStartTime + taskBottomLevelsWithoutEdgeCostsMap[beginnable]);
         }
         newSchedule.setEstimatedFinishTime(lowerBound);
         return newSchedule;
@@ -284,102 +279,98 @@ public class Scheduler {
     public boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
         int maxFinishTime = schedule.getTaskFinishTime(addedTask);
         int processor = schedule.getTaskProcessor(addedTask);
-        List<Task> taskSet = new ArrayList<>();
+        List<Task> processorTasks = new ArrayList<>();
         for (Task t : tasks) {
             if (schedule.getTaskProcessor(t) == processor) {
-                taskSet.add(t);
+                processorTasks.add(t);
             }
         }
-        taskSet.sort((a, b) -> schedule.getTaskStartTime(b) - schedule.getTaskStartTime(a));
+        processorTasks.sort(Comparator.comparingInt(schedule::getTaskStartTime));
 
         int[] original = schedule.getTaskStartTimeMap();
         int[] taskStartTimes = schedule.getTaskStartTimeMap().clone();
         byte[] taskProcessorMap = schedule.getTaskProcessorMap();
-        for (int i = 1; i < taskSet.size(); i++) {
-            Task t1 = taskSet.get(i - 1);
-            Task t2 = taskSet.get(i);
+
+        for (int i = processorTasks.size() - 1; i > 0; i--) {
+            Task t1 = processorTasks.get(i);
+            Task t2 = processorTasks.get(i - 1);
+
             if (t2.getUniqueID() < t1.getUniqueID()) {
                 break;
             }
 
+            //swapping the task order
+            processorTasks.set(i - 1, t1);
+            processorTasks.set(i, t2);
+
             int t1StartTime = 0;
-            if (i < taskSet.size() - 1) {
-                t1StartTime = taskStartTimes[taskSet.get(i + 1).getUniqueID()] + taskSet.get(i + 1).getWeight();
+            if (i > 1) {
+                t1StartTime = taskStartTimes[processorTasks.get(i - 2).getUniqueID()] + processorTasks.get(i - 2).getWeight();
             }
             taskStartTimes[t1.getUniqueID()] = calculateEarliestTimeToSchedule(taskStartTimes, taskProcessorMap, t1, processor, t1StartTime);
 
-            for (int j = i; j > 0; j--) {
-                Task current = taskSet.get(j);
-                Task prev = taskSet.get(j - 1);
+            for (int j = i; j < processorTasks.size(); j++) {
+                Task current = processorTasks.get(j);
+                Task prev = processorTasks.get(j - 1);
                 int currentStartTime = taskStartTimes[prev.getUniqueID()] + prev.getWeight();
                 taskStartTimes[current.getUniqueID()] = calculateEarliestTimeToSchedule(taskStartTimes, taskProcessorMap, current, processor, currentStartTime);
             }
+            if (taskStartTimes[processorTasks.get(processorTasks.size() - 1).getUniqueID()] + processorTasks.get(processorTasks.size() - 1).getWeight() <= maxFinishTime &&
+                    areChildrenStillValid(i, processorTasks, taskStartTimes, original, taskProcessorMap, processor, schedule.getProcessorFinishTimes())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-            if (taskStartTimes[taskSet.get(1).getUniqueID()] + taskSet.get(1).getWeight() <= maxFinishTime) {
-                boolean equivalent = true;
-                for (int k = i; k > 0; k--) {
-                    Task task = taskSet.get(k);
-                    if (taskStartTimes[task.getUniqueID()] > original[task.getUniqueID()]) {
-                        for (Edge e : task.getOutgoingEdges()) {
-                            int earliest = taskStartTimes[task.getUniqueID()] + task.getWeight() + e.getWeight();
-                            Task child = e.getHead();
-                            if (taskProcessorMap[child.getUniqueID()] != -1) {
-                                if (taskProcessorMap[child.getUniqueID()] != processor && earliest > taskStartTimes[child.getUniqueID()]) {
-                                    equivalent = false;
-                                }
-                            } else {
-                                for (int p = 0; p < processors; p++) {
-                                    if (p != processor) {
-                                        boolean scheduleLater = false;
-                                        for (Edge in : child.getIngoingEdges()) {
-                                            Task parent = in.getTail();
-                                            if (taskStartTimes[parent.getUniqueID()] + in.getWeight() > earliest) {
+    private boolean areChildrenStillValid(int i, List<Task> processorTasks, int[] taskStartTimes, int[] originalTaskStartTimes, byte[] taskProcessorMap, int processor, int[] processorFinishTimes) {
+        for (int k = i; k < processorTasks.size(); k++) {
+            Task task = processorTasks.get(k);
+            if (taskStartTimes[task.getUniqueID()] > originalTaskStartTimes[task.getUniqueID()]) {
+                for (Edge e : task.getOutgoingEdges()) {
+                    int earliest = taskStartTimes[task.getUniqueID()] + task.getWeight() + e.getWeight();
+                    Task child = e.getHead();
+                    if (taskProcessorMap[child.getUniqueID()] != -1) {
+                        if (taskProcessorMap[child.getUniqueID()] != processor && earliest > taskStartTimes[child.getUniqueID()]) {
+                            return false;
+                        }
+                    } else {
+                        for (int p = 0; p < processors; p++) {
+                            if (p != processor) {
+                                boolean scheduleLater = false;
+                                for (Edge in : child.getIngoingEdges()) {
+                                    Task parent = in.getTail();
+                                    if (parent != task) {
+                                        if (taskProcessorMap[parent.getUniqueID()] == -1) {
+                                            int parentStartTime = Integer.MAX_VALUE;
+                                            for (int q = 0; q < processor; q++) {
+                                                if (q != p) {
+                                                    parentStartTime = Math.min(parentStartTime, processorFinishTimes[q]);
+                                                }
+                                            }
+                                            parentStartTime = Math.max(parentStartTime, taskTopLevelWithoutEdgeCostsMap[parent.getUniqueID()]);
+                                            if (parentStartTime + parent.getWeight() + in.getWeight() >= earliest) {
+                                                scheduleLater = true;
+                                                break;
+                                            }
+                                        } else {
+                                            int communicationCost = 0;
+                                            if (taskProcessorMap[parent.getUniqueID()] != p) {
+                                                communicationCost = in.getWeight();
+                                            }
+                                            if (taskStartTimes[parent.getUniqueID()] + parent.getWeight() + communicationCost >= earliest) {
                                                 scheduleLater = true;
                                                 break;
                                             }
                                         }
-                                        if (!scheduleLater) {
-                                            equivalent = false;
-                                        }
                                     }
                                 }
+                                if (!scheduleLater) {
+                                    return false;
+                                }
                             }
-
                         }
                     }
-                }
-                if (equivalent) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    //Currently not in use
-    public boolean canFixTaskOrder(Schedule schedule) {
-        Queue<Integer> taskIDs = schedule.getBeginnableTasks();
-        Task sharedChild = null;
-        int sharedParentProcessor = -1;
-        for (Integer i : taskIDs) {
-            Task t = tasks[i];
-            if (t.getIngoingEdges().size() > 1 || t.getOutgoingEdges().size() > 1) {
-                return false;
-            }
-            if (t.getOutgoingEdges().size() == 1) {
-                if (sharedChild == null) {
-                    sharedChild = t.getOutgoingEdges().get(0).getHead();
-                } else if (sharedChild != t.getOutgoingEdges().get(0).getHead()) {
-                    return false;
-                }
-            }
-            if (t.getIngoingEdges().size() == 1) {
-                int parentProcessor = schedule.getTaskProcessor(t.getIngoingEdges().get(0).getTail());
-                if (sharedParentProcessor == -1) {
-                    sharedParentProcessor = parentProcessor;
-                } else if (sharedParentProcessor != parentProcessor) {
-                    return false;
                 }
             }
         }

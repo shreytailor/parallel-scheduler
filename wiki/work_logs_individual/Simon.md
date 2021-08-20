@@ -1,5 +1,32 @@
 ## Simon's Work Log
 
+### 19/08/2021
+Code refactoring by adding helper methods to reduce duplicated code in input graph resizing and theme toggle module.
+Keeping the miniute on the zoom meeting held on 19/08/2021 
+
+---
+
+### 18/08/2021
+Designed the GUI components of zoom in and zoom out icons.
+Implemented the feature of resizing the input graph component without causing image distortion.
+
+---
+
+### 17/08/2021
+Tested on the quality of input graph visualization on different input graph types. Discussion with Josh about implementing the feature of resizing the input graph.
+
+---
+
+### 13/08/2021
+Implemented the feature of showing the input graph in the application by using GraphViz
+
+---
+
+### 12/08/2021
+Researched on third Party Library for the input graph visualization.
+
+---
+
 ### 08/08/2021
 Tested the release scheduler.jar file on a few test cases in two Linux Virtual Machines via using Oracle VM VirtualBox Manager.
 
