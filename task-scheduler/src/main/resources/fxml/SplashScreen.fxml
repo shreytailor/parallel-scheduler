@@ -47,16 +47,16 @@
                <right>
                   <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                      <children>
-<!--                        <ImageView fx:id="zoomOutIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleZoomOutIcon" pickOnBounds="true" preserveRatio="true" styleClass="icon">-->
-<!--                           <image>-->
-<!--                              <Image url="@../images/zoom-out-light.png" />-->
-<!--                           </image>-->
-<!--                        </ImageView>-->
-<!--                        <ImageView fx:id="zoomInIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleZoomInIcon" pickOnBounds="true" preserveRatio="true" styleClass="icon">-->
-<!--                           <image>-->
-<!--                              <Image url="@../images/zoom-in-light.png" />-->
-<!--                           </image>-->
-<!--                        </ImageView>-->
+                        <ImageView fx:id="zoomOutIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleZoomOutIcon" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+                           <image>
+                              <Image url="@../images/zoom-out-light.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="zoomInIcon" fitHeight="29.0" fitWidth="29.0" onMouseClicked="#handleZoomInIcon" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+                           <image>
+                              <Image url="@../images/zoom-in-light.png" />
+                           </image>
+                        </ImageView>
                         <Button fx:id="viewToggleButton" cache="true" mnemonicParsing="false" onAction="#handleViewToggleButton" text="Show Input Graph">
                            <styleClass>
                               <String fx:value="btn" />
