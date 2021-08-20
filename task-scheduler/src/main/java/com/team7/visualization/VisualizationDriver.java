@@ -63,12 +63,7 @@ public class VisualizationDriver extends Application {
 
     public static void updateScreen() {
         Platform.runLater(() -> {
-            _controller.finalUpdate(scheduler);
+            _controller.finalUpdate(_scheduler);
         });
-    /**
-     * This method is used to stop the controller of the application.
-     */
-    public static void finish() {
-        _controller.stop();
     }
 }

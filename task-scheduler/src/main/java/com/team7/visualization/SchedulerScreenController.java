@@ -164,7 +164,6 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     public ImageView zoomOutIcon;
 
-
     @FXML
     private ImageView statusIconLoading;
 
@@ -257,9 +256,11 @@ public class SchedulerScreenController implements Initializable {
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
         if (isLightMode) {
-            updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE, inputGraphDark, LightCss, DarkCss);
+            updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE,
+                    DARK_LOAD_IMAGE, DARK_TICK_IMAGE, inputGraphDark, LightCss, DarkCss);
         } else {
-            updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE, inputGraphLight, DarkCss, LightCss);
+            updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE,
+                    LIGHT_LOAD_IMAGE, LIGHT_TICK_IMAGE, inputGraphLight, DarkCss, LightCss);
         }
     }
 
@@ -292,6 +293,10 @@ public class SchedulerScreenController implements Initializable {
         ganttProvider.updateSchedule(s.getSharedState());
         labelClosedStates.setText(String.valueOf(s.getInfoClosedStates()));
         labelOpenedStates.setText(String.valueOf(s.getInfoOpenStates()));
+        statusIconLoading.setVisible(false);
+        statusIconTick.setVisible(true);
+    }
+
     @FXML
     public void handleZoomOutIcon() {
 
@@ -320,14 +325,6 @@ public class SchedulerScreenController implements Initializable {
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }
 
-    public void stop() {
-
-        ScheduleUpdater.getInstance().stop();
-//        _chartUpdaterTimeline.stop();
-        ganttProvider.updateSchedule(ScheduleUpdater.getInstance().getObservedSchedule());
-        _timeProvider.stopTimerLabel();
-    }
-
     /***
      * A helper method that updates the input graph after resizing
      * @param isLightMode
@@ -354,16 +351,22 @@ public class SchedulerScreenController implements Initializable {
      * @param planet_image
      * @param close_image
      * @param min_image
+     * @param load_image
+     * @param  tick_image
      * @param inputGraph
      * @param removingCss
      * @param addingCss
      */
-    private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image, Image close_image, Image min_image, ImageView inputGraph, String removingCss, String addingCss) {
+    private void updateTheme(ObservableList<String> sheets, Image in_image, Image out_image, Image planet_image,
+                             Image close_image, Image min_image, Image load_image, Image tick_image,
+                             ImageView inputGraph, String removingCss, String addingCss) {
         zoomInIcon.setImage(in_image);
         zoomOutIcon.setImage(out_image);
         themeToggleIcon.setImage(planet_image);
         closeIcon.setImage(close_image);
         minimizeIcon.setImage(min_image);
+        statusIconLoading.setImage(load_image);
+        statusIconTick.setImage(tick_image);
         inputGraphContainer.setCenter(inputGraph);
 
         sheets.remove(removingCss);
