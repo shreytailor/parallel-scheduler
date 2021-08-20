@@ -51,6 +51,7 @@ public class ParallelScheduler extends Scheduler {
             Schedule schedule = scheduleQueue.poll();
             if (schedule.getNumberOfTasks() == tasks.length) {
                 Entrypoint.stopTimerLabel();
+                sharedState = schedule;
                 return schedule;
             }
             expandSchedule(schedule);
@@ -69,6 +70,7 @@ public class ParallelScheduler extends Scheduler {
             e.printStackTrace();
         }
         Entrypoint.stopTimerLabel();
+        sharedState = bestSchedule;
         return bestSchedule;
     }
 
