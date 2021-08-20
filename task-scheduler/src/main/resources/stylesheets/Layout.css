@@ -44,3 +44,7 @@
 .chart-plot-background {
     -fx-background-color: transparent;
 }
+
+.status-icon-loading:hover {
+    -fx-cursor: wait;
+}
