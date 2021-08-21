@@ -7,6 +7,9 @@ import java.util.*;
 
 public class Preprocessor {
 
+    /**
+     * Calculates the topological order from a list of tasks.
+     */
     public static Task[] getTopologicalOrder(List<Task> tasks) {
         Task[] result = new Task[tasks.size()];
         Map<Task,Integer> taskRequirementsMap = new HashMap<>();
@@ -34,33 +37,12 @@ public class Preprocessor {
         }
         return result;
     }
-    /**
-     * Static Level: Static level of a node is its bottom level without counting edge costs.
-     * Bottom Level: Bottom level of a node is the length of the longest path from node to an exit node.
-     *
-     * @param tasks
-     */
-    public static int[] calculateTaskBottomLevelsWithoutEdgeCosts(Task[] tasks) {
-        int[] taskStaticLevelMap = new int[tasks.length];
-        for (int i = 0; i < tasks.length; i++) {
-            Task task = tasks[i];
-            if (task.getOutgoingEdges().size() == 0) {
-                taskStaticLevelMap[i] = task.getWeight();
-                Queue<Task> taskQueue = new LinkedList<>();
-                taskQueue.add(task);
-                while (taskQueue.size() > 0) {
-                    Task t = taskQueue.poll();
-                    for (Edge e : t.getIngoingEdges()) {
-                        int neighbour = e.getTail().getUniqueID();
-                        taskStaticLevelMap[neighbour] = Math.max(taskStaticLevelMap[neighbour], taskStaticLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight());
-                        taskQueue.add(tasks[neighbour]);
-                    }
-                }
-            }
-        }
-        return taskStaticLevelMap;
-    }
 
+    /**
+     * Calculates the bottom level for each task.
+     * The weight of the current task is included.
+     * The bottom level of a node is the length of the longest path from that node to an exit node.
+     */
     public static int[] calculateTaskBottomLevels(Task[] tasks) {
         int[] taskBottomLevelMap = new int[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
@@ -83,9 +65,33 @@ public class Preprocessor {
     }
 
     /**
-     * Top level of a node is the length of the longest path from an entry node to the node
-     *
-     * @param tasks
+     * Calculates the bottom level for each task without edges costs i.e. the static level.
+     * The weight of the current task is included.
+     */
+    public static int[] calculateTaskBottomLevelsWithoutEdgeCosts(Task[] tasks) {
+        int[] taskStaticLevelMap = new int[tasks.length];
+        for (int i = 0; i < tasks.length; i++) {
+            Task task = tasks[i];
+            if (task.getOutgoingEdges().size() == 0) {
+                taskStaticLevelMap[i] = task.getWeight();
+                Queue<Task> taskQueue = new LinkedList<>();
+                taskQueue.add(task);
+                while (taskQueue.size() > 0) {
+                    Task t = taskQueue.poll();
+                    for (Edge e : t.getIngoingEdges()) {
+                        int neighbour = e.getTail().getUniqueID();
+                        taskStaticLevelMap[neighbour] = Math.max(taskStaticLevelMap[neighbour], taskStaticLevelMap[t.getUniqueID()] + tasks[neighbour].getWeight());
+                        taskQueue.add(tasks[neighbour]);
+                    }
+                }
+            }
+        }
+        return taskStaticLevelMap;
+    }
+
+    /**
+     * Calculates the top level for each task. The weight of the current task is not included.
+     * The top level of a node is the length of the longest path from a start node to the current node.
      */
     public static int[] calculateTaskTopLevelsWithoutEdgeCosts(Task[] tasks) {
         int[] taskTopLevelMap = new int[tasks.length];
@@ -110,8 +116,6 @@ public class Preprocessor {
 
     /**
      * Record each task as having prerequisites (requirements) or beginnable (no requirements).
-     *
-     * @param tasks
      */
     public static byte[] calculateRequirements(Task[] tasks) {
         byte[] taskRequirementsMap = new byte[tasks.length];
@@ -121,7 +125,10 @@ public class Preprocessor {
         return taskRequirementsMap;
     }
 
-
+    /**
+     * Stores all the tasks that are equivalent to tasks[i] into the list taskEquivalences[i].
+     * Tasks are equivalent if they have the same weight, the same ingoing edges, and the same outgoing edges.
+     */
     public static List[] calculateEquivalentTasks(Task[] tasks) {
         List<Task>[] taskEquivalences = new List[tasks.length];
         for (int i = 0; i < tasks.length; i++) {

@@ -6,13 +6,13 @@ public class Schedule {
     private byte[] taskProcessorMap;
     private int[] taskStartTimeMap;
     private byte[] taskRequirementsMap;
+    private int[] processorFinishTimes;
+    private byte[] processorFirstTask;
     private int estimatedFinishTime = 0;
     private byte tasksCompleted = 0;
-    private int[] processorFinishTimes;
-    private int idleTime;
+    private int idleTime = 0;
     private byte partialExpansionIndex = -1;
-    private byte normalisationIndex;
-    private byte[] processorFirstTask;
+    private byte normalisationIndex = -1;
 
     public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap) {
         taskProcessorMap = new byte[numTasks];
@@ -21,8 +21,6 @@ public class Schedule {
         Arrays.fill(taskStartTimeMap, -1);
         this.taskRequirementsMap = taskRequirementsMap;
         processorFinishTimes = new int[numProcessors];
-        idleTime = 0;
-        normalisationIndex = -1;
         processorFirstTask = new byte[numProcessors];
         Arrays.fill(processorFirstTask, (byte) -1);
     }
@@ -57,7 +55,7 @@ public class Schedule {
         }
 
         processorFinishTimes[processor] = startTime + n.getWeight();
-        if (processorFirstTask[processor]==-1) {
+        if (processorFirstTask[processor] == -1) {
             processorFirstTask[processor] = n.getUniqueID();
         }
         tasksCompleted++;
@@ -145,7 +143,7 @@ public class Schedule {
         if (this.getEstimatedFinishTime() != other.getEstimatedFinishTime() || this.getNumberOfTasks() != other.getNumberOfTasks()) {
             return false;
         }
-        return Arrays.equals(taskProcessorMap,other.taskProcessorMap) && Arrays.equals(taskStartTimeMap ,other.taskStartTimeMap);
+        return Arrays.equals(taskProcessorMap, other.taskProcessorMap) && Arrays.equals(taskStartTimeMap, other.taskStartTimeMap);
     }
 
     @Override
