@@ -260,6 +260,8 @@ public class SchedulerScreenController implements Initializable {
         // Adding the container of the input graph to the screen.
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
         inputGraphContainer.setVisible(false);
+        zoomInIcon.setVisible(false);
+        zoomOutIcon.setVisible(false);
     }
 
     /**
@@ -304,6 +306,9 @@ public class SchedulerScreenController implements Initializable {
     public void handleViewToggleButton() {
         utilGraphContainer.setVisible(!isShowingUtilization);
         inputGraphContainer.setVisible(isShowingUtilization);
+        zoomInIcon.setVisible(isShowingUtilization);
+        zoomOutIcon.setVisible(isShowingUtilization);
+
         isShowingUtilization = !isShowingUtilization;
 
         if (isShowingUtilization) {
