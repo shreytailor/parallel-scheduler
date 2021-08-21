@@ -7,7 +7,6 @@ public class Schedule {
     private int[] taskStartTimeMap;
     private byte[] taskRequirementsMap;
     private int[] processorFinishTimes;
-    private byte[] processorFirstTask;
     private int estimatedFinishTime = 0;
     private byte tasksCompleted = 0;
     private int idleTime = 0;
@@ -21,14 +20,12 @@ public class Schedule {
         Arrays.fill(taskStartTimeMap, -1);
         this.taskRequirementsMap = taskRequirementsMap;
         processorFinishTimes = new int[numProcessors];
-        processorFirstTask = new byte[numProcessors];
-        Arrays.fill(processorFirstTask, (byte) -1);
     }
 
     public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap,
                     byte[] taskRequirementsMap, int[] processorFinishTimes,
                     int estimatedFinishTime, byte tasksCompleted,
-                    int idleTime, byte normalisationIndex, byte[] processorFirstTask) {
+                    int idleTime, byte normalisationIndex) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
@@ -37,7 +34,6 @@ public class Schedule {
         this.tasksCompleted = tasksCompleted;
         this.idleTime = idleTime;
         this.normalisationIndex = normalisationIndex;
-        this.processorFirstTask = processorFirstTask;
     }
 
     public void addTask(Task n, int processor, int startTime) {
@@ -55,9 +51,6 @@ public class Schedule {
         }
 
         processorFinishTimes[processor] = startTime + n.getWeight();
-        if (processorFirstTask[processor] == -1) {
-            processorFirstTask[processor] = n.getUniqueID();
-        }
         tasksCompleted++;
     }
 
@@ -132,7 +125,7 @@ public class Schedule {
         return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(),
                 taskRequirementsMap.clone(), processorFinishTimes.clone(),
                 estimatedFinishTime, tasksCompleted,
-                idleTime, normalisationIndex, processorFirstTask);
+                idleTime, normalisationIndex);
     }
 
     @Override

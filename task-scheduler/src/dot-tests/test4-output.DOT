@@ -1,6 +1,0 @@
-digraph output {
-b [Weight=1,Start=1,Processor=0];
-a [Weight=1,Start=0,Processor=0];
-c [Weight=1,Start=0,Processor=1];
-a -> b [Weight=1];
-}

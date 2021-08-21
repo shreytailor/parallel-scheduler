@@ -75,10 +75,6 @@ public class ParallelScheduler extends Scheduler {
         return bestSchedule;
     }
 
-    public void shutdown() {
-        executorService.shutdownNow();
-    }
-
     private class IndependentWorker implements Callable<Schedule> {
         private Queue<Schedule> schedules = createScheduleQueue();
 
@@ -112,6 +108,11 @@ public class ParallelScheduler extends Scheduler {
         }
     }
 
+    /**
+     * Expands schedule s and adds the new schedules to the queue.
+     * @param s the schedule we want to expand
+     * @param schedules the queue which we will add new schedules to
+     */
     private void expandSchedule(Schedule s, Queue<Schedule> schedules) {
         Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
