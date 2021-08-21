@@ -1,5 +1,19 @@
 # Shrey's Work Log
 
+## 20/08/2021
+- In the afternoon, I took part in a Zoom peer-programming session with Josh and Hajin, in order to solve the issues we were having regarding updating the visualization (and its communication with the algorithm). We managed to fix the issue together.
+- Implemented some final features for the visualization.
+  - Stopping the graph from updating once the algorithm execution has finished. This involved tweaking the mechanisms of `ScheduleUpdater` and `TimeProvider` APIs, and reflect that change over to the `SchedulerScreenController`.
+  - Updating the statistics as the algorithm runs, after deciding with the team that we want to show the number of *open states* and *closed states*. 
+- Documented most of the Graphical User Interface classes, and made sure the code was as descriptive as possible for the readers.
+
+---
+
+## 19/08/2021
+- Continued to work on the things from yesterday, however had a few issues which must be communicated with the team in order to resolve it.
+
+---
+
 ## 18/08/2021
 - Added onto the implementation of the existing `ScheduleUpdater` class to make it more efficient to show the visualization, and refactored some of the code that deals with linking the algorithm, middleware, and visualization together.
 
