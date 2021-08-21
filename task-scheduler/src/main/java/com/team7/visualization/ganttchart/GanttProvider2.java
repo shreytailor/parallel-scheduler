@@ -70,7 +70,7 @@ public class GanttProvider2 {
                 Task currentTask = _tasks[counter];
                 short uniqueId = currentTask.getUniqueID();
                 if (Integer.valueOf(taskMap[uniqueId]) >= 0) {
-                    String processor = String.valueOf(taskMap[uniqueId]);
+                    String processor = String.valueOf(taskMap[uniqueId]+1);
                     int startTime = taskStartTime[uniqueId];
                     int length = currentTask.getWeight();
 
