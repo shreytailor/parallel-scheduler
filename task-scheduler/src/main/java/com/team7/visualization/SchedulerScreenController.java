@@ -34,6 +34,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -84,14 +85,6 @@ public class SchedulerScreenController implements Initializable {
     private BufferedImage darkBufferedImage;
     private MutableGraph lightMutableGraph;
     private MutableGraph darkMutableGraph;
-    private final int INPUT_GRAPH_MAX_HEIGHT = 650;
-    private final int INPUT_GRAPH_MAX_WIDTH = 500;
-    private final int INPUT_GRAPH_MIN_HEIGHT = 50;
-    private final int INPUT_GRAPH_MIN_WIDTH = 50;
-    private int inputGraphHeight;
-    private int inputGraphWidth;
-    private int unitAdjustmentValue = 20;
-    private int heightAdjustmentValue;
     private ImageView inputGraphLight;
     private ImageView inputGraphDark;
 
@@ -102,8 +95,17 @@ public class SchedulerScreenController implements Initializable {
     private Timeline _chartUpdaterTimeline;
     private TimeProvider _timeProvider;
 
-    // Ratio value used to resize the input graph.
+    //Input graph parameters.
+    private final int INPUT_GRAPH_MAX_HEIGHT = 650;
+    private final int INPUT_GRAPH_MAX_WIDTH = 500;
+    private final int INPUT_GRAPH_MIN_HEIGHT = 100;
+    private final int INPUT_GRAPH_MIN_WIDTH = 100;
+    private final int unitAdjustmentValue = 20;
+    private int heightAdjustmentValue;
     private double heightAdjustmentRatio;
+    private int inputGraphHeight;
+    private int inputGraphWidth;
+
 
     // FXML
     @FXML
@@ -169,15 +171,26 @@ public class SchedulerScreenController implements Initializable {
             darkMutableGraph.nodeAttrs().add(Color.WHITE);
             darkMutableGraph.nodeAttrs().add(Color.WHITE.font());
 
-            // Render an image into buffer
+            // Render an image into buffer, the render figures out the right scale itself
             lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).render(Format.SVG).toImage();
-            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).render(Format.SVG).toImage();
 
             // Finds a suitable adjustment height value for every zoom in/zoom out click
             inputGraphHeight = lightBufferedImage.getHeight();
             inputGraphWidth = lightBufferedImage.getWidth();
             heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
             heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
+
+            // Detects case that the auto generated graph exceeds the defined boundary of the input graph container
+            if (inputGraphHeight > INPUT_GRAPH_MAX_HEIGHT || inputGraphWidth > INPUT_GRAPH_MIN_WIDTH) {
+                inputGraphWidth = INPUT_GRAPH_MIN_WIDTH;
+                inputGraphHeight = (int) (INPUT_GRAPH_MIN_HEIGHT * heightAdjustmentRatio);
+
+                // Re-renders the light input graph, place inside the predicate to save overhead
+                lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
+            }
+
+            // Render the dark input graph
+            darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
 
             // Convert the image to javafx component
             inputGraphLight = new ImageView(SwingFXUtils.toFXImage(lightBufferedImage, null));
