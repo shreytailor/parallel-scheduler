@@ -40,12 +40,9 @@ public class Entrypoint {
                 Schedule schedule = scheduler.findOptimalSchedule();
                 System.out.println("Finished");
                 long finish = System.currentTimeMillis();
-                System.out.println(finish-start);
+                System.out.println("Time taken: "+(finish-start)+"ms");
                 Entrypoint.writeScheduleOutputToFile(schedule);
             }
-//            if (scheduler.getClass() == ParallelScheduler.class) {
-//                ((ParallelScheduler) scheduler).shutdown();
-//            }
 
         } catch (CommandLineException | FileNotFoundException exception) {
             System.out.println(exception.getMessage());
