@@ -17,23 +17,29 @@ import java.lang.management.ManagementFactory;
  * of this class, depending on what sort of data you want to display on the graph.
  */
 public abstract class UtilizationProvider {
-
     private LineChart<String, Number> chart;
     protected final OperatingSystemMXBean bean;
     private TimeProvider timeProvider;
 
-    public UtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider tp) {
+    /**
+     * This is the lone constructor for creating an instance for this class.
+     * @param chart the chart on which you want to initialize this provider.
+     * @param title String for the title of the chart.
+     * @param timeProvider the TimeProvider which is used for tracking this graph.
+     */
+    public UtilizationProvider(LineChart<String, Number> chart, String title, TimeProvider timeProvider) {
         this.chart = chart;
         chart.setTitle(title);
         chart.setLegendVisible(false);
         bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        timeProvider = tp;
+        this.timeProvider = timeProvider;
     }
 
     /**
      * This method starts displaying the tracked data onto the graph entered in the constructor.
      */
     public void startTracking() {
+
         // Configure the graph settings.
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         chart.setAnimated(false);
@@ -53,7 +59,17 @@ public abstract class UtilizationProvider {
         timeline.play();
     }
 
-
+    /**
+     * This abstract method will be overwritten by the classes which extend this class. This method
+     * is used to get the data which you want to display on the chart.
+     * @return double the data to be displayed.
+     */
     public abstract double getData();
+
+    /**
+     * This abstract method will be overwritten by the classes which extend this class. This method
+     * is used to get the upper bound for this particular graph (i.e. the top value of the y-axis).
+     * @return double for the upper bound of the graph's y-axis.
+     */
     public abstract double getUpperBound();
 }
