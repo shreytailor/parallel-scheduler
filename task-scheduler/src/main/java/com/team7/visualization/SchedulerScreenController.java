@@ -75,8 +75,6 @@ public class SchedulerScreenController implements Initializable {
     private boolean isShowingUtilization = true;
     private final Config _config;
     private final Task[] _tasks;
-    private ImageView inputGraphLight;
-    private ImageView inputGraphDark;
     private final BorderPane inputGraphContainer = new BorderPane();
     private Scheduler scheduler;
     private Schedule _observedSchedule;
@@ -94,7 +92,20 @@ public class SchedulerScreenController implements Initializable {
     private int inputGraphWidth;
     private int unitAdjustmentValue = 20;
     private int heightAdjustmentValue;
+    private ImageView inputGraphLight;
+    private ImageView inputGraphDark;
 
+    // Objects used for the live visualization.
+    private CPUUtilizationProvider cpuUtilizationProvider;
+    private RAMUtilizationProvider ramUtilizationProvider;
+    private GanttProvider2 ganttProvider;
+    private Timeline _chartUpdaterTimeline;
+    private TimeProvider _timeProvider;
+
+    // Ratio value used to resize the input graph.
+    private double heightAdjustmentRatio;
+
+    // FXML
     @FXML
     private GridPane utilGraphContainer;
 
@@ -142,16 +153,6 @@ public class SchedulerScreenController implements Initializable {
 
     @FXML
     public LineChart<String, Number> ramUsageChart;
-
-    // Objects used for the live visualization.
-    private CPUUtilizationProvider cpuUtilizationProvider;
-    private RAMUtilizationProvider ramUtilizationProvider;
-    private GanttProvider2 ganttProvider;
-    private Timeline _chartUpdaterTimeline;
-    private TimeProvider _timeProvider;
-
-    // Ratio value used to resize the input graph.
-    private double heightAdjustmentRatio;
 
     public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
         _config = config;
@@ -243,20 +244,22 @@ public class SchedulerScreenController implements Initializable {
         ganttProvider = new GanttProvider2(_tasks, _observedSchedule, _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
+        // Event for schedule update and states update
         EventHandler<ActionEvent> rerenderStatistics = event -> {
             ganttProvider.updateSchedule(scheduleUpdater.getObservedSchedule());
             labelOpenedStates.setText(String.valueOf(scheduleUpdater.getOpenedStates()));
             labelClosedStates.setText(String.valueOf(scheduleUpdater.getClosedStates()));
         };
 
+        // Time line for schedule and states update + registering timeline
         _chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), rerenderStatistics));
         _chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
         _chartUpdaterTimeline.play();
+        _timeProvider.registerTimeline(_chartUpdaterTimeline);
 
         // Adding the container of the input graph to the screen.
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
         inputGraphContainer.setVisible(false);
-        _timeProvider.registerTimeline(_chartUpdaterTimeline);
     }
 
     /**
@@ -266,9 +269,11 @@ public class SchedulerScreenController implements Initializable {
     private void handleToggleTheme() {
         ObservableList<String> sheets = themeToggleIcon.getScene().getRoot().getStylesheets();
         if (isLightMode) {
+            // Switch to dark mode
             updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE,
                     DARK_LOAD_IMAGE, DARK_TICK_IMAGE, inputGraphDark, LightCss, DarkCss);
         } else {
+            // Switch to light mode
             updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE,
                     LIGHT_LOAD_IMAGE, LIGHT_TICK_IMAGE, inputGraphLight, DarkCss, LightCss);
         }
@@ -399,9 +404,12 @@ public class SchedulerScreenController implements Initializable {
      * This method is used for the final update of the visualization.
      */
     public void finalUpdate(Scheduler s) {
+        // Update final schedule and opened, closed states
         ganttProvider.updateSchedule(s.getSharedState());
         labelClosedStates.setText(String.valueOf(s.getInfoClosedStates()));
         labelOpenedStates.setText(String.valueOf(s.getInfoOpenStates()));
+
+        // Set the status to finished
         statusIconLoading.setVisible(false);
         statusIconTick.setVisible(true);
     }
