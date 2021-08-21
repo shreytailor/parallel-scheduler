@@ -1,5 +1,11 @@
 # Shrey's Work Log
 
+## 21/08/2021
+- Stress tested the whole implementation using different input graphs (*small* and *large*) to find any bugs, if any exist. The test was done using two computers, with and without visualization to check if the graphical user interface is making an impact.
+- **Refactoring:** Added lots of JavaDocs to the codebase, so its easy for readers to determine what the code is doing.
+
+---
+
 ## 20/08/2021
 - In the afternoon, I took part in a Zoom peer-programming session with Josh and Hajin, in order to solve the issues we were having regarding updating the visualization (and its communication with the algorithm). We managed to fix the issue together.
 - Implemented some final features for the visualization.
