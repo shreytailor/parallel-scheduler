@@ -96,10 +96,20 @@ public class ParallelScheduler extends Scheduler {
                 continue;
             }
             equivalent.addAll(taskEquivalencesMap[t]);
+
+            boolean partiallyExpanded = false;
+            boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
-                if (earliestStartTime == 0 && t<s.getNormalisationIndex()) {
-                    continue;
+                //Normalising
+                if (earliestStartTime == 0) {
+                    if (normalised) {
+                        continue;
+                    }
+                    normalised = true;
+                    if (t < s.getNormalisationIndex()) {
+                        continue;
+                    }
                 }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
@@ -109,11 +119,14 @@ public class ParallelScheduler extends Scheduler {
                         !visitedSchedules.contains(newSchedule)) {
                     schedules.add(newSchedule);
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
-                        s.setPartialExpansionIndex(t.byteValue());
-                        schedules.add(s);
-                        return;
+                        partiallyExpanded = true;
                     }
                 }
+            }
+            if (partiallyExpanded) {
+                s.setPartialExpansionIndex(t.byteValue());
+                schedules.add(s);
+                return;
             }
         }
         synchronized (this) {

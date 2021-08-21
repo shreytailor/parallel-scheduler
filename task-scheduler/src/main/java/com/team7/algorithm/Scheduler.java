@@ -19,10 +19,12 @@ public class Scheduler {
     protected int totalComputationTime = 0;
     protected Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
+    protected Schedule sharedState;
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
         tasks = Preprocessor.getTopologicalOrder(g.getNodes());
+        //Assigning a unique id to each task.
         for (int i = 0; i < tasks.length; i++) {
             Task t = tasks[i];
             t.setUniqueID((byte) i);
@@ -37,6 +39,10 @@ public class Scheduler {
         visitedSchedules = createVisitedScheduleSet();
     }
 
+    /**
+     * Create a list for schedules that are waiting to be expanded. Sorted by increasing estimated finish time.
+     * If two tasks have the same estimated finish time, the schedule with more tasks already scheduled is chosen.
+     */
     public Queue<Schedule> createScheduleQueue() {
         return new PriorityQueue<>((a, b) -> {
             int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
@@ -47,6 +53,9 @@ public class Scheduler {
         });
     }
 
+    /**
+     * Create a treeset containing all the schedules that have been fully expanded. Allows for finding elements in O(log(n)).
+     */
     protected Set<Schedule> createVisitedScheduleSet() {
         return new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
@@ -69,8 +78,6 @@ public class Scheduler {
 
     /**
      * Generates an optimal schedule using an A* algorithm.
-     *
-     * @return an optimal schedule
      */
     public Schedule findOptimalSchedule() {
         findFeasibleSchedule();
@@ -95,8 +102,6 @@ public class Scheduler {
 
     /**
      * Generates a valid schedule using a greedy approach.
-     *
-     * @return a valid schedule
      */
     public Schedule findFeasibleSchedule() {
         Schedule schedule =
@@ -138,8 +143,6 @@ public class Scheduler {
      * nodes to the processors. Each matching produces a new state s'.
      * Compute f(s') = g(s')+h(s') for each new state s'.
      * Put all the new states in OPEN.
-     *
-     * @param s
      */
     public void expandSchedule(Schedule s) {
         Set<Task> equivalent = new HashSet<>();
@@ -149,24 +152,39 @@ public class Scheduler {
             }
             equivalent.addAll(taskEquivalencesMap[t]);
 
+            boolean partiallyExpanded = false;
+            boolean normalised = false;
             for (int i = 0; i < processors; i++) {
                 int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
-                if (earliestStartTime == 0 && t<s.getNormalisationIndex()) {
-                    continue;
+                //Normalising
+                if (earliestStartTime == 0) {
+                    if (normalised) {
+                        continue;
+                    }
+                    normalised = true;
+                    if (t < s.getNormalisationIndex()) {
+                        continue;
+                    }
                 }
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
+                //Pruning techniques used: upper bounding, equivalent schedule pruning, and duplicate detection using a CLOSED list.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
                         !visitedSchedules.contains(newSchedule)) {
                     scheduleQueue.add(newSchedule);
+                    //Partial expansion
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
-                        s.setPartialExpansionIndex(t.byteValue());
-                        scheduleQueue.add(s);
-                        return;
+                        partiallyExpanded = true;
                     }
                 }
+            }
+            // If the conditions for partial expansion are satisfied, then do not fully expand the current schedule.
+            if (partiallyExpanded) {
+                s.setPartialExpansionIndex(t.byteValue());
+                scheduleQueue.add(s);
+                return;
             }
         }
         visitedSchedules.add(s);
@@ -174,8 +192,6 @@ public class Scheduler {
 
     /**
      * Generates a list of schedules (formally, States), each with one task scheduled that has no prerequisites.
-     *
-     * @return a list schedules, each with one task
      */
     protected void generateInitialSchedules() {
         //Creating schedules for all the tasks that can be completed at the beginning (i.e. tasks which have no prerequisites)
@@ -191,11 +207,6 @@ public class Scheduler {
 
     /**
      * On the given processor, find the earliest time we can schedule the given task
-     *
-     * @param schedule
-     * @param task
-     * @param processor
-     * @return the earliest time that the task can be scheduled on the processor
      */
     public int calculateEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
         int earliestStartTime = schedule.getProcessorFinishTime(processor);
@@ -210,6 +221,9 @@ public class Scheduler {
         return earliestStartTime;
     }
 
+    /**
+     * Similar to the method above but uses information from the provided arrays and not the whole Schedule object.
+     */
     private int calculateEarliestTimeToSchedule(int[] taskStartTimes, byte[] taskProcessorMap, Task t1, int processor, int t1StartTime) {
         int earliestStartTime = t1StartTime;
         for (Edge e : t1.getIngoingEdges()) {
@@ -226,12 +240,6 @@ public class Scheduler {
 
     /**
      * Creates a new schedule from schedule s which allocates task t to the given processor
-     *
-     * @param s
-     * @param t
-     * @param processor
-     * @param earliestStartTime
-     * @return the new schedule
      */
     public Schedule generateNewSchedule(Schedule s, Task t, int processor, int earliestStartTime) {
         Schedule newSchedule = s.clone();
@@ -254,9 +262,15 @@ public class Scheduler {
         return newSchedule;
     }
 
+    /**
+     * Checks if the provided schedule with a recently added task can have its tasks rearranged yet still
+     * provide a schedule with the same or better estimated finish time.
+     */
     public boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
         int maxFinishTime = schedule.getTaskFinishTime(addedTask);
         int processor = schedule.getTaskProcessor(addedTask);
+
+        //Get all the tasks on the same processor as addedTask
         List<Task> processorTasks = new ArrayList<>();
         for (Task t : tasks) {
             if (schedule.getTaskProcessor(t) == processor) {
@@ -301,6 +315,9 @@ public class Scheduler {
         return false;
     }
 
+    /**
+     * Checks that after rearranging the tasks on the specific processor, the children of those tasks are unaffected.
+     */
     private boolean areChildrenStillValid(int i, List<Task> processorTasks, int[] taskStartTimes, int[] originalTaskStartTimes, byte[] taskProcessorMap, int processor, int[] processorFinishTimes) {
         for (int k = i; k < processorTasks.size(); k++) {
             Task task = processorTasks.get(k);
@@ -357,5 +374,9 @@ public class Scheduler {
 
     public Task[] getTasks() {
         return tasks;
+    }
+
+    public Schedule getSharedState() {
+        return sharedState;
     }
 }
