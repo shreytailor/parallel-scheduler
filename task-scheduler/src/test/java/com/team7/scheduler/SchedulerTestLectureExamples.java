@@ -2,7 +2,6 @@ package com.team7.scheduler;
 
 import com.team7.Entrypoint;
 import com.team7.algorithm.ParallelScheduler;
-import com.team7.algorithm.ParallelSchedulerDeprecated;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
