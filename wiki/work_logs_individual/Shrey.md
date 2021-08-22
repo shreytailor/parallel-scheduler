@@ -1,5 +1,11 @@
 # Shrey's Work Log
 
+## 22/08/2021
+- Worked on bundling the JavaFX dependencies within the `jar` file, such that it is runnable on the FlexIT machine.
+- Final testing for the application (edge cases).
+
+---
+
 ## 21/08/2021
 - Stress tested the whole implementation using different input graphs (*small* and *large*) to find any bugs, if any exist. The test was done using two computers, with and without visualization to check if the graphical user interface is making an impact.
 - **Refactoring:** Added lots of JavaDocs to the codebase, so its easy for readers to determine what the code is doing.
