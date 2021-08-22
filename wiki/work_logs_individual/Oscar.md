@@ -1,3 +1,6 @@
+### 19 August
+Fix bug with partial expansion and help to implement the parallel scheduler.
+
 ### 18 August
 Implement equivalent task pruning https://www.sciencedirect.com/science/article/pii/S0305054813002542
 
@@ -6,6 +9,9 @@ Implement equivalent schedule pruning https://www.sciencedirect.com/science/arti
 
 ### 13 August
 Implement a method of identifying equivalent tasks which will be used for a pruning technique later on https://link.springer.com/content/pdf/10.1007/s11227-010-0395-1.pdf.
+
+### 12 August
+Implement a CLOSED list which stores fully expanded states. Now states will only be added to the OPEN list if they cannot be found in the CLOSED list.
 
 ### 11 August
 Implement partial expansion https://link.springer.com/content/pdf/10.1007/s11227-010-0395-1.pdf
@@ -20,9 +26,9 @@ Reduced the memory usage of the scheduling algorithm by replacing HashMaps with 
 ### 3 August
 Improve the heuristic of the scheduling algorithm. Strategies used include: 
 
-Adding node priorities (i.e. nodes with higher priorities are scheduled first, priority in this case is referring to the sum of the bottom and top levels of the node).*No longer used*
+Adding node priorities (i.e. nodes with higher priorities are scheduled first, priority in this case is referring to the bottom level of the node).*Only used for the feasible schedule algorithm
 
-Initially generating a feasible schedule using a greedy approach, the makespan of this schedule is then used as an upper bound to prune schedules that cannot be optimal. Tasks with the highest bottom level are scheduled first.
+Initially generating a feasible schedule using a greedy approach, the makespan of this schedule is then used as an upper bound to prune schedules that cannot be optimal. Tasks are scheduled according to their node priorities.
 
 The origin of these ideas are from the following paper: https://www.researchgate.net/publication/222302496_On_multiprocessor_task_scheduling_using_efficient_state_space_search_approaches
 
