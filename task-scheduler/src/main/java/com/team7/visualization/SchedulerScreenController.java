@@ -96,13 +96,14 @@ public class SchedulerScreenController implements Initializable {
     private TimeProvider _timeProvider;
 
     //Input graph parameters.
-    private final int INPUT_GRAPH_MAX_HEIGHT = 950;
-    private final int INPUT_GRAPH_MAX_WIDTH = 550;
-    private final int INPUT_GRAPH_MIN_HEIGHT = 10;
-    private final int INPUT_GRAPH_MIN_WIDTH = 50;
-    private final int unitAdjustmentValue = 30;
+    private int INPUT_GRAPH_MAX_HEIGHT = 650;
+    private int INPUT_GRAPH_MAX_WIDTH = 550;
+    private int INPUT_GRAPH_MIN_HEIGHT = 10;
+    private int INPUT_GRAPH_MIN_WIDTH = 50;
+    private int unitAdjustmentValue = 30;
     private int heightAdjustmentValue;
     private double heightAdjustmentRatio;
+    private double scaleRatio;
     private int inputGraphHeight;
     private int inputGraphWidth;
 
@@ -180,14 +181,20 @@ public class SchedulerScreenController implements Initializable {
             heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
             heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
 
-            // Detects case that the auto generated graph exceeds the defined boundary of the input graph container
-            if (inputGraphHeight > INPUT_GRAPH_MAX_HEIGHT || inputGraphWidth > INPUT_GRAPH_MIN_WIDTH) {
-                inputGraphWidth = INPUT_GRAPH_MIN_WIDTH;
-                inputGraphHeight = (int) (INPUT_GRAPH_MIN_HEIGHT * heightAdjustmentRatio);
+            // Calculates the default max height vs max width ratio
+            scaleRatio = (double) INPUT_GRAPH_MAX_HEIGHT / (double) INPUT_GRAPH_MAX_WIDTH;
 
-                // Re-renders the light input graph, place inside the predicate to save overhead
-                lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
+            // Maximizes the input graph
+            if (heightAdjustmentRatio > scaleRatio) {
+                inputGraphHeight = INPUT_GRAPH_MAX_HEIGHT;
+                inputGraphWidth = (int) ((double) INPUT_GRAPH_MAX_HEIGHT / heightAdjustmentRatio);
+            } else {
+                inputGraphWidth = INPUT_GRAPH_MAX_WIDTH;
+                inputGraphHeight = (int) ((double) INPUT_GRAPH_MAX_WIDTH * heightAdjustmentRatio);
             }
+
+            // Re-renders the light input graph, place inside the predicate to save overhead
+            lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
 
             // Render the dark input graph
             darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
@@ -322,13 +329,13 @@ public class SchedulerScreenController implements Initializable {
         zoomInIcon.setVisible(isShowingUtilization);
         zoomOutIcon.setVisible(isShowingUtilization);
 
-        isShowingUtilization = !isShowingUtilization;
-
         if (isShowingUtilization) {
             viewToggleButton.setText("Show Utilization");
         } else {
             viewToggleButton.setText("Show Input Graph");
         }
+
+        isShowingUtilization = !isShowingUtilization;
     }
 
     /**
