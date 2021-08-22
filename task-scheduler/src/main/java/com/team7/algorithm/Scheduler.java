@@ -23,22 +23,6 @@ public class Scheduler {
     protected Queue<Schedule> scheduleQueue;
     protected Set<Schedule> visitedSchedules;
     protected Schedule sharedState;
-    
-    /**
-     * Open state just means it's a state that is to be expanded
-     * @return the number of states waiting to be expanded
-     */
-    public int getInfoOpenStates() {
-        return scheduleQueue.size();
-    }
-
-    /**
-     * Closed state means it has been expanded and won't be looked at again
-     * @return number of closed states
-     */
-    public int getInfoClosedStates() {
-        return visitedSchedules.size();
-    }
 
     public Scheduler(Graph g, int numOfProcessors) {
         processors = numOfProcessors;
@@ -119,7 +103,6 @@ public class Scheduler {
             }
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
             expandSchedule(s);
-
         }
         Entrypoint.stopTimerLabel();
         sharedState = feasibleSchedule;
@@ -130,7 +113,7 @@ public class Scheduler {
      * Generates a valid schedule using a greedy approach.
      * @return a complete and valid schedule
      */
-    protected Schedule findFeasibleSchedule() {
+    public Schedule findFeasibleSchedule() {
         Schedule schedule =
                 new Schedule(tasks.length, processors, taskRequirementsMap.clone());
         Queue<Task> tasksToSchedule = new PriorityQueue<>((a, b) -> taskBottomLevelMap[b.getUniqueID()] - taskBottomLevelMap[a.getUniqueID()]);
@@ -421,5 +404,21 @@ public class Scheduler {
 
     public Schedule getSharedState() {
         return sharedState;
+    }
+
+    /**
+     * Open state just means it's a state that is to be expanded
+     * @return the number of states waiting to be expanded
+     */
+    public int getInfoOpenStates() {
+        return scheduleQueue.size();
+    }
+
+    /**
+     * Closed state means it has been expanded and won't be looked at again
+     * @return number of closed states
+     */
+    public int getInfoClosedStates() {
+        return visitedSchedules.size();
     }
 }
