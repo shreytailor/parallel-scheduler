@@ -75,3 +75,29 @@
 - Finished dark mode high fidelity prototype
 - Implemented dark mode visualization screen
 - Added functionality to close, minimize, and switch mode button
+
+### 17 Aug
+
+- Refactored out css class to swap minimum styling
+- Added tooltips to components
+- Added more styling for interaction such as change colour on hovering
+
+### 18 Aug
+
+- Implemented functionality to stop timer
+- Fixed dynamic view of schedule states (update schedule every second)
+
+### 19 Aug
+
+- Fixed dynamic view of schedule states (update schedule every second) as it was broken when merging
+- Fixed dynamic view of schedule states with parallel scheduling
+- Implemented changing progress after finishing algorithm
+
+### 22 Aug
+
+- Refactoring code
+  - Adding comments
+  - Removing unused imports
+  - Removed unused variables
+  - Changed variable names for consistent code convention
+
