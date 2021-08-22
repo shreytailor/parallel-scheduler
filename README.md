@@ -4,6 +4,12 @@ This is the project repository for Group 7 (*The Marauders*). It consists of the
 
 ## Usage Instructions
 
+## Environment
+
+The `scheduler.jar` file located in the project root has been tested on Java 11 (in the FlexIT machine), and it was confirmed to be working as expected by the development team.
+
+### Arguments/Inputs
+
 This task scheduler will take in a directed graph (*.dot* file) as an input. Tasks and their computation times are represented in the graph as weighted nodes, while the communication costs between these tasks will be represented by the weighted edges. Dot files should be placed in the same folder as the jar file.
 
 The command line arguments which can be used to interact with this program are shown below.
