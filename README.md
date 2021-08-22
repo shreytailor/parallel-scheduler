@@ -16,9 +16,7 @@ The command line arguments which can be used to interact with this program are s
 | -v | Visualize the scheduling algorithm. |
 | -o OUTPUT | Output file is named OUTPUT (default is INPUT-output.dot) |
 
-**Note:** Milestone 1 only supports the required arguments.
-
-Example usage: ```java -jar scheduler.jar Nodes_11_OutTree.dot 2```
+Example usage: ```java -jar scheduler.jar Nodes_11_OutTree.dot 2 -v -p 4```
 
 ## Team
 
