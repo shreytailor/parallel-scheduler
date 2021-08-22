@@ -100,7 +100,7 @@ public class SchedulerScreenController implements Initializable {
     private int INPUT_GRAPH_MAX_WIDTH = 550;
     private int INPUT_GRAPH_MIN_HEIGHT = 10;
     private int INPUT_GRAPH_MIN_WIDTH = 50;
-    private int unitAdjustmentValue = 30;
+    private int UNIT_ADJUSTMENT_VALUE = 30;
     private int heightAdjustmentValue;
     private double heightAdjustmentRatio;
     private double scaleRatio;
@@ -192,10 +192,8 @@ public class SchedulerScreenController implements Initializable {
                 inputGraphHeight = (int) ((double) INPUT_GRAPH_MAX_WIDTH * heightAdjustmentRatio);
             }
 
-            // Re-renders the light input graph, place inside the predicate to save overhead
+            // Re-renders the input graphs with size maximized
             lightBufferedImage = Graphviz.fromGraph(lightMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
-
-            // Render the dark input graph
             darkBufferedImage = Graphviz.fromGraph(darkMutableGraph).width(inputGraphWidth).height(inputGraphHeight).render(Format.SVG).toImage();
 
             // Convert the image to javafx component
