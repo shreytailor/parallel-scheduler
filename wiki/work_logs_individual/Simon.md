@@ -1,5 +1,20 @@
 ## Simon's Work Log
 
+### 22/08/2021
+- Fixed the bug of input graph/utilization display toggle button show text incorrect.
+- Implement a feature of only showing the zoom in and zoom out button when the input graph is displayed.
+- Implement a feature that maximizes the input graph within the certain boundary of the image container when initiating.
+- Fixed the bug of the cross button is not correctly displayed in the Linux environment.
+- Research into exporting usable jar file in the FlexIT Ubuntu environment.
+- Export the jar file with maven shade plugin, that runs successfully in Client's environment without needing client to install any packages manually.
+
+---
+
+### 20/08/2021
+Beautifies the input graph display, it zoom in and out on scale to get rid of blury image displayed.
+
+---
+
 ### 19/08/2021
 Code refactoring by adding helper methods to reduce duplicated code in input graph resizing and theme toggle module.
 Keeping the miniute on the zoom meeting held on 19/08/2021 
