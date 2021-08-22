@@ -10,10 +10,10 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 
 public class GanttProvider {
-    private Config _config;
-    private Schedule _schedule;
-    private Task[] _tasks;
-    private GanttComponent<Number, String> _chart;
+    private Config config;
+    private Schedule schedule;
+    private Task[] tasks;
+    private GanttComponent<Number, String> chart;
     private ObservableList<XYChart.Series<Number, String>> processorSeries;
 
     /**
@@ -23,18 +23,18 @@ public class GanttProvider {
      * @param config a Config instance representing the CLI arguments passed by the user.
      */
     public GanttProvider(Task[] tasks, Schedule schedule, Config config) {
-        _config = config;
-        _tasks = tasks;
+        this.config = config;
+        this.tasks = tasks;
 
         // Creating and configuring the chart.
         final NumberAxis xAxis = new NumberAxis();
         final CategoryAxis yAxis = new CategoryAxis();
-        _chart = new GanttComponent<>(xAxis, yAxis);
+        chart = new GanttComponent<>(xAxis, yAxis);
 
-        _chart.setAnimated(false);
-        _chart.setTitle("Schedule Visualization");
-        _chart.setLegendVisible(false);
-        _chart.setBlockHeight(18);
+        chart.setAnimated(false);
+        chart.setTitle("Schedule Visualization");
+        chart.setLegendVisible(false);
+        chart.setBlockHeight(18);
 
         // Configuring the axis.
         xAxis.setMinorTickCount(4);
@@ -44,11 +44,11 @@ public class GanttProvider {
 
         // Registering the processors.
         processorSeries = FXCollections.observableArrayList();
-        for (int counter = 0; counter < _config.getNumOfProcessors(); counter++) {
+        for (int counter = 0; counter < this.config.getNumOfProcessors(); counter++) {
             processorSeries.add(new XYChart.Series());
         }
 
-        _chart.setData(processorSeries);
+        chart.setData(processorSeries);
         updateSchedule(schedule);
     }
 
@@ -58,21 +58,21 @@ public class GanttProvider {
      * @param schedule a Schedule instance representing the new schedule.
      */
     public void updateSchedule(Schedule schedule) {
-        _schedule = schedule;
+        this.schedule = schedule;
 
         try {
 
             // Getting the important parts of the schedule.
-            byte[] taskMap = _schedule.getTaskProcessorMap();
-            int[] taskStartTime = _schedule.getTaskStartTimeMap();
+            byte[] taskMap = this.schedule.getTaskProcessorMap();
+            int[] taskStartTime = this.schedule.getTaskStartTimeMap();
 
             // Clear series before updating.
             for (XYChart.Series se : processorSeries) {
                 se.getData().clear();
             }
 
-            for (int counter = 0; counter < _tasks.length; counter++) {
-                Task currentTask = _tasks[counter];
+            for (int counter = 0; counter < tasks.length; counter++) {
+                Task currentTask = tasks[counter];
                 short uniqueId = currentTask.getUniqueID();
 
                 if (Integer.valueOf(taskMap[uniqueId]) >= 0) {
@@ -98,7 +98,7 @@ public class GanttProvider {
      * @return GanttComponent representing the JavaFX Gantt Chart representation.
      */
     public GanttComponent getSchedule() {
-        return _chart;
+        return chart;
     }
 }
 

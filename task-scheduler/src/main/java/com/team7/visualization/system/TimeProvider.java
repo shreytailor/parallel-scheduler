@@ -17,8 +17,8 @@ import java.util.List;
  */
 public class TimeProvider {
     private static long time;
-    private Timeline _clockTimeline;
-    private List<Timeline> _timelines;
+    private Timeline clockTimeline;
+    private List<Timeline> timelines;
     private static TimeProvider provider;
 
     /**
@@ -28,14 +28,14 @@ public class TimeProvider {
 
         // Set the initial time to zero, and initialize the list to store the JavaFX Timelines.
         time = 0;
-        _timelines = new ArrayList<>();
+        timelines = new ArrayList<>();
 
         /*
         This is the timeline which tracks the main clock of the application - updating every 100ms.
          */
-        _clockTimeline = new Timeline(new KeyFrame(Duration.millis(100), event -> time += 100));
-        _clockTimeline.setCycleCount(Timeline.INDEFINITE);
-        _clockTimeline.play();
+        clockTimeline = new Timeline(new KeyFrame(Duration.millis(100), event -> time += 100));
+        clockTimeline.setCycleCount(Timeline.INDEFINITE);
+        clockTimeline.play();
     }
 
     /**
@@ -67,7 +67,7 @@ public class TimeProvider {
         timeline.play();
 
         // Add the created timeline to the list of timelines in the class.
-        _timelines.add(timeline);
+        timelines.add(timeline);
     }
 
     /**
@@ -76,7 +76,7 @@ public class TimeProvider {
      */
     public void stopTimers() {
         // Go through all the timelines in the list, and stop them.
-        for (Timeline timeline : _timelines) {
+        for (Timeline timeline : timelines) {
             timeline.stop();
         }
     }
@@ -86,7 +86,7 @@ public class TimeProvider {
      * @param timeline
      */
     public void registerTimeline(Timeline timeline) {
-        _timelines.add(timeline);
+        timelines.add(timeline);
     }
 
     /**
