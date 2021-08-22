@@ -380,7 +380,6 @@ public class SchedulerScreenController implements Initializable {
             inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
         }
 
-        System.out.println("H:" + inputGraphHeight +"\tW:" + inputGraphWidth);
         inputGraphContainer.setCenter(isLightMode ? inputGraphLight : inputGraphDark);
     }
 
