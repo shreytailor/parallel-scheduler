@@ -37,7 +37,7 @@
                <left>
                   <Label nodeOrientation="RIGHT_TO_LEFT" styleClass="main-font-color" text="The Marauders: Task Scheduler Visualization" BorderPane.alignment="CENTER">
                      <font>
-                        <Font name="System Bold" size="28.0" />
+                        <Font name="System Bold" size="25.0" />
                      </font>
                      <BorderPane.margin>
                         <Insets />
