@@ -18,8 +18,8 @@ public class Scheduler {
     protected List[] taskEquivalencesMap;
     protected Schedule feasibleSchedule;
     protected int totalComputationTime = 0;
-    protected Queue<Schedule> scheduleQueue;
-    protected Set<Schedule> visitedSchedules;
+    protected TreeSet<Schedule> openSchedules;
+    protected TreeSet<Schedule> visitedSchedules;
     protected Schedule sharedState;
 
     public Scheduler(Graph g, int numOfProcessors) {
@@ -36,30 +36,15 @@ public class Scheduler {
         taskBottomLevelMap = Preprocessor.calculateTaskBottomLevels(tasks);
         taskBottomLevelsWithoutEdgeCostsMap = Preprocessor.calculateTaskBottomLevelsWithoutEdgeCosts(tasks);
         taskEquivalencesMap = Preprocessor.calculateEquivalentTasks(tasks);
-        scheduleQueue = createScheduleQueue();
-        visitedSchedules = createVisitedScheduleSet();
+        openSchedules = createScheduleSet();
+        visitedSchedules = createScheduleSet();
     }
 
     /**
-     * Create a list for schedules that are waiting to be expanded. Sorted by increasing estimated finish time.
-     * If two tasks have the same estimated finish time, the schedule with more tasks already scheduled is chosen.
-     * @return a queue containing the incomplete schedules waiting to be expanded.
+     * Create a treeset to hold the schedules in the CLOSED and OPEN list. Schedules are sorted in ascending estimated finish time.
+     * @return a set which will be used to store schedules.
      */
-    protected Queue<Schedule> createScheduleQueue() {
-        return new PriorityQueue<>((a, b) -> {
-            int n = a.getEstimatedFinishTime() - b.getEstimatedFinishTime();
-            if (n == 0) {
-                return b.getNumberOfTasks() - a.getNumberOfTasks();
-            }
-            return n;
-        });
-    }
-
-    /**
-     * Create a treeset containing all the schedules that have been fully expanded. Allows for finding elements in O(log(n)).
-     * @return a set which will be used to store all the fully expanded schedules.
-     */
-    protected Set<Schedule> createVisitedScheduleSet() {
+    protected TreeSet<Schedule> createScheduleSet() {
         return new TreeSet<>((a, b) -> {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
@@ -88,9 +73,9 @@ public class Scheduler {
 
         // (1) OPEN priority queue, sorted by f
         generateInitialSchedules();
-        while (scheduleQueue.size() != 0) {
+        while (openSchedules.size() != 0) {
             // (2) Remove from OPEN the search state s with the smallest f
-            Schedule s = scheduleQueue.poll();
+            Schedule s = openSchedules.pollFirst();
 
             // (3) If s is the goal state, a complete and optimal schedule is found and the algorithm stops;
             // otherwise, go to the next step.
@@ -179,11 +164,12 @@ public class Scheduler {
                 sharedState = newSchedule;
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
-                //Pruning techniques used: upper bounding, equivalent schedule pruning, and duplicate detection using a CLOSED list.
+                //Pruning techniques used: upper bounding, equivalent schedule pruning, and duplicate detection using the CLOSED and OPEN lists.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
-                        !visitedSchedules.contains(newSchedule)) {
-                    scheduleQueue.add(newSchedule);
+                        !visitedSchedules.contains(newSchedule) &&
+                        !openSchedules.contains(newSchedule)) {
+                    openSchedules.add(newSchedule);
                     //Partial expansion
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
                         partiallyExpanded = true;
@@ -193,7 +179,7 @@ public class Scheduler {
             // If the conditions for partial expansion are satisfied, then do not fully expand the current schedule.
             if (partiallyExpanded) {
                 s.setPartialExpansionIndex(t.byteValue());
-                scheduleQueue.add(s);
+                openSchedules.add(s);
                 return;
             }
         }
@@ -210,7 +196,7 @@ public class Scheduler {
                 Schedule s = new Schedule(tasks.length, processors, taskRequirementsMap.clone());
                 s.addTask(tasks[i], 0, 0);
                 s.setEstimatedFinishTime(taskBottomLevelsWithoutEdgeCostsMap[i]);
-                scheduleQueue.add(s);
+                openSchedules.add(s);
             }
         }
     }
@@ -409,7 +395,7 @@ public class Scheduler {
      * @return the number of states waiting to be expanded
      */
     public int getInfoOpenStates() {
-        return scheduleQueue.size();
+        return openSchedules.size();
     }
 
     /**

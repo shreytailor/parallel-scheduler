@@ -1,6 +1,7 @@
 package com.team7.scheduler;
 
 import com.team7.Entrypoint;
+import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -57,7 +58,7 @@ public class SchedulerTestCrawledExamples {
                 fail("ignore this case");
             }
 
-            Scheduler scheduler = new Scheduler(g, graphInfo.numberOfTargetProcessors);
+            Scheduler scheduler = new ParallelScheduler(g, graphInfo.numberOfTargetProcessors, 4);
             assertTimeout(Duration.ofSeconds(120), ()->{
                 Schedule result = scheduler.findOptimalSchedule();
                 assertTrue(TaskSchedulingConstraintsChecker.isProcessorConstraintMet(result, g, graphInfo.numberOfTargetProcessors));

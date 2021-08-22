@@ -17,7 +17,7 @@ public class ParallelScheduler extends Scheduler {
     public ParallelScheduler(Graph g, int numOfProcessors, int numThreads) {
         super(g, numOfProcessors);
 
-        if(numThreads == 0){
+        if (numThreads == 0) {
             throw new RuntimeException("number of threads not specified");
         }
         executorService = Executors.newFixedThreadPool(numThreads);
@@ -29,7 +29,7 @@ public class ParallelScheduler extends Scheduler {
     }
 
     @Override
-    public int getInfoOpenStates(){
+    public int getInfoOpenStates() {
         int numberOfOpenStates = 0;
         for (IndependentWorker worker : workers) {
             numberOfOpenStates += worker.getOpenStatesSize();
@@ -47,8 +47,8 @@ public class ParallelScheduler extends Scheduler {
 
         generateInitialSchedules();
 
-        while (scheduleQueue.size() > 0 && scheduleQueue.size() < numThreads * 10) {
-            Schedule schedule = scheduleQueue.poll();
+        while (openSchedules.size() > 0 && openSchedules.size() < numThreads * 10) {
+            Schedule schedule = openSchedules.pollFirst();
             if (schedule.getNumberOfTasks() == tasks.length) {
                 Entrypoint.stopTimerLabel();
                 sharedState = schedule;
@@ -59,8 +59,8 @@ public class ParallelScheduler extends Scheduler {
 
         // distribute the tasks
         int index = 0;
-        while (scheduleQueue.size() > 0) {
-            workers[index % numThreads].addSchedule(scheduleQueue.poll());
+        while (openSchedules.size() > 0) {
+            workers[index % numThreads].addSchedule(openSchedules.pollFirst());
             index++;
         }
 
@@ -69,20 +69,20 @@ public class ParallelScheduler extends Scheduler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         Entrypoint.stopTimerLabel();
         sharedState = bestSchedule;
         return bestSchedule;
     }
 
     private class IndependentWorker implements Callable<Schedule> {
-        private Queue<Schedule> schedules = createScheduleQueue();
+        private TreeSet<Schedule> schedules = createScheduleSet();
 
         public void addSchedule(Schedule s) {
             schedules.add(s);
         }
 
-        public int getOpenStatesSize(){
+        public int getOpenStatesSize() {
             return schedules.size();
         }
 
@@ -90,7 +90,7 @@ public class ParallelScheduler extends Scheduler {
         public Schedule call() {
             // (1) OPEN priority queue, sorted by f
             while (schedules.size() != 0) {
-                Schedule s = schedules.poll();
+                Schedule s = schedules.pollFirst();
 
                 synchronized (this) {
                     if (s.getEstimatedFinishTime() >= bestSchedule.getEstimatedFinishTime()) {
@@ -110,10 +110,11 @@ public class ParallelScheduler extends Scheduler {
 
     /**
      * Expands schedule s and adds the new schedules to the queue.
-     * @param s the schedule we want to expand
+     *
+     * @param s         the schedule we want to expand
      * @param schedules the queue which we will add new schedules to
      */
-    private void expandSchedule(Schedule s, Queue<Schedule> schedules) {
+    private void expandSchedule(Schedule s, TreeSet<Schedule> schedules) {
         Set<Task> equivalent = new HashSet<>();
         for (Integer t : s.getBeginnableTasks()) {
             if (equivalent.contains(tasks[t])) {
@@ -140,7 +141,8 @@ public class ParallelScheduler extends Scheduler {
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
                         !containsEquivalentSchedule(newSchedule, tasks[t]) &&
-                        !visitedSchedules.contains(newSchedule)) {
+                        !visitedSchedules.contains(newSchedule) &&
+                        !schedules.contains(newSchedule)) {
                     schedules.add(newSchedule);
                     if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
                         partiallyExpanded = true;
