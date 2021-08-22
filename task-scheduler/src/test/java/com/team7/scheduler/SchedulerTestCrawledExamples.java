@@ -1,7 +1,6 @@
 package com.team7.scheduler;
 
 import com.team7.Entrypoint;
-import com.team7.algorithm.ParallelScheduler;
 import com.team7.algorithm.Scheduler;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
@@ -9,7 +8,6 @@ import com.team7.parsing.DOTParser;
 import com.team7.testutil.GraphInfoUtil;
 import com.team7.testutil.TaskSchedulingConstraintsChecker;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;

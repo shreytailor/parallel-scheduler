@@ -17,10 +17,10 @@ import javafx.stage.StageStyle;
  * This class is the driver which initiates the Graphical User Interface, if asked by the user.
  */
 public class VisualizationDriver extends Application {
-    private static Config _config;
-    private static Task[] _tasks;
-    private static Scheduler _scheduler;
-    private static SchedulerScreenController _controller;
+    private static Config config;
+    private static Task[] tasks;
+    private static Scheduler scheduler;
+    private static SchedulerScreenController controller;
 
     /**
      * This method is used to launch the user interface for the algorithm, after you pass in the
@@ -30,9 +30,9 @@ public class VisualizationDriver extends Application {
      * @param scheduler the Scheduler which is doing the scheduling.
      */
     public static void show(Task[] tasks, Config config, Scheduler scheduler) {
-        _config = config;
-        _tasks = tasks;
-        _scheduler = scheduler;
+        VisualizationDriver.config = config;
+        VisualizationDriver.tasks = tasks;
+        VisualizationDriver.scheduler = scheduler;
         launch();
     }
 
@@ -41,8 +41,8 @@ public class VisualizationDriver extends Application {
 
         // Load the fxml file, its custom controller, and set it as the main parent.
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SplashScreen.fxml"));
-        _controller = new SchedulerScreenController(_tasks, _config, _scheduler);
-        loader.setController(_controller);
+        controller = new SchedulerScreenController(tasks, config);
+        loader.setController(controller);
         Parent root = loader.load();
         Scene scene = new Scene(root);
 
@@ -56,14 +56,14 @@ public class VisualizationDriver extends Application {
 
         // Begin the algorithm on a new thread, so the application is not being blocked.
         new Thread(() -> {
-            Schedule schedule = _scheduler.findOptimalSchedule();
+            Schedule schedule = scheduler.findOptimalSchedule();
             Entrypoint.writeScheduleOutputToFile(schedule);
         }).start();
     }
 
     public static void updateScreen() {
         Platform.runLater(() -> {
-            _controller.finalUpdate(_scheduler);
+            controller.finalUpdate(scheduler);
         });
     }
 }

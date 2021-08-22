@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TaskSchedulingConstraintsChecker {
 
     public static boolean isProcessorConstraintMet(Schedule schedule, Graph graph, int numOfProcessors) {
-//        make a list of tasks that are assigned to each processor
+        // Make a list of tasks that are assigned to each processor
         List<Task>[] processors = getTaskPopulatedProcessors(schedule, graph, numOfProcessors);
 
 
-//        for each processor, check that each pair of tasks meet processor requirement
-//        this check is only done if there's an edge between those pair of tasks
+        // For each processor, check that each pair of tasks meet processor requirement
+        // This check is only done if there's an edge between those pair of tasks
         for (List<Task> processor : processors) {
-//            if a processor doesn't have any tasks assigned, break
+            // If a processor doesn't have any tasks assigned, break
             if (processor == null) {
                 break;
             }
@@ -45,7 +45,7 @@ public class TaskSchedulingConstraintsChecker {
         int taskOneStartingTime = schedule.getTaskStartTime(taskOne);
         int taskTwoStartingTime = schedule.getTaskStartTime(taskTwo);
 
-        // only need to satisfy two conditions as OR
+        // Only need to satisfy two conditions as OR
         boolean conditionOne = taskOneStartingTime + taskOne.getWeight() <= taskTwoStartingTime;
         boolean conditionTwo = taskTwoStartingTime + taskTwo.getWeight() <= taskOneStartingTime;
 
@@ -71,11 +71,11 @@ public class TaskSchedulingConstraintsChecker {
     }
 
     public static boolean isPrecedenceConstraintMet(Schedule schedule, List<Edge> edges) {
-//         for each edge ij (i being the tail task, j being the head task)
-//        if p_i != p_j, then
-//        ts_j => ts_i + w_i + c_e (cost of edge)
-//        else, ts_j => ts_i + w_i
 
+        // For each edge ij (i being the tail task, j being the head task)
+        // If p_i != p_j, then
+        // ts_j => ts_i + w_i + c_e (cost of edge)
+        // else, ts_j => ts_i + w_i
         for (Edge edge : edges) {
             Task tail = edge.getTail();
             Task head = edge.getHead();

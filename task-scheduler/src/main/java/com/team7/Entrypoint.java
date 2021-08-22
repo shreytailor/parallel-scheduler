@@ -7,16 +7,14 @@ import com.team7.exceptions.CommandLineException;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
-import com.team7.parsing.Config;
 import com.team7.parsing.CLIParser;
+import com.team7.parsing.Config;
 import com.team7.parsing.DOTParser;
 import com.team7.visualization.VisualizationDriver;
 import com.team7.visualization.realtime.ScheduleUpdater;
 import com.team7.visualization.system.TimeProvider;
-import javafx.application.Platform;
 
 import java.io.FileNotFoundException;
-import java.sql.SQLOutput;
 
 public class Entrypoint {
     public static boolean IS_TEST_MODE = false;

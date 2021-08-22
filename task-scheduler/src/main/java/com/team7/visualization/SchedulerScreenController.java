@@ -69,18 +69,18 @@ public class SchedulerScreenController implements Initializable {
     private final Image LIGHT_IN_IMAGE = new Image("/images/zoom-in-light.png");
 
     // Style Sheets
-    private final String LightCss = getClass().getResource("/stylesheets/SplashLightMode.css").toExternalForm();
-    private final String DarkCss = getClass().getResource("/stylesheets/SplashDarkMode.css").toExternalForm();
+    private final String LIGHT_CSS = getClass().getResource("/stylesheets/SplashLightMode.css").toExternalForm();
+    private final String DARK_CSS = getClass().getResource("/stylesheets/SplashDarkMode.css").toExternalForm();
 
+    // States variables
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
-    private final Config _config;
-    private final Task[] _tasks;
-    private final BorderPane inputGraphContainer = new BorderPane();
-    private Scheduler scheduler;
-    private Schedule _observedSchedule;
+    private final Config config;
+    private final Task[] tasks;
+    private Schedule observedSchedule;
 
     // Input Graph variables
+    private final BorderPane inputGraphContainer = new BorderPane();
     private BufferedImage lightBufferedImage;
     private BufferedImage darkBufferedImage;
     private MutableGraph lightMutableGraph;
@@ -92,8 +92,8 @@ public class SchedulerScreenController implements Initializable {
     private CPUUtilizationProvider cpuUtilizationProvider;
     private RAMUtilizationProvider ramUtilizationProvider;
     private GanttProvider ganttProvider;
-    private Timeline _chartUpdaterTimeline;
-    private TimeProvider _timeProvider;
+    private Timeline chartUpdaterTimeline;
+    private TimeProvider timeProvider;
 
     //Input graph parameters.
     private int INPUT_GRAPH_MAX_HEIGHT = 650;
@@ -134,10 +134,10 @@ public class SchedulerScreenController implements Initializable {
     private ImageView closeIcon;
 
     @FXML
-    public ImageView zoomInIcon;
+    private ImageView zoomInIcon;
 
     @FXML
-    public ImageView zoomOutIcon;
+    private ImageView zoomOutIcon;
 
     @FXML
     private ImageView statusIconLoading;
@@ -152,17 +152,16 @@ public class SchedulerScreenController implements Initializable {
     private Label labelClosedStates;
 
     @FXML
-    public LineChart<String, Number> cpuUsageChart;
+    private LineChart<String, Number> cpuUsageChart;
 
     @FXML
-    public LineChart<String, Number> ramUsageChart;
+    private LineChart<String, Number> ramUsageChart;
 
-    public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
-        _config = config;
-        _tasks = tasks;
-        scheduler = s;
+    public SchedulerScreenController(Task[] tasks, Config config) {
+        this.config = config;
+        this.tasks = tasks;
 
-        try (InputStream dot = new FileInputStream(_config.getInputName())) {
+        try (InputStream dot = new FileInputStream(this.config.getInputName())) {
 
             // Parse the dot file and generate an image
             lightMutableGraph = new Parser().read(dot);
@@ -179,7 +178,7 @@ public class SchedulerScreenController implements Initializable {
             inputGraphHeight = lightBufferedImage.getHeight();
             inputGraphWidth = lightBufferedImage.getWidth();
             heightAdjustmentRatio = (double) inputGraphHeight / (double) inputGraphWidth;
-            heightAdjustmentValue = (int) (unitAdjustmentValue * heightAdjustmentRatio);
+            heightAdjustmentValue = (int) (UNIT_ADJUSTMENT_VALUE * heightAdjustmentRatio);
 
             // Calculates the default max height vs max width ratio
             scaleRatio = (double) INPUT_GRAPH_MAX_HEIGHT / (double) INPUT_GRAPH_MAX_WIDTH;
@@ -236,10 +235,10 @@ public class SchedulerScreenController implements Initializable {
      * This method is used to set up the providers, required for live CPU/RAM usage visualization.
      */
     private void setupSystemCharts() {
-        _timeProvider = TimeProvider.getInstance();
-        _timeProvider.registerLabel(timerLabel);
+        timeProvider = TimeProvider.getInstance();
+        timeProvider.registerLabel(timerLabel);
 
-        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", _timeProvider);
+        cpuUtilizationProvider = new CPUUtilizationProvider(cpuUsageChart, "CPU Utilization", timeProvider);
         cpuUtilizationProvider.startTracking();
 
         // Applying custom properties to the CPU chart.
@@ -248,7 +247,7 @@ public class SchedulerScreenController implements Initializable {
         cpuYAxis.setLabel("Usage (%)");
         cpuYAxis.setUpperBound(cpuUtilizationProvider.getUpperBound());
 
-        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization", _timeProvider);
+        ramUtilizationProvider = new RAMUtilizationProvider(ramUsageChart, "RAM Utilization", timeProvider);
         ramUtilizationProvider.startTracking();
 
         // Applying custom properties to the RAM chart.
@@ -259,9 +258,9 @@ public class SchedulerScreenController implements Initializable {
 
         // Beginning the live visualization by getting the ScheduleUpdater singleton instance.
         ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
-        _observedSchedule = scheduleUpdater.getObservedSchedule();
+        observedSchedule = scheduleUpdater.getObservedSchedule();
         scheduleUpdater.start();
-        ganttProvider = new GanttProvider(_tasks, _observedSchedule, _config);
+        ganttProvider = new GanttProvider(tasks, observedSchedule, config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
         // Event for schedule update and states update
@@ -272,10 +271,10 @@ public class SchedulerScreenController implements Initializable {
         };
 
         // Time line for schedule and states update + registering timeline
-        _chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), rerenderStatistics));
-        _chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
-        _chartUpdaterTimeline.play();
-        _timeProvider.registerTimeline(_chartUpdaterTimeline);
+        chartUpdaterTimeline = new Timeline(new KeyFrame(Duration.seconds(1), rerenderStatistics));
+        chartUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
+        chartUpdaterTimeline.play();
+        timeProvider.registerTimeline(chartUpdaterTimeline);
 
         // Adding the container of the input graph to the screen.
         mainGrid.add(inputGraphContainer, 0, 1, 1, 2);
@@ -293,11 +292,11 @@ public class SchedulerScreenController implements Initializable {
         if (isLightMode) {
             // Switch to dark mode
             updateTheme(sheets, DARK_IN_IMAGE, DARK_OUT_IMAGE, SUN_IMAGE, DARK_CLOSE_IMAGE, DARK_MIN_IMAGE,
-                    DARK_LOAD_IMAGE, DARK_TICK_IMAGE, inputGraphDark, LightCss, DarkCss);
+                    DARK_LOAD_IMAGE, DARK_TICK_IMAGE, inputGraphDark, LIGHT_CSS, DARK_CSS);
         } else {
             // Switch to light mode
             updateTheme(sheets, LIGHT_IN_IMAGE, LIGHT_OUT_IMAGE, MOON_IMAGE, LIGHT_CLOSE_IMAGE, LIGHT_MIN_IMAGE,
-                    LIGHT_LOAD_IMAGE, LIGHT_TICK_IMAGE, inputGraphLight, DarkCss, LightCss);
+                    LIGHT_LOAD_IMAGE, LIGHT_TICK_IMAGE, inputGraphLight, DARK_CSS, LIGHT_CSS);
         }
     }
 
@@ -323,7 +322,7 @@ public class SchedulerScreenController implements Initializable {
      * This handler method is used to define the logic of toggling between system and input charts.
      */
     @FXML
-    public void handleViewToggleButton() {
+    private void handleViewToggleButton() {
         utilGraphContainer.setVisible(!isShowingUtilization);
         inputGraphContainer.setVisible(isShowingUtilization);
         zoomInIcon.setVisible(isShowingUtilization);
@@ -342,7 +341,7 @@ public class SchedulerScreenController implements Initializable {
      * This handler method is used to define the logic of zooming out of the input graph.
      */
     @FXML
-    public void handleZoomOutIcon() {
+    private void handleZoomOutIcon() {
 
         // When the image size is smaller than the minimum width, return to save overhead
         if (inputGraphHeight <= INPUT_GRAPH_MIN_HEIGHT || inputGraphWidth <= INPUT_GRAPH_MIN_WIDTH) {
@@ -350,7 +349,7 @@ public class SchedulerScreenController implements Initializable {
         }
 
         inputGraphHeight -= heightAdjustmentValue;
-        inputGraphWidth -= unitAdjustmentValue;
+        inputGraphWidth -= UNIT_ADJUSTMENT_VALUE;
 
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }
@@ -359,7 +358,7 @@ public class SchedulerScreenController implements Initializable {
      * This handler method is used to define the logic of zooming into the input graph.
      */
     @FXML
-    public void handleZoomInIcon() {
+    private void handleZoomInIcon() {
 
         // When the image size is exceeding the minimum height, return to save overhead
         if (inputGraphHeight >= INPUT_GRAPH_MAX_HEIGHT || inputGraphWidth >= INPUT_GRAPH_MAX_WIDTH) {
@@ -367,7 +366,7 @@ public class SchedulerScreenController implements Initializable {
         }
 
         inputGraphHeight += heightAdjustmentValue;
-        inputGraphWidth += unitAdjustmentValue;
+        inputGraphWidth += UNIT_ADJUSTMENT_VALUE;
 
         updateInputGraph(isLightMode, inputGraphHeight, inputGraphWidth);
     }

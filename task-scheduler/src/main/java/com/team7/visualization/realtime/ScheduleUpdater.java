@@ -14,12 +14,12 @@ import javafx.util.Duration;
  * the execution occurs.
  */
 public class ScheduleUpdater {
-    private int _openedStates;
-    private int _closedStates;
-    private Scheduler _scheduler;
-    private Schedule _observedSchedule;
-    private Timeline _scheduleUpdaterTimeline;
-    private static ScheduleUpdater _scheduleUpdater;
+    private int openedStates;
+    private int closedStates;
+    private Scheduler scheduler;
+    private Schedule observedSchedule;
+    private Timeline scheduleUpdaterTimeline;
+    private static ScheduleUpdater scheduleUpdater;
 
     /**
      * This lone constructor is called by the getInstance() method to create the Singleton instance.
@@ -33,11 +33,11 @@ public class ScheduleUpdater {
      * @return ScheduleUpdater the singleton instance of this class.
      */
     public static ScheduleUpdater getInstance () {
-        if (_scheduleUpdater == null) {
-            _scheduleUpdater = new ScheduleUpdater();
+        if (scheduleUpdater == null) {
+            scheduleUpdater = new ScheduleUpdater();
         }
 
-        return _scheduleUpdater;
+        return scheduleUpdater;
     }
 
     /**
@@ -47,22 +47,22 @@ public class ScheduleUpdater {
         EventHandler<ActionEvent> scheduleUpdater = event -> {
 
             // Fetch the latest statistics / information from the scheduler.
-            _observedSchedule = _scheduler.getSharedState();
-            _openedStates = _scheduler.getInfoOpenStates();
-            _closedStates = _scheduler.getInfoClosedStates();
+            observedSchedule = scheduler.getSharedState();
+            openedStates = scheduler.getInfoOpenStates();
+            closedStates = scheduler.getInfoClosedStates();
         };
 
-        _scheduleUpdaterTimeline = new Timeline(new KeyFrame(Duration.millis(500), scheduleUpdater));
-        _scheduleUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
-        _scheduleUpdaterTimeline.play();
+        scheduleUpdaterTimeline = new Timeline(new KeyFrame(Duration.millis(500), scheduleUpdater));
+        scheduleUpdaterTimeline.setCycleCount(Timeline.INDEFINITE);
+        scheduleUpdaterTimeline.play();
     }
 
     /**
      * This method starts the process of retrieving the information from the scheduler.
      */
     public void stop() {
-        _observedSchedule = _scheduler.getSharedState();
-        _scheduleUpdaterTimeline.stop();
+        observedSchedule = scheduler.getSharedState();
+        scheduleUpdaterTimeline.stop();
     }
 
     /**
@@ -70,7 +70,7 @@ public class ScheduleUpdater {
      * @param scheduler the scheduler on which the algorithm is running.
      */
     public void setScheduler(Scheduler scheduler) {
-        _scheduler = scheduler;
+        this.scheduler = scheduler;
     }
 
     /**
@@ -78,7 +78,7 @@ public class ScheduleUpdater {
      * @return Integer for the number of opened states.
      */
     public int getOpenedStates() {
-        return _openedStates;
+        return openedStates;
     }
 
     /**
@@ -86,7 +86,7 @@ public class ScheduleUpdater {
      * @return Integer for the number of closed states.
      */
     public int getClosedStates() {
-        return _closedStates;
+        return closedStates;
     }
 
     /**
@@ -94,6 +94,6 @@ public class ScheduleUpdater {
      * @return Schedule this is the latest schedule from the scheduler.
      */
     public Schedule getObservedSchedule() {
-        return _observedSchedule;
+        return observedSchedule;
     }
 }

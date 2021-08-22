@@ -5,8 +5,6 @@ import com.team7.model.Edge;
 import com.team7.model.Graph;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
-import com.team7.visualization.system.TimeProvider;
-import javafx.beans.property.SimpleBooleanProperty;
 
 import java.util.*;
 
