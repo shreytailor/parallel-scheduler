@@ -96,11 +96,11 @@ public class SchedulerScreenController implements Initializable {
     private TimeProvider _timeProvider;
 
     //Input graph parameters.
-    private final int INPUT_GRAPH_MAX_HEIGHT = 650;
-    private final int INPUT_GRAPH_MAX_WIDTH = 500;
-    private final int INPUT_GRAPH_MIN_HEIGHT = 100;
-    private final int INPUT_GRAPH_MIN_WIDTH = 100;
-    private final int unitAdjustmentValue = 20;
+    private final int INPUT_GRAPH_MAX_HEIGHT = 950;
+    private final int INPUT_GRAPH_MAX_WIDTH = 550;
+    private final int INPUT_GRAPH_MIN_HEIGHT = 10;
+    private final int INPUT_GRAPH_MIN_WIDTH = 50;
+    private final int unitAdjustmentValue = 30;
     private int heightAdjustmentValue;
     private double heightAdjustmentRatio;
     private int inputGraphHeight;
@@ -380,6 +380,7 @@ public class SchedulerScreenController implements Initializable {
             inputGraphDark = new ImageView(SwingFXUtils.toFXImage(darkBufferedImage, null));
         }
 
+        System.out.println("H:" + inputGraphHeight +"\tW:" + inputGraphWidth);
         inputGraphContainer.setCenter(isLightMode ? inputGraphLight : inputGraphDark);
     }
 
