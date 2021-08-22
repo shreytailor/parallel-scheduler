@@ -72,15 +72,15 @@ public class SchedulerScreenController implements Initializable {
     private final String LightCss = getClass().getResource("/stylesheets/SplashLightMode.css").toExternalForm();
     private final String DarkCss = getClass().getResource("/stylesheets/SplashDarkMode.css").toExternalForm();
 
+    // States variables
     private boolean isLightMode = true;
     private boolean isShowingUtilization = true;
     private final Config _config;
     private final Task[] _tasks;
-    private final BorderPane inputGraphContainer = new BorderPane();
-    private Scheduler scheduler;
     private Schedule _observedSchedule;
 
     // Input Graph variables
+    private final BorderPane inputGraphContainer = new BorderPane();
     private BufferedImage lightBufferedImage;
     private BufferedImage darkBufferedImage;
     private MutableGraph lightMutableGraph;
@@ -156,10 +156,9 @@ public class SchedulerScreenController implements Initializable {
     @FXML
     public LineChart<String, Number> ramUsageChart;
 
-    public SchedulerScreenController(Task[] tasks, Config config, Scheduler s) {
+    public SchedulerScreenController(Task[] tasks, Config config) {
         _config = config;
         _tasks = tasks;
-        scheduler = s;
 
         try (InputStream dot = new FileInputStream(_config.getInputName())) {
 

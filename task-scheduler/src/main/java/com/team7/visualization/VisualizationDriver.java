@@ -41,7 +41,7 @@ public class VisualizationDriver extends Application {
 
         // Load the fxml file, its custom controller, and set it as the main parent.
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SplashScreen.fxml"));
-        _controller = new SchedulerScreenController(_tasks, _config, _scheduler);
+        _controller = new SchedulerScreenController(_tasks, _config);
         loader.setController(_controller);
         Parent root = loader.load();
         Scene scene = new Scene(root);
