@@ -4,7 +4,7 @@ import com.team7.algorithm.Scheduler;
 import com.team7.model.Schedule;
 import com.team7.model.Task;
 import com.team7.parsing.Config;
-import com.team7.visualization.ganttchart.GanttProvider2;
+import com.team7.visualization.ganttchart.GanttProvider;
 import com.team7.visualization.realtime.ScheduleUpdater;
 import com.team7.visualization.system.CPUUtilizationProvider;
 import com.team7.visualization.system.RAMUtilizationProvider;
@@ -91,7 +91,7 @@ public class SchedulerScreenController implements Initializable {
     // Objects used for the live visualization.
     private CPUUtilizationProvider cpuUtilizationProvider;
     private RAMUtilizationProvider ramUtilizationProvider;
-    private GanttProvider2 ganttProvider;
+    private GanttProvider ganttProvider;
     private Timeline _chartUpdaterTimeline;
     private TimeProvider _timeProvider;
 
@@ -254,7 +254,7 @@ public class SchedulerScreenController implements Initializable {
         ScheduleUpdater scheduleUpdater = ScheduleUpdater.getInstance();
         _observedSchedule = scheduleUpdater.getObservedSchedule();
         scheduleUpdater.start();
-        ganttProvider = new GanttProvider2(_tasks, _observedSchedule, _config);
+        ganttProvider = new GanttProvider(_tasks, _observedSchedule, _config);
         stateGraphContainer.setCenter(ganttProvider.getSchedule());
 
         // Event for schedule update and states update
