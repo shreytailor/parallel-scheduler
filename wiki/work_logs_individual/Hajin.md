@@ -1,3 +1,13 @@
+### 22 Aug
+- Created a release. Took the whole day to build, test, fix jar file.
+- Done!
+
+### 20 Aug
+- Had a zoom meeting with Shrey and Josh to fix schedule visualisation. There were some bugs with the event transmission, which we fixed together. There was another problem that the scheduler doesn't start before algorithm starts, so we fixed that together as well.
+- Implemented a feature where time label in the visualisation stops going up in time after scheduler stops. Being part of the algorithm implemnetation team, I knew where scheduler was meant to stop, and was able to put the code that stops the timer in the right place. This placement was more important with parallel scheduler, as visualisation team were not strongly familiar with the implementation.
+- Implemented a public method that retrieves # of opened states (partial schedules) and closed (visited) states. 
+- Also peer-programmed with Josh to get rid of ObservedList<Schedule>, as a single Schedule was sufficient. Had to fix some bugs that came with the change though.
+
 ### 17 Aug
 - Implemented a working parallel scheduler 'ParallelSchedulerShareEachLoop', which produces an optimal schedule. This uses Executor service to have a fixed number of threads in the pool. When the while loop is entered, we create at least as many workers as there are threads, and we assign a state to explore for each of them. 
 - Implemented a parser and utility that parses the gxl files crawled from [optimal schedule database of UoA Parallel Lab](https://parallel.auckland.ac.nz/OptimalTaskScheduling/OptimalSchedules.html). GraphInfo also stores extra information regarding expected optimal time, number of processors we are allocating task to, and number of tasks to allocate.
