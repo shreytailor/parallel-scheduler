@@ -22,7 +22,9 @@ The command line arguments which can be used to interact with this program are s
 | -v | Visualize the scheduling algorithm. |
 | -o OUTPUT | Output file is named OUTPUT (default is INPUT-output.dot) |
 
-Example usage: ```java -jar scheduler.jar Nodes_11_OutTree.dot 2 -v -p 4```
+Example usages: 
+```java -jar scheduler.jar Nodes_11_OutTree.dot 2 -v -p 4```
+```java -jar scheduler.jar ".\task-scheduler\src\crawled-dot-tests\Fork_Join_Nodes_10_CCR_0.10_WeightType_Random#5_Homogeneous-4.dot" 8 -v```
 
 ## Team
 
