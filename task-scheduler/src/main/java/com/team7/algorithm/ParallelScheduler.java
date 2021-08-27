@@ -42,6 +42,7 @@ public class ParallelScheduler extends Scheduler {
      *
      * @return an optimal schedule
      */
+    @Override
     public Schedule findOptimalSchedule() {
         bestSchedule = findFeasibleSchedule();
 
@@ -54,7 +55,7 @@ public class ParallelScheduler extends Scheduler {
                 sharedState = schedule;
                 return schedule;
             }
-            expandSchedule(schedule);
+            expandSchedule(schedule, openSchedules);
         }
 
         // distribute the tasks
@@ -73,6 +74,13 @@ public class ParallelScheduler extends Scheduler {
         Entrypoint.stopTimerLabel();
         sharedState = bestSchedule;
         return bestSchedule;
+    }
+
+    @Override
+    protected void addToVisitedSchedules(Schedule s) {
+        synchronized (this) {
+            visitedSchedules.add(s);
+        }
     }
 
     private class IndependentWorker implements Callable<Schedule> {
@@ -105,58 +113,6 @@ public class ParallelScheduler extends Scheduler {
                 expandSchedule(s, schedules);
             }
             return null;
-        }
-    }
-
-    /**
-     * Expands schedule s and adds the new schedules to the queue.
-     *
-     * @param s         the schedule we want to expand
-     * @param schedules the queue which we will add new schedules to
-     */
-    private void expandSchedule(Schedule s, TreeSet<Schedule> schedules) {
-        Set<Task> equivalent = new HashSet<>();
-        for (Integer t : s.getBeginnableTasks()) {
-            if (equivalent.contains(tasks[t])) {
-                continue;
-            }
-            equivalent.addAll(taskEquivalencesMap[t]);
-
-            boolean partiallyExpanded = false;
-            boolean normalised = false;
-            for (int i = 0; i < processors; i++) {
-                int earliestStartTime = calculateEarliestTimeToSchedule(s, tasks[t], i);
-                //Normalising
-                if (earliestStartTime == 0) {
-                    if (normalised) {
-                        continue;
-                    }
-                    normalised = true;
-                    if (t < s.getNormalisationIndex()) {
-                        continue;
-                    }
-                }
-                Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
-                sharedState = newSchedule;
-                //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
-                if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
-                        !containsEquivalentSchedule(newSchedule, tasks[t]) &&
-                        !visitedSchedules.contains(newSchedule) &&
-                        !schedules.contains(newSchedule)) {
-                    schedules.add(newSchedule);
-                    if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
-                        partiallyExpanded = true;
-                    }
-                }
-            }
-            if (partiallyExpanded) {
-                s.setPartialExpansionIndex(t.byteValue());
-                schedules.add(s);
-                return;
-            }
-        }
-        synchronized (this) {
-            visitedSchedules.add(s);
         }
     }
 }

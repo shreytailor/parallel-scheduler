@@ -42,6 +42,7 @@ public class Scheduler {
 
     /**
      * Create a treeset to hold the schedules in the CLOSED and OPEN list. Schedules are sorted in ascending estimated finish time.
+     *
      * @return a set which will be used to store schedules.
      */
     protected TreeSet<Schedule> createScheduleSet() {
@@ -49,11 +50,11 @@ public class Scheduler {
             if (a.getEstimatedFinishTime() == b.getEstimatedFinishTime()) {
                 if (b.getNumberOfTasks() == a.getNumberOfTasks()) {
                     for (Task t : tasks) {
-                        if (a.getTaskProcessor(t) != b.getTaskProcessor(t)) {
-                            return a.getTaskProcessor(t) - b.getTaskProcessor(t);
-                        }
                         if (a.getTaskStartTime(t) != b.getTaskStartTime(t)) {
                             return a.getTaskStartTime(t) - b.getTaskStartTime(t);
+                        }
+                        if (a.getTaskProcessor(t) != b.getTaskProcessor(t)) {
+                            return a.getTaskProcessor(t) - b.getTaskProcessor(t);
                         }
                     }
                     return 0;
@@ -66,6 +67,7 @@ public class Scheduler {
 
     /**
      * Generates an optimal schedule using an A* algorithm.
+     *
      * @return A complete and optimal schedule
      */
     public Schedule findOptimalSchedule() {
@@ -85,7 +87,7 @@ public class Scheduler {
                 return s;
             }
             // (4) Expand the state s, which produces new state s'. Compute f and put s' into OPEN. Go to (2).
-            expandSchedule(s);
+            expandSchedule(s, openSchedules);
         }
         Entrypoint.stopTimerLabel();
         sharedState = feasibleSchedule;
@@ -94,6 +96,7 @@ public class Scheduler {
 
     /**
      * Generates a valid schedule using a greedy approach.
+     *
      * @return a complete and valid schedule
      */
     public Schedule findFeasibleSchedule() {
@@ -136,11 +139,24 @@ public class Scheduler {
      * nodes to the processors. Each matching produces a new state s'.
      * Compute f(s') = g(s')+h(s') for each new state s'.
      * Put all the new states in OPEN.
-     * @param s the schedule from which we will generate new schedules
+     *
+     * @param s         the schedule we want to expand
+     * @param schedules the queue which we will add new schedules to
      */
-    protected void expandSchedule(Schedule s) {
+    protected void expandSchedule(Schedule s, TreeSet<Schedule> schedules) {
+        tryToFixTaskOrder(s);
+
+        Queue<Integer> beginnableTasks;
+        if (s.isTaskOrderFixed()) {
+            beginnableTasks = new LinkedList<>();
+            beginnableTasks.add(s.getFixedTaskOrder().remove());
+        } else {
+            beginnableTasks = s.getBeginnableTasks();
+        }
+
         Set<Task> equivalent = new HashSet<>();
-        for (Integer t : s.getBeginnableTasks()) {
+        while (beginnableTasks.size() > 0) {
+            Integer t = beginnableTasks.poll();
             if (equivalent.contains(tasks[t])) {
                 continue;
             }
@@ -156,33 +172,40 @@ public class Scheduler {
                         continue;
                     }
                     normalised = true;
-                    if (t < s.getNormalisationIndex()) {
+                    if (t < s.getNormalisationIndex() && !s.isTaskOrderFixed()) {
                         continue;
                     }
                 }
+
                 Schedule newSchedule = generateNewSchedule(s, tasks[t], i, earliestStartTime);
                 sharedState = newSchedule;
 
                 //Only add the new schedule to the queue if it can potentially be better than the feasible schedule.
-                //Pruning techniques used: upper bounding, equivalent schedule pruning, and duplicate detection using the CLOSED and OPEN lists.
                 if (newSchedule.getEstimatedFinishTime() < feasibleSchedule.getEstimatedFinishTime() &&
-                        !containsEquivalentSchedule(newSchedule, tasks[t]) &&
+                        (!newSchedule.isEquivalentSchedulePruningEnabled() || !containsEquivalentSchedule(newSchedule, tasks[t])) &&
                         !visitedSchedules.contains(newSchedule) &&
-                        !openSchedules.contains(newSchedule)) {
-                    openSchedules.add(newSchedule);
-                    //Partial expansion
-                    if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime()) {
+                        !schedules.contains(newSchedule)) {
+                    schedules.add(newSchedule);
+                    if (newSchedule.getEstimatedFinishTime() == s.getEstimatedFinishTime() && beginnableTasks.size() > 0) {
                         partiallyExpanded = true;
                     }
                 }
             }
-            // If the conditions for partial expansion are satisfied, then do not fully expand the current schedule.
             if (partiallyExpanded) {
                 s.setPartialExpansionIndex(t.byteValue());
-                openSchedules.add(s);
+                schedules.add(s);
                 return;
             }
         }
+        addToVisitedSchedules(s);
+    }
+
+    /**
+     * Adds the schedule to the CLOSED list
+     *
+     * @param s the schedule we are adding
+     */
+    protected void addToVisitedSchedules(Schedule s) {
         visitedSchedules.add(s);
     }
 
@@ -203,12 +226,13 @@ public class Scheduler {
 
     /**
      * On the given processor, find the earliest time we can schedule the given task
-     * @param schedule the schedule we want to add the task to
+     *
+     * @param schedule  the schedule we want to add the task to
      * @param processor the processor which we want to schedule the task on
-     * @param task the task we want to schedule
+     * @param task      the task we want to schedule
      * @return the earliest time we can schedule the task
      */
-    public int calculateEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
+    protected int calculateEarliestTimeToSchedule(Schedule schedule, Task task, int processor) {
         int earliestStartTime = schedule.getProcessorFinishTime(processor);
         for (Edge e : task.getIngoingEdges()) {
             int finishTime = schedule.getTaskFinishTime(e.getTail());
@@ -223,11 +247,12 @@ public class Scheduler {
 
     /**
      * Similar to the method above but uses information from the provided arrays and not the whole Schedule object.
-     * @param processor the processor we want to schedule the task on
-     * @param t1 the task to schedule
-     * @param t1StartTime the earliest time that we can schedule t1 that we know so far
+     *
+     * @param processor        the processor we want to schedule the task on
+     * @param t1               the task to schedule
+     * @param t1StartTime      the earliest time that we can schedule t1 that we know so far
      * @param taskProcessorMap an array representing the task processor allocations
-     * @param taskStartTimes an array representing the task start times
+     * @param taskStartTimes   an array representing the task start times
      * @return the earliest time we can schedule the task on the given processor
      */
     private int calculateEarliestTimeToSchedule(int[] taskStartTimes, byte[] taskProcessorMap, Task t1, int processor, int t1StartTime) {
@@ -247,7 +272,7 @@ public class Scheduler {
     /**
      * Creates a new schedule from schedule s which allocates task t to the given processor
      */
-    public Schedule generateNewSchedule(Schedule s, Task t, int processor, int earliestStartTime) {
+    protected Schedule generateNewSchedule(Schedule s, Task t, int processor, int earliestStartTime) {
         Schedule newSchedule = s.clone();
         newSchedule.addTask(t, processor, earliestStartTime);
 
@@ -271,11 +296,12 @@ public class Scheduler {
     /**
      * Checks if the provided schedule with a recently added task can have its tasks rearranged yet still
      * provide a schedule with the same or better estimated finish time.
-     * @param schedule the Schedule
+     *
+     * @param schedule  the Schedule
      * @param addedTask the Task that was just added to the schedule
      * @return boolean representing whether the schedule contains an equivalent schedule
      */
-    public boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
+    private boolean containsEquivalentSchedule(Schedule schedule, Task addedTask) {
         int maxFinishTime = schedule.getTaskFinishTime(addedTask);
         int processor = schedule.getTaskProcessor(addedTask);
 
@@ -326,6 +352,7 @@ public class Scheduler {
 
     /**
      * Checks that after rearranging the tasks on the specific processor, the children of those tasks are unaffected.
+     *
      * @return boolean representing whether the children are valid or not
      */
     private boolean areChildrenStillValid(int i, List<Task> processorTasks, int[] taskStartTimes, int[] originalTaskStartTimes, byte[] taskProcessorMap, int processor, int[] processorFinishTimes) {
@@ -382,6 +409,122 @@ public class Scheduler {
         return true;
     }
 
+    /**
+     * Tries to generate a fixed task order for a schedule
+     *
+     * @param schedule the schedule for which we are trying to fix the task order.
+     */
+    private void tryToFixTaskOrder(Schedule schedule) {
+        if (schedule.isTaskOrderFixed() || schedule.isPartiallyExpanded()) {
+            return;
+        }
+
+        Queue<Integer> taskIDs = schedule.getBeginnableTasks();
+        if (taskIDs.size() <= 1 || !satisfiesFixingOrderCondition(taskIDs, schedule)) {
+            return;
+        }
+
+        LinkedList<Integer> fixedTaskOrder = createFixedTaskOrderList(taskIDs, schedule);
+
+        if (isValidFixedTaskOrder(fixedTaskOrder)) {
+            schedule.fixTaskOrder(fixedTaskOrder);
+        }
+    }
+
+    /**
+     * Checks whether the provided list of free tasks can have their order fixed.
+     *
+     * @param taskIDs  the free tasks that we are checking
+     * @param schedule the schedule from which these tasks originate
+     * @return
+     */
+    private boolean satisfiesFixingOrderCondition(Queue<Integer> taskIDs, Schedule schedule) {
+        Task sharedChild = null;
+        int sharedParentProcessor = -1;
+        for (Integer i : taskIDs) {
+            Task t = tasks[i];
+            if (t.getIngoingEdges().size() > 1 || t.getOutgoingEdges().size() > 1) {
+                return false;
+            }
+            if (t.getOutgoingEdges().size() == 1) {
+                if (sharedChild == null) {
+                    sharedChild = t.getOutgoingEdges().get(0).getHead();
+                } else if (sharedChild != t.getOutgoingEdges().get(0).getHead()) {
+                    return false;
+                }
+            }
+            if (t.getIngoingEdges().size() == 1) {
+                int parentProcessor = schedule.getTaskProcessor(t.getIngoingEdges().get(0).getTail());
+                if (sharedParentProcessor == -1) {
+                    sharedParentProcessor = parentProcessor;
+                } else if (sharedParentProcessor != parentProcessor) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Generates a fixed task order list from the provided tasks.
+     *
+     * @param taskIDs  the free tasks that we are fixing
+     * @param schedule the schedule that we are fixing the task order for
+     * @return a list containing the fixed task order
+     */
+    private LinkedList<Integer> createFixedTaskOrderList(Queue<Integer> taskIDs, Schedule schedule) {
+        LinkedList<Integer> fixedTaskOrder = new LinkedList<>(taskIDs);
+        fixedTaskOrder.sort((a, b) -> {
+            int DRTa = 0;
+            if (tasks[a].getIngoingEdges().size() == 1) {
+                Edge ingoing = tasks[a].getIngoingEdges().get(0);
+                DRTa = schedule.getTaskFinishTime(ingoing.getTail()) + ingoing.getWeight();
+            }
+            int DRTb = 0;
+            if (tasks[b].getIngoingEdges().size() == 1) {
+                Edge ingoing = tasks[b].getIngoingEdges().get(0);
+                DRTb = schedule.getTaskFinishTime(ingoing.getTail()) + ingoing.getWeight();
+            }
+            if (DRTa == DRTb) {
+                int outCosta = 0;
+                if (tasks[a].getOutgoingEdges().size() == 1) {
+                    outCosta = tasks[a].getOutgoingEdges().get(0).getWeight();
+                }
+                int outCostb = 0;
+                if (tasks[b].getOutgoingEdges().size() == 1) {
+                    outCostb = tasks[b].getOutgoingEdges().get(0).getWeight();
+                }
+                return outCostb - outCosta;
+            }
+            return DRTa - DRTb;
+        });
+        return fixedTaskOrder;
+    }
+
+    /**
+     * Verifies that the fixed task order satisfies the condition where free tasks are in non-increasing out-edge cost order.
+     *
+     * @param fixedTaskOrder the task order that we are checking
+     * @return true if the ordering is valid otherwise return false
+     */
+    private boolean isValidFixedTaskOrder(LinkedList<Integer> fixedTaskOrder) {
+        Integer prev = 0;
+        if (tasks[fixedTaskOrder.peek()].getOutgoingEdges().size() == 1) {
+            prev = tasks[fixedTaskOrder.peek()].getOutgoingEdges().get(0).getWeight();
+        }
+        for (Integer i : fixedTaskOrder) {
+            int outEdgeCost = 0;
+            if (tasks[i].getOutgoingEdges().size() == 1) {
+                outEdgeCost = tasks[i].getOutgoingEdges().get(0).getWeight();
+            }
+            if (outEdgeCost > prev) {
+                return false;
+            }
+            prev = outEdgeCost;
+        }
+        return true;
+    }
+
     public Task[] getTasks() {
         return tasks;
     }
@@ -392,6 +535,7 @@ public class Scheduler {
 
     /**
      * Open state just means it's a state that is to be expanded
+     *
      * @return the number of states waiting to be expanded
      */
     public int getInfoOpenStates() {
@@ -400,6 +544,7 @@ public class Scheduler {
 
     /**
      * Closed state means it has been expanded and won't be looked at again
+     *
      * @return number of closed states
      */
     public int getInfoClosedStates() {

@@ -12,6 +12,8 @@ public class Schedule {
     private int idleTime = 0;
     private byte partialExpansionIndex = -1;
     private byte normalisationIndex = -1;
+    private boolean equivalentSchedulePruningEnabled = true;
+    private Queue<Integer> fixedTaskOrder = null;
 
     public Schedule(int numTasks, int numProcessors, byte[] taskRequirementsMap) {
         taskProcessorMap = new byte[numTasks];
@@ -25,7 +27,8 @@ public class Schedule {
     public Schedule(byte[] taskProcessorMap, int[] taskStartTimeMap,
                     byte[] taskRequirementsMap, int[] processorFinishTimes,
                     int estimatedFinishTime, byte tasksCompleted,
-                    int idleTime, byte normalisationIndex) {
+                    int idleTime, byte normalisationIndex,
+                    boolean equivalentSchedulePruningEnabled, Queue<Integer> fixedTaskOrder) {
         this.taskProcessorMap = taskProcessorMap;
         this.taskStartTimeMap = taskStartTimeMap;
         this.taskRequirementsMap = taskRequirementsMap;
@@ -34,6 +37,8 @@ public class Schedule {
         this.tasksCompleted = tasksCompleted;
         this.idleTime = idleTime;
         this.normalisationIndex = normalisationIndex;
+        this.equivalentSchedulePruningEnabled = equivalentSchedulePruningEnabled;
+        this.fixedTaskOrder = fixedTaskOrder;
     }
 
     public void addTask(Task n, int processor, int startTime) {
@@ -48,6 +53,9 @@ public class Schedule {
         //Checking whether there are any new tasks that we can begin
         for (Edge out : n.getOutgoingEdges()) {
             taskRequirementsMap[out.getHead().getUniqueID()]--;
+            if (taskRequirementsMap[out.getHead().getUniqueID()] == 0) {
+                fixedTaskOrder = null;
+            }
         }
 
         processorFinishTimes[processor] = startTime + n.getWeight();
@@ -120,12 +128,38 @@ public class Schedule {
         return normalisationIndex;
     }
 
+    public void fixTaskOrder(Queue<Integer> tasks) {
+        fixedTaskOrder = tasks;
+        equivalentSchedulePruningEnabled = false;
+    }
+
+    public boolean isTaskOrderFixed() {
+        return fixedTaskOrder != null;
+    }
+
+    public Queue<Integer> getFixedTaskOrder() {
+        return fixedTaskOrder;
+    }
+
+    public boolean isEquivalentSchedulePruningEnabled() {
+        return equivalentSchedulePruningEnabled;
+    }
+
+    public boolean isPartiallyExpanded() {
+        return partialExpansionIndex != -1;
+    }
+
     @Override
     public Schedule clone() {
+        Queue<Integer> fixedTaskOrderClone = null;
+        if (fixedTaskOrder != null) {
+            fixedTaskOrderClone = new LinkedList<>(fixedTaskOrder);
+        }
         return new Schedule(taskProcessorMap.clone(), taskStartTimeMap.clone(),
                 taskRequirementsMap.clone(), processorFinishTimes.clone(),
                 estimatedFinishTime, tasksCompleted,
-                idleTime, normalisationIndex);
+                idleTime, normalisationIndex,
+                equivalentSchedulePruningEnabled, fixedTaskOrderClone);
     }
 
     @Override
